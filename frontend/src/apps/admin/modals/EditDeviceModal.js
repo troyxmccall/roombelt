@@ -17,7 +17,22 @@ const FormFieldLabel = styled.label`
   color: #333;
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn }) => {
+const LocaleWrapper = styled.div`
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  
+  > :first-child {
+    flex: 1 1 0;
+  }
+  
+  > :last-child {
+    width: 130px;
+    margin-left: 20px;
+  }
+`;
+
+const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeClockType }) => {
   const select = useRef();
   useEffect(() => {
     if (isVisible) select.current.focus();
@@ -74,15 +89,23 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
       </FormField>
 
       <FormField>
-        <FormFieldLabel>Language</FormFieldLabel>
-        <Select
-          instanceId="edit-device-choose-language"
-          value={(device && device.language) || "en-US"}
-          options={Object.values(translations)}
-          getOptionLabel={lang => lang.language}
-          getOptionValue={lang => lang.key}
-          onChange={translation => onChangeLanguage && onChangeLanguage(translation && translation.key)}
-        />
+        <FormFieldLabel>Locale</FormFieldLabel>
+        <LocaleWrapper>
+          <Select
+            instanceId="edit-device-choose-language"
+            value={(device && device.language) || "en-US"}
+            options={Object.values(translations)}
+            getOptionLabel={lang => lang.language}
+            getOptionValue={lang => lang.key}
+            onChange={translation => onChangeLanguage && onChangeLanguage(translation && translation.key)}
+          />
+          <Select
+            instanceId="edit-device-choose-clock-type"
+            value={(device && device.clockType) || 12}
+            options={[{ label: "12h clock", value: 12 }, { label: "24h clock", value: 24 }]}
+            onChange={option => onChangeClockType && onChangeClockType(option && option.value)}
+          />
+        </LocaleWrapper>
       </FormField>
 
       {device && device.deviceType === "calendar" && <FormField>
@@ -114,6 +137,7 @@ const mapDispatchToProps = dispatch => ({
   onChangeType: deviceType => dispatch(editDeviceDialogActions.setDeviceType(deviceType)),
   onChangeCalendar: calendarId => dispatch(editDeviceDialogActions.setCalendarId(calendarId)),
   onChangeLanguage: language => dispatch(editDeviceDialogActions.setLanguage(language)),
+  onChangeClockType: clockType => dispatch(editDeviceDialogActions.setClockType(clockType)),
   onChangeMinutesForCheckIn: minutes => dispatch(editDeviceDialogActions.setMinutesForCheckIn(minutes))
 });
 

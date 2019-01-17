@@ -48,6 +48,8 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, calendarId: action.calendarId } };
     case editDeviceDialogActions.setLanguage:
       return { data: { ...state.data, language: action.language } };
+    case editDeviceDialogActions.setClockType:
+      return { data: { ...state.data, clockType: action.clockType } };
     case editDeviceDialogActions.setMinutesForCheckIn:
       return { data: { ...state.data, minutesForCheckIn: action.minutesForCheckIn } };
     default:
@@ -73,6 +75,7 @@ const defaultConnectDeviceWizardState = {
   deviceType: "calendar",
   calendarId: null,
   language: "en-US",
+  clockType: 12,
   minutesForCheckIn: 0,
   errorMessage: null,
   isSubmitting: false
@@ -102,6 +105,8 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...state, calendarId: action.calendarId };
     case connectDeviceWizardActions.thirdStep.setLanguage:
       return { ...state, language: action.language };
+    case connectDeviceWizardActions.thirdStep.setClockType:
+      return { ...state, clockType: action.clockType };
     case connectDeviceWizardActions.thirdStep.$startSubmitting:
       return { ...state, errorMessage: null, isSubmitting: true };
     default:

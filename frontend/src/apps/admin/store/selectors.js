@@ -3,7 +3,8 @@ export const newDeviceData = state => ({
   deviceId: state.connectDeviceWizard.deviceId,
   calendarId: state.connectDeviceWizard.calendarId,
   deviceType: state.connectDeviceWizard.deviceType,
-  language: state.connectDeviceWizard.language
+  language: state.connectDeviceWizard.language,
+  clockType: state.connectDeviceWizard.clockType
 });
 
 export const editDeviceData = state => ({
@@ -11,6 +12,7 @@ export const editDeviceData = state => ({
   deviceType: state.editedDevice.data.deviceType,
   calendarId: state.editedDevice.data.calendarId,
   language: state.editedDevice.data.language,
+  clockType: state.editedDevice.data.clockType,
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn
 });
 

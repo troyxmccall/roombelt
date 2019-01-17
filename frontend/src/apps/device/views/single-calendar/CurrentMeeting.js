@@ -4,10 +4,10 @@ import { connect } from "react-redux";
 import { Badge, Time } from "../../../../theme/index";
 import { MeetingHeader, MeetingTitle, MeetingSubtitle } from "./Components";
 import { currentMeetingSelector, nextMeetingSelector } from "../../store/selectors";
-import { requireCheckInSelector } from "apps/device/store/selectors";
+import { isAmPmClockSelector, requireCheckInSelector } from "apps/device/store/selectors";
 
 const CurrentMeeting = props => {
-  const { requireCheckIn } = props;
+  const { requireCheckIn, isAmPmClock } = props;
   const { attendees, organizer, isCheckedIn, startTimestamp, endTimestamp, summary } = props.currentMeeting;
 
   const guestsCount = attendees.filter(u => u.displayName !== organizer.displayName).length;
@@ -27,7 +27,8 @@ const CurrentMeeting = props => {
     <React.Fragment>
       <MeetingHeader>{getHeader()}</MeetingHeader>
       <MeetingTitle>
-        {summary || i18next.t("meeting.no-title")} <Time timestamp={startTimestamp}/> - <Time timestamp={endTimestamp}/>
+        {summary || i18next.t("meeting.no-title")}{" "}
+        <Time timestamp={startTimestamp} ampm={isAmPmClock}/> - <Time timestamp={endTimestamp} ampm={isAmPmClock}/>
       </MeetingTitle>
       <MeetingSubtitle>
         {organizer.displayName} {guestsCount > 0 && i18next.t("meeting.guests", { count: guestsCount })}
@@ -40,7 +41,8 @@ const mapStateToProps = state => ({
   currentTimestamp: state.timestamp,
   currentMeeting: currentMeetingSelector(state),
   nextMeeting: nextMeetingSelector(state),
-  requireCheckIn: requireCheckInSelector(state)
+  requireCheckIn: requireCheckInSelector(state),
+  isAmPmClock: isAmPmClockSelector(state)
 });
 
 export default connect(mapStateToProps)(CurrentMeeting);

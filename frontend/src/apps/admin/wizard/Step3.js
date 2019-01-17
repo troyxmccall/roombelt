@@ -1,4 +1,5 @@
 import React from "react";
+import styled from "styled-components/macro";
 import { Text, Select, Button, LoaderButton } from "theme";
 import WizardStepLayout from "./WizardStepLayout";
 import { PaidDisclaimer } from "apps/admin/Paid";
@@ -7,7 +8,22 @@ import { connectDeviceWizardActions } from "apps/admin/store/actions";
 import { connect } from "react-redux";
 import { useWizard } from "apps/admin/wizard/Wizard";
 
-const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage }) => {
+const LocaleWrapper = styled.div`
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  
+  > :first-child {
+    flex: 1 1 0;
+  }
+  
+  > :last-child {
+    width: 130px;
+    margin-left: 20px;
+  }
+`;
+
+const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType }) => {
   const { isCurrentStep, isTransitioning } = useWizard();
 
   const calendarSelector = (
@@ -36,18 +52,28 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
 
   const languageSelector = (
     <>
-      <Text large block style={{ marginTop: 15, marginBottom: 10 }}>Language</Text>
-      <Select
-        instanceId="edit-device-choose-language"
-        value={language}
-        options={Object.values(translations)}
-        getOptionLabel={lang => lang.language}
-        getOptionValue={lang => lang.key}
-        onChange={translation => onSetLanguage && onSetLanguage(translation && translation.key)}
-        menuPortalTarget={document.body}
-        autofocus={isDashboard && isCurrentStep && !isTransitioning}
-        tabIndex={isCurrentStep ? 0 : -1}
-      />
+      <Text large block style={{ marginTop: 15, marginBottom: 10 }}>Locale</Text>
+      <LocaleWrapper>
+        <Select
+          instanceId="edit-device-choose-language"
+          value={language}
+          options={Object.values(translations)}
+          getOptionLabel={lang => lang.language}
+          getOptionValue={lang => lang.key}
+          onChange={translation => onSetLanguage && onSetLanguage(translation && translation.key)}
+          menuPortalTarget={document.body}
+          autofocus={isDashboard && isCurrentStep && !isTransitioning}
+          tabIndex={isCurrentStep ? 0 : -1}
+        />
+        <Select
+          instanceId="edit-device-choose-clock"
+          value={clockType}
+          options={[{ label: "12h clock", value: 12 }, { label: "24h clock", value: 24 }]}
+          menuPortalTarget={document.body}
+          tabIndex={isCurrentStep ? 0 : -1}
+          onChange={option => onSetClockType && onSetClockType(option && option.value)}
+        />
+      </LocaleWrapper>
     </>
   );
 
@@ -74,14 +100,16 @@ const mapStateToProps = state => ({
   isDashboard: state.connectDeviceWizard.deviceType === "dashboard",
   isSubmitting: state.connectDeviceWizard.isSubmitting,
   calendarId: state.connectDeviceWizard.calendarId,
-  language: state.connectDeviceWizard.language
+  language: state.connectDeviceWizard.language,
+  clockType: state.connectDeviceWizard.clockType
 });
 
 const mapDispatchToProps = dispatch => ({
   onBack: () => dispatch(connectDeviceWizardActions.thirdStep.previousStep()),
   onSubmit: () => dispatch(connectDeviceWizardActions.thirdStep.submit()),
   onSetCalendar: calendarId => dispatch(connectDeviceWizardActions.thirdStep.setCalendarId(calendarId)),
-  onSetLanguage: language => dispatch(connectDeviceWizardActions.thirdStep.setLanguage(language))
+  onSetLanguage: language => dispatch(connectDeviceWizardActions.thirdStep.setLanguage(language)),
+  onSetClockType: clockType => dispatch(connectDeviceWizardActions.thirdStep.setClockType(clockType))
 });
 
 export default {

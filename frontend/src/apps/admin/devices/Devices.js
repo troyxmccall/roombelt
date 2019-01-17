@@ -44,8 +44,11 @@ const SingleDeviceRow = props => (
       </Text>
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text>
+      <Text block>
         {translations[props.device.language].language}
+      </Text>
+      <Text muted small>
+        {props.device.clockType}h clock
       </Text>
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
@@ -103,7 +106,7 @@ const Devices = props => {
         <TableHeader>
           <TableRow>
             <TableHeaderColumn>Calendar</TableHeaderColumn>
-            <TableHeaderColumn>Language</TableHeaderColumn>
+            <TableHeaderColumn>Locale</TableHeaderColumn>
             <TableHeaderColumn>Require check-in</TableHeaderColumn>
             <TableHeaderColumn>Status</TableHeaderColumn>
             <TableHeaderColumn style={{ width: 50 }}/>

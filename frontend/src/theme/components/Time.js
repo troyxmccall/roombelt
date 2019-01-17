@@ -19,7 +19,7 @@ const Time = props => {
 
   const hour24h = new Date(props.timestamp).getHours();
   const hour12h = hour24h % 12 || 12;
-  const suffix12h = hour24h >= 12 && hour24h < 24 ? "p.m." : "a.m.";
+  const suffix12h = hour24h >= 12 && hour24h < 24 ? "pm" : "am";
 
   const hour = pad(props.ampm ? hour12h : hour24h);
   const minutes = pad(new Date(props.timestamp).getMinutes());

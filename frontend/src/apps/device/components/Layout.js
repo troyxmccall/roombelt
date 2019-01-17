@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { Time, PageLoaded } from "../../../theme";
 import FullScreenToggle from "../components/FullScreenToggle";
 import { Button } from "theme";
+import { isAmPmClockSelector } from "apps/device/store/selectors";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -109,12 +110,12 @@ export const SidebarButton = styled(Button)`
   line-height: 1.5em;
 `;
 
-const CalendarView = ({ currentTimestamp, style, title, children, sidebar, footer }) => (
+const CalendarView = ({ currentTimestamp, style, title, children, sidebar, isAmPmClock, footer }) => (
   <Wrapper style={style}>
     <PageLoaded/>
     <Header>
       <PageTitle>{title}</PageTitle>
-      <CurrentTime><Time timestamp={currentTimestamp} blinking/></CurrentTime>
+      <CurrentTime><Time timestamp={currentTimestamp} ampm={isAmPmClock} blinking/></CurrentTime>
     </Header>
     <ContentWrapper>
       <MainContent>{children}</MainContent>
@@ -126,7 +127,8 @@ const CalendarView = ({ currentTimestamp, style, title, children, sidebar, foote
 );
 
 const mapStateToProps = state => ({
-  currentTimestamp: state.timestamp
+  currentTimestamp: state.timestamp,
+  isAmPmClock: isAmPmClockSelector(state)
 });
 
 export default connect(mapStateToProps)(CalendarView);

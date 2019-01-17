@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { connect } from "react-redux";
 import {
   calendarNameSelector, currentActionSourceSelector,
-  currentMeetingSelector, isActionErrorSelector, isActionSuccessSelector, isRetryingActionSelector,
+  currentMeetingSelector, isActionErrorSelector, isActionSuccessSelector, isAmPmClockSelector, isRetryingActionSelector,
   nextMeetingSelector, timestampSelector
 } from "apps/device/store/selectors";
 import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
@@ -39,7 +39,7 @@ const getAvailability = (timeToStart, minutesAvailable) => {
 };
 
 
-const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated }) => {
+const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated, isAmPmClock }) => {
   const startTimestamp = currentMeeting ? currentMeeting.endTimestamp : timestamp;
   const endTimestamp = nextMeeting ? nextMeeting.startTimestamp : Number.POSITIVE_INFINITY;
 
@@ -76,8 +76,9 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
       {header}
       {showMeetingDetails && <Text style={{ fontSize: "0.8em" }}>
         {currentMeeting.summary}{" "}
-        <Time timestamp={currentMeeting.startTimestamp}/> -{" "}
-        <Time timestamp={currentMeeting.endTimestamp}/>
+        <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
+        {" - "}
+        <Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>
       </Text>}
       {showSuccessInfo && <>
         <Text style={{ marginRight: "1em", fontSize: "0.8em" }}>{i18next.t("meeting-created")}</Text>
@@ -106,7 +107,8 @@ const mapStateToProps = (state, { calendarId }) => ({
   isRetryingAction: isRetryingActionSelector(state),
   isCurrentActionError: isActionErrorSelector(state),
   isCurrentActionSuccess: isActionSuccessSelector(state),
-  currentActionSource: currentActionSourceSelector(state)
+  currentActionSource: currentActionSourceSelector(state),
+  isAmPmClock: isAmPmClockSelector(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({

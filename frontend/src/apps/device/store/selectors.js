@@ -26,6 +26,7 @@ export const calendarSelector = (state, props) => {
 export const isDeviceConnectedSelector = createSelector(deviceSelector, device => device && !device.connectionCode);
 export const isDashboardDeviceSelector = createSelector(deviceSelector, device => device && device.deviceType === "dashboard");
 export const isCalendarSelectedSelector = createSelector(deviceSelector, device => device && !!device.calendar);
+export const isAmPmClockSelector = createSelector(deviceSelector, device => device ? device.clockType === 12 : true);
 
 export const allCalendarsSelector = createSelector(deviceSelector, device => (device && device.allCalendars) || []);
 export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && !!device.allCalendars);

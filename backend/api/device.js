@@ -50,6 +50,7 @@ router.get("/device", async function(req, res) {
   res.json({
     deviceType: req.context.device.deviceType,
     language: process.env["REFRESH_LANG"] || req.context.device.language,
+    clockType: req.context.device.clockType,
     connectionCode: req.context.device.connectionCode,
     minutesForCheckIn: req.context.device.minutesForCheckIn,
     calendar,

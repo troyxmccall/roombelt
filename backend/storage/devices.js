@@ -7,6 +7,7 @@ module.exports = class {
       connectionCode: { type: Sequelize.STRING, defaultValue: () => Math.floor(Math.random() * 100000).toString() },
       userId: Sequelize.STRING,
       language: { type: Sequelize.STRING, defaultValue: "en-US" },
+      clockType: { type: Sequelize.INTEGER, defaultValue: 24 },
       deviceType: { type: Sequelize.STRING, defaultValue: "calendar" },
       calendarId: Sequelize.STRING,
       createdAt: Sequelize.DATE,
@@ -55,6 +56,10 @@ module.exports = class {
 
   async setLanguageForDevice(deviceId, language) {
     await this.Model.update({ language }, { where: { deviceId } });
+  }
+
+  async setClockTypeForDevice(deviceId, clockType) {
+    await this.Model.update({ clockType }, { where: { deviceId } });
   }
 
   async setMinutesForCheckIn(deviceId, minutesForCheckIn) {
