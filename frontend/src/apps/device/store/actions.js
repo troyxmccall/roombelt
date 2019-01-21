@@ -97,7 +97,7 @@ export const deviceActions = {
       return;
     }
 
-    // Don't automatically remove very long meetings (e.g. whole day events)
+    // Don't automatically remove very long meetings (e.g. all day events)
     const meetingDurationInMinutes = (meeting.endTimestamp - meeting.startTimestamp) / 1000 / 60;
     if (meetingDurationInMinutes >= 240) {
       return;

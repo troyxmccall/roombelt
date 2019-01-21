@@ -7,6 +7,8 @@ import { useIsVisible } from "utils/react";
 const t = (key, time) => i18next.t(key, { time: prettyFormatMinutes(time) });
 
 const getStatusMessage = (meeting, timestamp) => {
+  if (meeting.isAllDayEvent) return t("dashboard.all-day-meeting");
+
   const minutesToStart = timeDifferenceInMinutes(meeting.startTimestamp, timestamp);
   const minutesToEnd = timeDifferenceInMinutes(meeting.endTimestamp, timestamp);
 

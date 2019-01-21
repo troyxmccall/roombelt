@@ -26,7 +26,11 @@ const Row = styled(Card)`
   }
 `;
 
-const getAvailability = (timeToStart, minutesAvailable) => {
+const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
+  if(isAllDayMeeting) {
+    return <Badge danger>{i18next.t("availability.occupied-all-day")}</Badge>;
+  }
+
   if (timeToStart >= 15 || minutesAvailable < 5) {
     return <Badge danger>{i18next.t("availability.occupied")}</Badge>;
   }
@@ -58,7 +62,7 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
   const header = (
     <Header>
       {calendarName}
-      {getAvailability(timeToStart, minutesAvailable)}
+      {getAvailability(currentMeeting && currentMeeting.isAllDayEvent, timeToStart, minutesAvailable)}
     </Header>
   );
 
@@ -76,9 +80,11 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
       {header}
       {showMeetingDetails && <Text style={{ fontSize: "0.8em" }}>
         {currentMeeting.summary}{" "}
-        <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
-        {" - "}
-        <Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>
+        {currentMeeting && !currentMeeting.isAllDayEvent && <>
+          <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
+          {" - "}
+          <Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>
+        </>}
       </Text>}
       {showSuccessInfo && <>
         <Text style={{ marginRight: "1em", fontSize: "0.8em" }}>{i18next.t("meeting-created")}</Text>

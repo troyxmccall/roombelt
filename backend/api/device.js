@@ -1,4 +1,7 @@
 const router = require("express-promise-router")();
+const Moment = require("moment");
+
+const getTimestamp = time => time.isTimeZoneFixedToUTC && Moment.utc(time).valueOf();
 
 router.use("/device", async function(req, res) {
   if (req.context.session.scope !== "device") {
@@ -17,7 +20,7 @@ router.use("/device", async function(req, res) {
 async function getCalendarInfo(calendarId, calendarProvider) {
   const calendar = calendarId && await calendarProvider.getCalendar(calendarId);
   const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId);
-  const events = calendarId && calendarEvents.filter(event => event.endTimestamp > Date.now()).slice(0, 5);
+  const events = calendarId && calendarEvents.filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now()).slice(0, 10);
 
   return calendar && {
     id: calendarId,
@@ -76,14 +79,14 @@ router.post("/device/meeting", async function(req, res) {
 
   const calendar = await req.context.calendarProvider.getCalendar(calendarId);
   const events = await req.context.calendarProvider.getEvents(calendarId);
-  const nextEvent = events.find(event => event.startTimestamp > Date.now());
+  const nextEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) > Date.now());
 
   const desiredStartTime = Date.now() + (req.body.timeInMinutes || 15) * 60 * 1000;
-  const nextEventStartTime = nextEvent ? nextEvent.startTimestamp : Number.POSITIVE_INFINITY;
+  const nextEventStartTime = nextEvent ? getTimestamp(nextEvent.start) : Number.POSITIVE_INFINITY;
 
   await req.context.calendarProvider.createEvent(calendarId, {
-    startTimestamp: Date.now(),
-    endTimestamp: Math.min(desiredStartTime, nextEventStartTime),
+    startDateTime: Date.now(),
+    endDateTime: Math.min(desiredStartTime, nextEventStartTime),
     isCheckedIn: true,
     summary: req.body.summary || `Meeting in ${calendar.summary}`
   });
@@ -105,8 +108,8 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
   const extensionTime = getExtensionTime();
 
   await req.context.calendarProvider.patchEvent(req.context.device.calendarId, req.params.meetingId, {
-    startTimestamp: startNowTime,
-    endTimestamp: endNowTime || extensionTime,
+    startDateTime: startNowTime,
+    endDateTime: endNowTime || extensionTime,
     isCheckedIn
   });
 
@@ -115,17 +118,14 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
   function getExtensionTime() {
     if (!req.body.extensionTime) return;
 
-    const indexOfEvent = events.indexOf(event);
+    const nextEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) > Date.now());
 
-    const currentEventEndTimestamp = events[indexOfEvent].endTimestamp;
-    const nextEventStartTimestamp = events[indexOfEvent + 1] && events[indexOfEvent + 1].startTimestamp;
+    const currentEventEndTimestamp = getTimestamp(event.end);
+    const nextEventStartTimestamp = nextEvent ? getTimestamp(nextEvent.start) : Number.POSITIVE_INFINITY;
 
-    const endTime = Math.min(
-      currentEventEndTimestamp + req.body.extensionTime * 60 * 1000,
-      nextEventStartTimestamp || Number.POSITIVE_INFINITY
-    );
+    const endTime = Math.min(currentEventEndTimestamp + req.body.extensionTime * 60 * 1000, nextEventStartTimestamp);
 
-    return Math.max(event.endTimestamp, endTime);
+    return Math.max(currentEventEndTimestamp, endTime);
   }
 });
 

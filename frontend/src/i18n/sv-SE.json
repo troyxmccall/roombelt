@@ -5,8 +5,9 @@
     "available": "Ledig",
     "available-for": "Ledig i {{ time }}",
     "available-in": "Ledig om {{ time }}",
-    "whole-day": "Ledig hel dag",
+    "available-all-day": "Ledig hel dag",
     "occupied": "Upptagen",
+    "occupied-all-day": "Upptagen hel dag",
     "starts": {
       "now": "Börjar nu",
       "ago": "Startade för 1 minut sedan",
@@ -52,7 +53,8 @@
     "starts-in": "Startar om {{ time }}",
     "starts-now": "Börjar nu",
     "started-ago": "Startade för {{ time }} sedan",
-    "ends-in": "Slutar om {{ time }}"
+    "ends-in": "Slutar om {{ time }}",
+    "all-day-meeting": "Hela dagen möte"
   },
   "meeting-created": "Möte skapades. Gå till rummet nu."
 }

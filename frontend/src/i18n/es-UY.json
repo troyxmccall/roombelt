@@ -5,8 +5,9 @@
     "available": "Disponible",
     "available-for": "Disponible para {{ time }}",
     "available-in": "Disponible en {{ time }}",
-    "whole-day": "Disponible todo el día",
+    "available-all-day": "Disponible todo el día",
     "occupied": "Ocupada",
+    "occupied-all-day": "Ocupada todo el día",
     "starts": {
       "now": "Comienza ahora",
       "ago": "Comenzó hace 1 minuto",
@@ -52,7 +53,8 @@
     "starts-in": "Comienza en {{ time }}",
     "starts-now": "Comienza ahora",
     "started-ago": "Comenzó hace {{ time }}",
-    "ends-in": "Termina en {{ time }}"
+    "ends-in": "Termina en {{ time }}",
+    "all-day-meeting": "Reunion todo el dia"
   },
   "meeting-created": "Reunión creada. Ve a la habitación ahora."
 }

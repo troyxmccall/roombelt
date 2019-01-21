@@ -1,14 +1,25 @@
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const Cache = require("./cache");
+const Moment = require("moment");
 
-const getTimestamp = time => time && time && new Date(time.dateTime || time.date).getTime();
+const getTime = time => {
+  if (!time) {
+    return null;
+  }
+
+  const [year, month, day, hour, minute, second] = Moment.utc(time.dateTime || time.date).toArray();
+
+  return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !!time.dateTime};
+};
+
 const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties }) => ({
   id,
   summary,
   organizer,
-  startTimestamp: getTimestamp(start),
-  endTimestamp: getTimestamp(end),
+  isAllDayEvent: !!(start && start.date) || !!(end && end.date),
+  start: getTime(start),
+  end: getTime(end),
   attendees: attendees || [],
   isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true"
 });
@@ -122,29 +133,30 @@ module.exports = class {
       calendarId: encodeURIComponent(calendarId),
       timeMin: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
       timeMax: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      singleEvents: true
+      singleEvents: true,
+      orderBy: "startTime"
     };
 
     const { data } = await new Promise((res, rej) =>
       this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    const result = data.items.map(mapEvent).sort((a, b) => a.startTimestamp - b.startTimestamp);
+    const result = data.items.map(mapEvent);
 
     cache.set(cacheKey, result);
 
     return result;
   }
 
-  async createEvent(calendarId, { startTimestamp, endTimestamp, isCheckedIn, summary }) {
+  async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
     cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const query = {
       calendarId: encodeURIComponent(calendarId),
       resource: {
         summary,
-        start: { dateTime: new Date(startTimestamp).toISOString() },
-        end: { dateTime: new Date(endTimestamp).toISOString() },
+        start: { dateTime: new Date(startDateTime).toISOString() },
+        end: { dateTime: new Date(endDateTime).toISOString() },
         extendedProperties: { private: { roombeltIsCheckedIn: isCheckedIn ? "true" : "false" } }
       }
     };
@@ -154,12 +166,12 @@ module.exports = class {
     );
   }
 
-  async patchEvent(calendarId, eventId, { startTimestamp, endTimestamp, isCheckedIn }) {
+  async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
     cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const resource = {};
-    if (startTimestamp) resource.start = { dateTime: new Date(startTimestamp).toISOString() };
-    if (endTimestamp) resource.end = { dateTime: new Date(endTimestamp).toISOString() };
+    if (startDateTime) resource.start = { dateTime: new Date(startDateTime).toISOString() };
+    if (endDateTime) resource.end = { dateTime: new Date(endDateTime).toISOString() };
     if (isCheckedIn) resource.extendedProperties = { private: { roombeltIsCheckedIn: "true" } };
 
     const query = {

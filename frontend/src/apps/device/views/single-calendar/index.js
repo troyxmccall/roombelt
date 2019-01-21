@@ -25,8 +25,7 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
           sidebar={<SidebarButton onClick={showAllCalendarsView} info>{i18next.t("actions.find-room")}</SidebarButton>}>
     <Content>
       {currentMeeting ? <CurrentMeeting/> : <RoomAvailable/>}
-      <ActionsBarWrapper><ActionsBar/></ActionsBarWrapper>
-
+      {(!currentMeeting || !currentMeeting.isAllDayEvent) && <ActionsBarWrapper><ActionsBar/></ActionsBarWrapper>}
     </Content>
   </Layout>
 );

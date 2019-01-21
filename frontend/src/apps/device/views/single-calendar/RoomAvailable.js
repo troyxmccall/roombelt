@@ -14,7 +14,7 @@ const RoomAvailable = props => (
       <MeetingSubtitle>
         {(props.nextMeeting && props.nextMeeting.startTimestamp)
           ? i18next.t("availability.available-for", { time: prettyFormatMinutes(props.minutesToNextMeeting) })
-          : i18next.t("availability.whole-day")}
+          : i18next.t("availability.available-all-day")}
       </MeetingSubtitle>
     </React.Fragment>
 );

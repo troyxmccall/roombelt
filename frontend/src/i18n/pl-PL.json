@@ -5,8 +5,9 @@
     "available": "Wolne",
     "available-for": "Wolne przez {{ time }}",
     "available-in": "Wolne za {{ time }}",
-    "whole-day": "Wolne przez cały dzień",
+    "available-all-day": "Wolne cały dzień",
     "occupied": "Zajęte",
+    "occupied-all-day": "Zajęte cały dzień",
     "starts": {
       "now": "Zaczyna się teraz",
       "ago_0": "Zaczęło się minutę temu",
@@ -55,7 +56,8 @@
     "starts-in": "Zaczyna się za {{ time }}",
     "starts-now": "Zaczyna się teraz",
     "started-ago": "Zaczęło się {{ time }} temu",
-    "ends-in": "Kończy się za {{ time }}"
+    "ends-in": "Kończy się za {{ time }}",
+    "all-day-meeting": "Spotkanie całodniowe"
   },
   "meeting-created": "Utworzono spotkanie. Udaj się teraz do tej sali."
 }

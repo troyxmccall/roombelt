@@ -3,9 +3,30 @@ import {
 } from "apps/device/store/actions";
 
 import { combineReducers } from "redux";
+import Moment from "moment";
 
 const timestamp = (state = 0, action) => (action.type === deviceActions.$updateClock ? action.timestamp : state);
-const device = (state = null, action) => (action.type === deviceActions.$updateDeviceData ? action.device : state);
+
+const device = (state = null, action) => {
+  if (action.type !== deviceActions.$updateDeviceData) return state;
+
+  const getTimestamp = time => time.isTimeZoneFixedToUTC ? Moment.utc(time).valueOf() : Moment(time).valueOf();
+
+  const setEventsTimestamps = calendar => ({
+    ...calendar,
+    events: calendar.events.map(event => ({
+      ...event,
+      startTimestamp: getTimestamp(event.start),
+      endTimestamp: getTimestamp(event.end)
+    }))
+  });
+
+  return {
+    ...action.device,
+    calendar: action.device.calendar && setEventsTimestamps(action.device.calendar),
+    allCalendars: action.device.allCalendars && action.device.allCalendars.map(setEventsTimestamps)
+  };
+};
 
 const defaultCurrentMeetingActionsState = {
   source: null,

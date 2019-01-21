@@ -71,10 +71,12 @@ export const dashBoardMeetingsSelector = createSelector(
   (currentTimestamp, allCalendars) => {
     const eventsByCalendars = allCalendars.map(calendar => calendar.events.map(event => ({ ...event, calendar })));
     const allEvents = [].concat(...eventsByCalendars);
+    const endOfTheDay = new Date();
+    endOfTheDay.setHours(23, 59, 59, 999);
 
     return allEvents
       .filter(event => event.startTimestamp > currentTimestamp || event.endTimestamp > currentTimestamp)
-      .filter(event => new Date(event.startTimestamp).toDateString() === new Date(currentTimestamp).toDateString())
+      .filter(event => new Date(event.startTimestamp) < endOfTheDay)
       .sort((eventA, eventB) => eventA.startTimestamp - eventB.startTimestamp);
   }
 );

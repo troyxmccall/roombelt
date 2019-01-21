@@ -5,7 +5,7 @@ import styled from "styled-components/macro";
 
 import { Time } from "theme/index";
 import { MeetingTitle, MeetingSubtitle } from "./Components";
-import { nextMeetingSelector, timestampSelector } from "../../store/selectors";
+import { nextMeetingSelector } from "../../store/selectors";
 import { isAmPmClockSelector } from "apps/device/store/selectors";
 
 const Wrapper = styled.div`
@@ -19,9 +19,11 @@ const NextMeeting = ({ nextMeeting, isAmPmClock }) =>
     </MeetingTitle>
     <MeetingSubtitle>
       {nextMeeting.summary + " "}
-      <Time timestamp={nextMeeting.startTimestamp} ampm={isAmPmClock}/>
-      {" - "}
-      <Time timestamp={nextMeeting.endTimestamp} ampm={isAmPmClock}/>
+      {!nextMeeting.isAllDayEvent && <>
+        <Time timestamp={nextMeeting.startTimestamp} ampm={isAmPmClock}/>
+        {" - "}
+        <Time timestamp={nextMeeting.endTimestamp} ampm={isAmPmClock}/>
+      </>}
     </MeetingSubtitle>
   </Wrapper>;
 
