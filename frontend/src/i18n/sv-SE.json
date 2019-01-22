@@ -18,8 +18,8 @@
   },
   "meeting": {
     "no-title": "(ingen titel)",
-    "guests_0": "och 1 gäst",
-    "guests_1": "och {{ count }} gäster",
+    "guests": "och 1 gäst",
+    "guests_plural": "och {{ count }} gäster",
     "next": "Nästa möte idag",
     "quick-meeting-title": "Möte i {{ roomName }}"
   },

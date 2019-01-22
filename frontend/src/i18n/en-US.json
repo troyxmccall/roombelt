@@ -18,8 +18,8 @@
   },
   "meeting": {
     "no-title": "(No title)",
-    "guests_0": "and 1 guest",
-    "guests_1": "and {{ count }} guests",
+    "guests": "and 1 guest",
+    "guests_plural": "and {{ count }} guests",
     "next": "Next meeting today",
     "quick-meeting-title": "Meeting in {{ roomName }}"
   },
