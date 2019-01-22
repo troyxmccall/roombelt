@@ -21,14 +21,15 @@ This is plan for manual tests run before every release.
 1. Ensure that device browser shows calendar view.
 
 ### Edit device
-1. In admin panel click connected device to edit it. Pick another calendar and click "OK". After 30s ensure that the calendar has changed on the device browser window.
-2. In admin panel click connected device to edit it. Pick polish language and click "OK". After 30s ensure that the language has changed on the device browser window.
+1. In admin panel click connected device to edit it. Pick another calendar and click "OK". After 30s ensure that the calendar has changed in the device browser window.
+2. In admin panel click connected device to edit it. Pick polish language and click "OK". After 30s ensure that the language has changed in the device browser window.
+3. In admin panel click connected device to edit it. Change clock type and click "OK". After 30s ensure that the clock type has changed in the device browser window.
 
 ## Device
 
 1. Ensure that displayed time is valid.
 ### Create & extend
-1. Click "15 min" to start a meeting. Ensure that start and end time is valid.
+1. Click "15 min" to start a meeting. Ensure that start and end time are valid.
 2. Click "End now" and "Cancel". You should see the "Extend" screen.
 3. Click "+15 min". Validate that the meeting end time is valid.
 4. Click "+1h". Validate that the meeting end time is valid.
