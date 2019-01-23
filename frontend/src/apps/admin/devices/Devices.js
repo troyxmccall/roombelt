@@ -4,7 +4,6 @@ import styled from "styled-components/macro";
 import moment from "moment";
 
 import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
-import { PaidMarker } from "apps/admin/Paid";
 import { translations } from "../../../i18n";
 
 import {
@@ -35,7 +34,7 @@ const SingleDeviceRow = props => (
   <CalendarRowWrapper>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
-        {props.device.deviceType === "dashboard" && <><em>Dashboard</em> <PaidMarker/></>}
+        {props.device.deviceType === "dashboard" && <em>Dashboard</em>}
         {props.device.deviceType === "calendar" && (props.calendar ? props.calendar.summary :
           <em>No calendar connected</em>)}
       </Text>

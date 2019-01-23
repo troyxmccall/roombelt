@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components/macro";
 import { Text, Select, Button, LoaderButton } from "theme";
 import WizardStepLayout from "./WizardStepLayout";
-import { PaidDisclaimer } from "apps/admin/Paid";
 import { translations } from "i18n";
 import { connectDeviceWizardActions } from "apps/admin/store/actions";
 import { connect } from "react-redux";
@@ -86,13 +85,10 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
 };
 
 const Buttons = ({ onSubmit, onBack, isSubmitting }) => (
-  <>
-    <div>
-      <Button disabled={isSubmitting} onClick={onBack}>Back</Button>
-      <LoaderButton primary onClick={onSubmit} isLoading={isSubmitting}>Voila</LoaderButton>
-    </div>
-    <PaidDisclaimer/>
-  </>
+  <div>
+    <Button disabled={isSubmitting} onClick={onBack}>Back</Button>
+    <LoaderButton primary onClick={onSubmit} isLoading={isSubmitting}>Voila</LoaderButton>
+  </div>
 );
 
 const mapStateToProps = state => ({
