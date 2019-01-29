@@ -1,0 +1,60 @@
+{
+  "key": "de-DE",
+  "language": "Deutsch",
+  "availability": {
+    "available": "Verfügbar",
+    "available-for": "Verfügbar für {{ time }}",
+    "available-in": "Verfügbar in {{ time }}",
+    "available-all-day": "Ganztags verfügbar",
+    "occupied": "Belegt",
+    "occupied-all-day": "Ganztags belegt",
+    "starts": {
+      "now": "Beginnt jetzt",
+      "ago": "Begann vor einer Minute",
+      "ago_plural": "Begann vor {{ count }} Minuten",
+      "in": "Beginnt in einer Minute",
+      "in_plural": "Beginnt in {{ count }} Minuten"
+    }
+  },
+  "meeting": {
+    "no-title": "(Kein Titel)",
+    "guests": "und ein Gast",
+    "guests_plural": "und {{ count }} Gäste",
+    "next": "Nächstes Meeting",
+    "quick-meeting-title": "Meeting in {{ roomName }}"
+  },
+  "actions": {
+    "end-now": "Jetzt beenden",
+    "confirm": "Bestätigen",
+    "extend": "Verlängern",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "retry": "Wiederholen",
+    "check-in": "Einchecken",
+    "start-early": "Jetzt starten",
+    "cancel-meeting": "Meeting absagen",
+    "find-room": "Raum finden"
+  },
+  "full-screen": "Vollbild",
+  "errors": {
+    "unable-to-connect-server": "Keine Verbindung zum Server möglich",
+    "check-internet-and-try-again": "Internet-Verbindung prüfen und nochmals probieren",
+    "action-error-title": "Ein Fehler ist aufgetreten",
+    "action-error-subtitle": "Besteht das Problem weiterhin, wenden Sie sich bitte an ihren IT-Administrator",
+    "refresh-page": "Seite neu laden",
+    "device-disconnected-title": "Verbindung getrennt",
+    "device-disconnected-message": "Dieses Gerät wurde in der Administrations-Konsole getrennt. Wollen Sie erneut eine Verbindung herstellen?"
+  },
+  "dashboard": {
+    "page-title": "Meetingräume",
+    "calendar": "Raum",
+    "meeting": "Meeting",
+    "status": "Status",
+    "starts-in": "Beginnt in {{ time }}",
+    "starts-now": "Beginnt jetzt",
+    "started-ago": "Begann vor {{ time }}",
+    "ends-in": "Endet in {{ time }}",
+    "all-day-meeting": "Ganztägiges Meeting"
+  },
+  "meeting-created": "Meeting erstellt. Begeben Sie sich zum Raum."
+}
