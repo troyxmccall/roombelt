@@ -1,6 +1,6 @@
 ## Roombelt
 
-[Roombelt](https://roombelt.com) is a free and open source meeting room manager
+[Roombelt](https://roombelt.com) is a free meeting room manager
 focused on simplicity. Works both in Cloud and On-Premises.
 
 ![Tablet with roombelt installed](https://roombelt.com/img/tablet.png)
@@ -17,8 +17,7 @@ Feel free to request new feature on [Github](https://github.com/ziolko/roombelt/
 or contact me using the chat widget on [roombelt.com](https://roombelt.com).
 
 ## License
-
-Roombelt uses the [AGPL license](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)). 
+[Apache 2.0 with Commons Clause](https://raw.githubusercontent.com/roombelt/roombelt/master/LICENSE.txt). 
 
 ---
 
