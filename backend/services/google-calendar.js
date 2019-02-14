@@ -10,7 +10,7 @@ const getTime = time => {
 
   const [year, month, day, hour, minute, second] = Moment.utc(time.dateTime || time.date).toArray();
 
-  return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !!time.dateTime};
+  return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !!time.dateTime };
 };
 
 const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties }) => ({
@@ -36,14 +36,14 @@ module.exports = class {
     });
 
     this.calendarClient = google.calendar({ version: "v3", auth: this.oauthClient });
-    this.plusClient = google.plus({ version: "v1", auth: this.oauthClient });
+    this.peopleClient = google.people({ version: "v1", auth: this.oauthClient });
 
     this.cacheKey = credentials && credentials.refreshToken;
     this.clientId = keys.clientId;
   }
 
   getAuthUrl(forceConsent) {
-    const scopes = ["https://www.googleapis.com/auth/calendar", "profile"];
+    const scopes = ["https://www.googleapis.com/auth/calendar", "profile", "email"];
 
     return this.oauthClient.generateAuthUrl({
       access_type: "offline",
@@ -78,10 +78,16 @@ module.exports = class {
 
   async getUserDetails() {
     const { data } = await new Promise((res, rej) =>
-      this.plusClient.people.get({ userId: "me" }, (err, data) => (err ? rej(err) : res(data)))
+      this.peopleClient.people.get({
+        resourceName: "people/me",
+        personFields: "names,photos"
+      }, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    return data;
+    return {
+      displayName: (data.names && data.names[0] && data.names[0].displayName) || "Unknown",
+      photoUrl: data.photos && data.photos[0] && data.photos[0].url || ""
+    };
   }
 
   async getCalendars() {

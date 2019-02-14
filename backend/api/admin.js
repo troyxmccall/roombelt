@@ -20,7 +20,7 @@ const calendarRepresentation = ({ id, location, summary, description, accessRole
   canModifyEvents: accessRole === "writer" || accessRole === "owner"
 });
 
-const userRepresentation = ({ displayName, image }) => ({ displayName, avatarUrl: image.url });
+const userRepresentation = ({ displayName, photoUrl }) => ({ displayName, avatarUrl: photoUrl });
 
 router.use("/admin", async function(req, res) {
   if (req.context.session.scope !== "admin") {

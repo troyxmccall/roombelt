@@ -6,7 +6,7 @@ const config = require("./config");
 
 const storage = new Storage(
   new Sequelize(config.databaseUrl, {
-    logging: process.env.NODE_ENV !== "production",
+    logging: process.env.NODE_ENV !== "production" && console.log,
     operatorsAliases: false
   })
 );

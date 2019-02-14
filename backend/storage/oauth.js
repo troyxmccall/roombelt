@@ -15,6 +15,6 @@ module.exports = class {
   }
 
   async getTokens(userId) {
-    return await this.Model.findById(userId);
+    return await this.Model.findByPk(userId);
   }
 };

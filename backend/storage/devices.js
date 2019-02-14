@@ -27,7 +27,7 @@ module.exports = class {
   }
 
   async getDeviceById(deviceId) {
-    return await this.Model.findById(deviceId);
+    return await this.Model.findByPk(deviceId);
   }
 
   async getDeviceByConnectionCode(connectionCode) {
