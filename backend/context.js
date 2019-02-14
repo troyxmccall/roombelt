@@ -19,8 +19,12 @@ router.use(async (req, res) => {
 
   req.context = { storage, calendarProvider, session };
 
-  const year = 1000 * 60 * 60 * 24 * 365;
-  res.cookie("sessionToken", session.token, { httpOnly: true, maxAge: year });
+  const day = 1000 * 60 * 60 * 24;
+  const year = day * 365;
+
+  const sessionTimeout = session.scope === "admin" ? day : year;
+
+  res.cookie("sessionToken", session.token, { httpOnly: true, maxAge: sessionTimeout });
 
   return "next";
 });
