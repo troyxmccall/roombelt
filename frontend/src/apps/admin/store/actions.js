@@ -10,6 +10,7 @@ import {
 } from "services/api";
 
 import { newDeviceData, editDeviceData, removedDeviceId } from "./selectors";
+import { userEmailSelector } from "apps/admin/store/selectors";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
@@ -102,5 +103,27 @@ export const removeDeviceDialogActions = {
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(removeDeviceDialogActions.hide());
+  }
+};
+
+export const monetizationActions = {
+  init: () => () => {
+    if (window.Paddle) {
+      window.Paddle.Setup({ vendor: 39570 });
+    }
+  },
+
+  $setIsCheckoutOverlayOpen: action(isCheckoutOverlayOpen => ({ isCheckoutOverlayOpen })),
+  openCheckoutOverlay: productId => (dispatch, getState) => {
+    dispatch(monetizationActions.$setIsCheckoutOverlayOpen(true));
+
+    const email = userEmailSelector(getState());
+
+    window.Paddle.Checkout.open({
+      email,
+      product: productId,
+      closeCallback: () => dispatch(monetizationActions.$setIsCheckoutOverlayOpen(false)),
+      successCallback: () => dispatch(monetizationActions.$setIsCheckoutOverlayOpen(false))
+    });
   }
 };

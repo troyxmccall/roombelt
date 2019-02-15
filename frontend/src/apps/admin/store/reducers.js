@@ -4,13 +4,13 @@ import {
   adminActions,
   editDeviceDialogActions,
   connectDeviceWizardActions,
-  removeDeviceDialogActions
+  removeDeviceDialogActions, monetizationActions
 } from "apps/admin/store/actions";
 
-const user = (state = { displayName: "", avatarUrl: undefined }, action) => {
+const user = (state = { displayName: "", avatarUrl: undefined, email: undefined }, action) => {
   switch (action.type) {
     case adminActions.$setUserDetails:
-      return { displayName: action.user.displayName, avatarUrl: action.user.avatarUrl };
+      return { displayName: action.user.displayName, avatarUrl: action.user.avatarUrl, email: action.user.email };
     default:
       return state;
   }
@@ -114,11 +114,21 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
   }
 };
 
+const monetization = (state = { currentPlan: null, isCheckoutOverlayOpen: false }, action) => {
+  switch (action) {
+    case monetizationActions.$setIsCheckoutOverlayOpen:
+      return { ...state, isCheckoutOverlayOpen: action.isCheckoutOverlayOpen };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   devices,
   calendars,
   editedDevice,
   removedDevice,
-  connectDeviceWizard
+  connectDeviceWizard,
+  monetization
 });

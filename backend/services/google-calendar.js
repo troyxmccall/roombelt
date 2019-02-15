@@ -80,13 +80,14 @@ module.exports = class {
     const { data } = await new Promise((res, rej) =>
       this.peopleClient.people.get({
         resourceName: "people/me",
-        personFields: "names,photos"
+        personFields: "names,photos,emailAddresses"
       }, (err, data) => (err ? rej(err) : res(data)))
     );
 
     return {
       displayName: (data.names && data.names[0] && data.names[0].displayName) || "Unknown",
-      photoUrl: data.photos && data.photos[0] && data.photos[0].url || ""
+      photoUrl: (data.photos && data.photos[0] && data.photos[0].url) || "",
+      email: (data.emailAddresses && data.emailAddresses[0] && data.emailAddresses[0].value) || ""
     };
   }
 

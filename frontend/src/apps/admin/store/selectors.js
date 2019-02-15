@@ -17,3 +17,6 @@ export const editDeviceData = state => ({
 });
 
 export const removedDeviceId = state => state.removedDevice;
+
+export const userEmailSelector = state => state.user.email;
+export const isCheckoutOverlayOpenSelector = state => state.monetization.isCheckoutOverlayOpen;
