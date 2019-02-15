@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const bearerToken = require("express-bearer-token");
 const config = require("./config");
 
+require("./logger");
+
 const app = express();
 
 app.use(helmet({ frameguard: !config.disableFrameGuard }));
