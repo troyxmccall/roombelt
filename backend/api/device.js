@@ -5,12 +5,14 @@ const getTimestamp = time => time.isTimeZoneFixedToUTC && Moment.utc(time).value
 
 router.use("/device", async function(req, res) {
   if (req.context.session.scope !== "device") {
+    console.error(`[${req.baseUrl}]`, `Invalid session scope: ${req.context.session} for device ${req.context.session.deviceId}`);
     return res.sendStatus(403);
   }
 
   req.context.device = await req.context.storage.devices.getDeviceById(req.context.session.deviceId);
 
   if (!req.context.device) {
+    console.error(`[${req.baseUrl}]`, `Device not found: ${req.context.session.deviceId}`);
     return res.sendStatus(404);
   }
 
