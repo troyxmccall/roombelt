@@ -14,7 +14,7 @@ const colors = {
   silly: chalk.magenta
 };
 
-const defaultConfig = {
+const logger = winston.createLogger({
   format: winston.format.printf(info => {
     const level = colors[info.level](info.level.toUpperCase()) + " ";
 
@@ -25,10 +25,14 @@ const defaultConfig = {
     return `${level}${requestId}${path}${info.message}`;
   }),
   transports: [new winston.transports.Console()]
-};
-
-const logger = winston.createLogger(defaultConfig);
+});
 
 module.exports = logger;
-module.exports.setLogLevel = level => logger.configure({ ...defaultConfig, level });
-module.exports.middleware = (req, res, next) => requestContext.runInContext(next, req);
+
+module.exports.setLogLevel = level => {
+  logger.level = level;
+};
+
+module.exports.middleware = (req, res, next) => {
+  requestContext.runInContext(next, req);
+};
