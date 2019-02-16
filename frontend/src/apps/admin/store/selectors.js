@@ -1,4 +1,4 @@
-export const newDeviceData = state => ({
+export const newDeviceDataSelectot = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   deviceId: state.connectDeviceWizard.deviceId,
   calendarId: state.connectDeviceWizard.calendarId,
@@ -7,7 +7,7 @@ export const newDeviceData = state => ({
   clockType: state.connectDeviceWizard.clockType
 });
 
-export const editDeviceData = state => ({
+export const editDeviceDataSelector = state => ({
   deviceId: state.editedDevice.data.id,
   deviceType: state.editedDevice.data.deviceType,
   calendarId: state.editedDevice.data.calendarId,
@@ -16,7 +16,5 @@ export const editDeviceData = state => ({
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn
 });
 
-export const removedDeviceId = state => state.removedDevice;
-
-export const userEmailSelector = state => state.user.email;
+export const removedDeviceIdSelector = state => state.removedDevice;
 export const isCheckoutOverlayOpenSelector = state => state.monetization.isCheckoutOverlayOpen;

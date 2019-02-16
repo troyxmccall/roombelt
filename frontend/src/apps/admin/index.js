@@ -10,8 +10,6 @@ class AdminApp extends React.PureComponent {
     store.dispatch(adminActions.initialFetch());
     store.dispatch(monetizationActions.init());
 
-    setTimeout(() => store.dispatch(monetizationActions.openCheckoutOverlay(552216)), 5000);
-
     if (module.hot) {
       module.hot.accept("./Dashboard", () => this.forceUpdate());
     }

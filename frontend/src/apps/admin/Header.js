@@ -39,7 +39,7 @@ const Header = props => (
           {props.userName}
         </Text>
         <Text block xsmall muted>
-          Administrator
+          7 days of trial left
         </Text>
       </div>
     </User>

@@ -7,10 +7,10 @@ import {
   removeDeviceDialogActions, monetizationActions
 } from "apps/admin/store/actions";
 
-const user = (state = { displayName: "", avatarUrl: undefined, email: undefined }, action) => {
+const user = (state = { displayName: "", avatarUrl: undefined }, action) => {
   switch (action.type) {
     case adminActions.$setUserDetails:
-      return { displayName: action.user.displayName, avatarUrl: action.user.avatarUrl, email: action.user.email };
+      return { displayName: action.user.displayName, avatarUrl: action.user.avatarUrl };
     default:
       return state;
   }

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import IoPlusRound from "react-icons/lib/io/plus";
 import { PageTitle, Button } from "../../theme";
-import { connectDeviceWizardActions } from "apps/admin/store/actions";
+import { connectDeviceWizardActions, monetizationActions } from "apps/admin/store/actions";
 
 const ConnectDeviceButton = props => (
   <Button primary compact style={{ marginLeft: 10, fontSize: 13 }} onClick={props.onClick}>
@@ -23,7 +23,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onConnectDeviceClick: () => dispatch(connectDeviceWizardActions.show())
+  onConnectDeviceClick: () => dispatch(monetizationActions.openCheckoutOverlay(552216))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DevicesHeader);

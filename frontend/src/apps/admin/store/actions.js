@@ -9,8 +9,8 @@ import {
   setOptionsForDevice
 } from "services/api";
 
-import { newDeviceData, editDeviceData, removedDeviceId } from "./selectors";
-import { userEmailSelector } from "apps/admin/store/selectors";
+import { newDeviceDataSelectot, editDeviceDataSelector, removedDeviceIdSelector } from "./selectors";
+import { isCheckoutOverlayOpenSelector } from "apps/admin/store/selectors";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
@@ -41,7 +41,7 @@ export const connectDeviceWizardActions = {
       dispatch(connectDeviceWizardActions.firstStep.$startSubmitting());
 
       try {
-        const { connectionCode } = newDeviceData(getState());
+        const { connectionCode } = newDeviceDataSelectot(getState());
         const device = await connectDevice(connectionCode);
 
         dispatch(connectDeviceWizardActions.firstStep.$submitSuccess(device.id));
@@ -66,7 +66,7 @@ export const connectDeviceWizardActions = {
     submit: () => async (dispatch, getState) => {
       dispatch(connectDeviceWizardActions.thirdStep.$startSubmitting());
 
-      const { deviceId, deviceType, calendarId, language, clockType } = newDeviceData(getState());
+      const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelectot(getState());
       await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, clockType);
 
       dispatch(adminActions.$setDevices(await getConnectedDevices()));
@@ -85,7 +85,7 @@ export const editDeviceDialogActions = {
   setMinutesForCheckIn: action(minutesForCheckIn => ({ minutesForCheckIn })),
   $startSubmitting: action(),
   submit: () => async (dispatch, getState) => {
-    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, clockType } = editDeviceData(getState());
+    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, clockType } = editDeviceDataSelector(getState());
 
     dispatch(editDeviceDialogActions.$startSubmitting());
     await setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, clockType);
@@ -99,7 +99,7 @@ export const removeDeviceDialogActions = {
   show: action(device => ({ deviceId: device.id })),
   hide: action(),
   submit: () => async (dispatch, getState) => {
-    await disconnectDevice(removedDeviceId(getState()));
+    await disconnectDevice(removedDeviceIdSelector(getState()));
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(removeDeviceDialogActions.hide());
@@ -114,16 +114,22 @@ export const monetizationActions = {
   },
 
   $setIsCheckoutOverlayOpen: action(isCheckoutOverlayOpen => ({ isCheckoutOverlayOpen })),
-  openCheckoutOverlay: productId => (dispatch, getState) => {
-    dispatch(monetizationActions.$setIsCheckoutOverlayOpen(true));
+  $toggleOverlay: isVisible => (dispatch) => {
+    document.body.style.overflow = isVisible ? "hidden" : "auto";
+    dispatch(monetizationActions.$setIsCheckoutOverlayOpen(isVisible));
+  },
 
-    const email = userEmailSelector(getState());
+  openCheckoutOverlay: productId => (dispatch, getState) => {
+    if (isCheckoutOverlayOpenSelector(getState())) {
+      return;
+    }
+
+    dispatch(monetizationActions.$toggleOverlay(true));
 
     window.Paddle.Checkout.open({
-      email,
       product: productId,
-      closeCallback: () => dispatch(monetizationActions.$setIsCheckoutOverlayOpen(false)),
-      successCallback: () => dispatch(monetizationActions.$setIsCheckoutOverlayOpen(false))
+      closeCallback: () => dispatch(monetizationActions.$toggleOverlay(false)),
+      successCallback: () => dispatch(monetizationActions.$toggleOverlay(false))
     });
   }
 };
