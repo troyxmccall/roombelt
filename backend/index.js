@@ -3,11 +3,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const bearerToken = require("express-bearer-token");
+const logger = require("./logger");
 const config = require("./config");
 
-require("./logger");
-
 const app = express();
+
+logger.setLogLevel(config.logLevel);
+app.use(logger.middleware);
 
 app.use(helmet({ frameguard: !config.disableFrameGuard }));
 app.use(require("./force-ssl"));

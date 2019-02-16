@@ -1,21 +1,21 @@
 const router = require("express-promise-router")();
 const Moment = require("moment");
-const winston = require("winston");
+const logger = require("../logger");
 
 const getTimestamp = time => time.isTimeZoneFixedToUTC && Moment.utc(time).valueOf();
 
 router.use("/device", async function(req, res) {
-  winston.debug(`Device ID ${req.context.session.deviceId}`, { req });
+  logger.debug(`Device ID ${req.context.session.deviceId}`);
 
   if (req.context.session.scope !== "device") {
-    winston.error(`Invalid session scope: ${req.context.session} for device ${req.context.session.deviceId}`, { req });
+    logger.error(`Invalid session scope: ${req.context.session.scope} for device ${req.context.session.deviceId}`);
     return res.sendStatus(403);
   }
 
   req.context.device = await req.context.storage.devices.getDeviceById(req.context.session.deviceId);
 
   if (!req.context.device) {
-    winston.error(`Device not found: ${req.context.session.deviceId}`, { req });
+    logger.error(`Device not found: ${req.context.session.deviceId}`);
     return res.sendStatus(404);
   }
 

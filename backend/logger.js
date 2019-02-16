@@ -1,6 +1,8 @@
 const winston = require("winston");
 const chalk = require("chalk");
-const config = require("./config");
+const createContext = require("create-context");
+
+const requestContext = createContext();
 
 const colors = {
   error: chalk.red,
@@ -12,14 +14,21 @@ const colors = {
   silly: chalk.magenta
 };
 
-winston.configure({
-  level: config.logLevel,
+const defaultConfig = {
   format: winston.format.printf(info => {
     const level = colors[info.level](info.level.toUpperCase()) + " ";
-    const path = info.req ? chalk.green(`[${info.req.baseUrl}${info.req.path}] `) : "";
-    const ip = (info.req && info.req.get("X-Forwarded-For")) ? chalk.green(`[${info.req.get("X-Forwarded-For")}] `) : "";
 
-    return `${level}${path}${ip}${info.message}`;
+    const req = requestContext.getContext();
+    const path = req ? chalk.green(`[${req.baseUrl}${req.path}] `) : "";
+    const requestId = (req && req.get("X-Request-Id")) ? chalk.green(`[${req.get("X-Request-Id")}] `) : "";
+
+    return `${level}${requestId}${path}${info.message}`;
   }),
   transports: [new winston.transports.Console()]
-});
+};
+
+const logger = winston.createLogger(defaultConfig);
+
+module.exports = logger;
+module.exports.setLogLevel = level => logger.configure({ ...defaultConfig, level });
+module.exports.middleware = (req, res, next) => requestContext.runInContext(next, req);
