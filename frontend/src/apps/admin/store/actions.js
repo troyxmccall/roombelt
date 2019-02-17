@@ -6,16 +6,19 @@ import {
   getCalendars,
   getConnectedDevices,
   getUserDetails,
-  setOptionsForDevice
+  setOptionsForDevice,
+  setUserProperty
 } from "services/api";
 
-import { newDeviceDataSelectot, editDeviceDataSelector, removedDeviceIdSelector } from "./selectors";
+import { newDeviceDataSelector, editDeviceDataSelector, removedDeviceIdSelector } from "./selectors";
 import { isCheckoutOverlayOpenSelector } from "apps/admin/store/selectors";
+import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
   $setCalendars: action(calendars => ({ calendars })),
   $setUserDetails: action(user => ({ user })),
+  $setUserProperty: action((propertyId, value) => ({ propertyId, value })),
   initialFetch: () => async dispatch => {
     const [calendars, devices, user] = await Promise.all([
       getCalendars(),
@@ -41,7 +44,7 @@ export const connectDeviceWizardActions = {
       dispatch(connectDeviceWizardActions.firstStep.$startSubmitting());
 
       try {
-        const { connectionCode } = newDeviceDataSelectot(getState());
+        const { connectionCode } = newDeviceDataSelector(getState());
         const device = await connectDevice(connectionCode);
 
         dispatch(connectDeviceWizardActions.firstStep.$submitSuccess(device.id));
@@ -66,7 +69,7 @@ export const connectDeviceWizardActions = {
     submit: () => async (dispatch, getState) => {
       dispatch(connectDeviceWizardActions.thirdStep.$startSubmitting());
 
-      const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelectot(getState());
+      const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelector(getState());
       await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, clockType);
 
       dispatch(adminActions.$setDevices(await getConnectedDevices()));
@@ -111,6 +114,11 @@ export const monetizationActions = {
     if (window.Paddle) {
       window.Paddle.Setup({ vendor: 39570 });
     }
+  },
+
+  acknowledgeUpcomingPremiumPopup: () => (dispatch) => {
+    setUserProperty(upcomingPremiumAcknowledgedProperty, { isAcknowledged: true });
+    dispatch(adminActions.$setUserProperty(upcomingPremiumAcknowledgedProperty, true));
   },
 
   $setIsCheckoutOverlayOpen: action(isCheckoutOverlayOpen => ({ isCheckoutOverlayOpen })),

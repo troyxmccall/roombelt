@@ -1,4 +1,7 @@
-export const newDeviceDataSelectot = state => ({
+import ms from "ms";
+import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
+
+export const newDeviceDataSelector = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   deviceId: state.connectDeviceWizard.deviceId,
   calendarId: state.connectDeviceWizard.calendarId,
@@ -18,3 +21,11 @@ export const editDeviceDataSelector = state => ({
 
 export const removedDeviceIdSelector = state => state.removedDevice;
 export const isCheckoutOverlayOpenSelector = state => state.monetization.isCheckoutOverlayOpen;
+
+export const isUpcomingPremiumPopupVisibleSelector = state => {
+  const isLoaded = state.user.isLoaded;
+  const hasNotAcknowledgedYet = !state.user.properties[upcomingPremiumAcknowledgedProperty];
+  const isOldUser = state.user.createdAt < Date.now() - ms("7 days");
+
+  return isLoaded && isOldUser && hasNotAcknowledgedYet;
+};

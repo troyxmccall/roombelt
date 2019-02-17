@@ -39,7 +39,7 @@ const Header = props => (
           {props.userName}
         </Text>
         <Text block xsmall muted>
-          7 days of trial left
+          Roombelt Free
         </Text>
       </div>
     </User>

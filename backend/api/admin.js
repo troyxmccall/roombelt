@@ -20,7 +20,12 @@ const calendarRepresentation = ({ id, location, summary, description, accessRole
   canModifyEvents: accessRole === "writer" || accessRole === "owner"
 });
 
-const userRepresentation = ({ displayName, photoUrl }) => ({ displayName, avatarUrl: photoUrl });
+const userRepresentation = ({ createdAt }, { displayName, photoUrl }, properties) => ({
+  createdAt: new Date(createdAt).getTime(),
+  displayName,
+  avatarUrl: photoUrl,
+  properties
+});
 
 router.use("/admin", async function(req, res) {
   if (req.context.session.scope !== "admin") {
@@ -32,7 +37,15 @@ router.use("/admin", async function(req, res) {
 
 router.get("/admin/user", async function(req, res) {
   const userDetails = await req.context.calendarProvider.getUserDetails();
-  res.json(userRepresentation(userDetails));
+  const userOAuth = await req.context.storage.oauth.getTokens(req.context.session.userId);
+  const userProperties = await req.context.storage.userProperties.getProperties(req.context.session.userId);
+
+  res.json(userRepresentation(userOAuth, userDetails, userProperties));
+});
+
+router.put("/admin/user/property/:propertyId", async function(req, res) {
+  await req.context.storage.userProperties.setProperty(req.context.session.userId, req.params.propertyId, req.body);
+  res.sendStatus(204);
 });
 
 router.get("/admin/calendar", async function(req, res) {
@@ -94,7 +107,7 @@ router.delete("/admin/device/:deviceId", async function(req, res) {
   const device = await req.context.storage.devices.getDeviceById(req.params.deviceId);
 
   if (device && device.userId === req.context.session.userId) {
-    req.context.storage.devices.removeDevice(req.params.deviceId, req.context.session.userId);
+    await req.context.storage.devices.removeDevice(req.params.deviceId, req.context.session.userId);
   }
 
   res.sendStatus(204);
