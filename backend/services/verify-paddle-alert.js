@@ -15,6 +15,10 @@ function ksort(obj) {
 }
 
 module.exports = function(payload) {
+  if (!config.paddlePublicKey) {
+    return false;
+  }
+
   const signature = Buffer.from(payload.p_signature, "base64");
 
   delete payload.p_signature;
