@@ -15,7 +15,7 @@ router.use(async (req, res) => {
   const sessionToken = req.cookies.sessionToken || req.token;
   const session = await storage.session.getSession(sessionToken) || await storage.session.createSession();
 
-  const calendarProvider = new GoogleCalendar(config, await storage.oauth.getTokens(session.userId));
+  const calendarProvider = new GoogleCalendar(config, await storage.oauth.getByUserId(session.userId));
 
   req.context = { storage, calendarProvider, session };
 

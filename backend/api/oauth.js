@@ -1,6 +1,6 @@
 const router = require("express-promise-router")();
 
-router.use("/oauth/callback", async (req, res) => {
+router.get("/oauth/callback", async (req, res) => {
   if (req.query.error === "access_denied") {
     return res.redirect("/");
   }
@@ -17,7 +17,7 @@ router.use("/oauth/callback", async (req, res) => {
 
   await req.context.storage.oauth.saveTokens(tokens);
 
-  const savedTokens = await req.context.storage.oauth.getTokens(tokens.userId);
+  const savedTokens = await req.context.storage.oauth.getByUserId(tokens.userId);
 
   if (!savedTokens.refreshToken) {
     return res.redirect(req.context.calendarProvider.getAuthUrl(true));

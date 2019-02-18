@@ -11,8 +11,9 @@ const result = {
   forceHttps: process.env["FORCE_HTTPS"] === "true" || process.env["FORCE_HTTPS"] === "1",
   disableFrameGuard: process.env["DISABLE_FRAME_GUARD"] === "true" || process.env["DISABLE_FRAME_GUARD"] === "1",
   port: process.env["PORT"] || 3000,
-  acceptHost: process.env["ACCEPT_HOST"] || "0.0.0.0",
-  logLevel: (process.env["LOG_LEVEL"] || "debug").toLowerCase()
+  acceptHost: process.env["ACCEPT_HOST"] || undefined,
+  logLevel: (process.env["LOG_LEVEL"] || "debug").toLowerCase(),
+  paddlePublicKey: process.env["PADDLE_PUBLIC_KEY"] || ""
 };
 
 if (!result.clientId || !result.clientSecret || !result.redirectUrl) {

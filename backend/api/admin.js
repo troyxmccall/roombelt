@@ -20,10 +20,13 @@ const calendarRepresentation = ({ id, location, summary, description, accessRole
   canModifyEvents: accessRole === "writer" || accessRole === "owner"
 });
 
-const userRepresentation = ({ createdAt }, { displayName, photoUrl }, properties) => ({
-  createdAt: new Date(createdAt).getTime(),
+const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionPlanId, subscriptionCancellationEffectiveTimestamp }, { displayName, photoUrl }, properties) => ({
   displayName,
   avatarUrl: photoUrl,
+  createdAt: new Date(createdAt).getTime(),
+  subscriptionPassthrough,
+  subscriptionPlanId,
+  subscriptionCancellationEffectiveTimestamp,
   properties
 });
 
@@ -37,7 +40,7 @@ router.use("/admin", async function(req, res) {
 
 router.get("/admin/user", async function(req, res) {
   const userDetails = await req.context.calendarProvider.getUserDetails();
-  const userOAuth = await req.context.storage.oauth.getTokens(req.context.session.userId);
+  const userOAuth = await req.context.storage.oauth.getByUserId(req.context.session.userId);
   const userProperties = await req.context.storage.userProperties.getProperties(req.context.session.userId);
 
   res.json(userRepresentation(userOAuth, userDetails, userProperties));

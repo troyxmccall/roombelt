@@ -5,7 +5,7 @@ router.get("/version", (req, res) => res.json({ version: process.env["ROOMBELT_A
 router.use(require("./auth"));
 router.use(require("./admin"));
 router.use(require("./device"));
-
 router.use(require("./oauth"));
+router.use(require("./paddle"));
 
 module.exports = router;

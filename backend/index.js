@@ -15,6 +15,7 @@ app.use(helmet({ frameguard: !config.disableFrameGuard }));
 app.use(require("./force-ssl"));
 app.use("/api", bearerToken());
 app.use("/api", cookieParser());
+app.use("/api", bodyParser.urlencoded());
 app.use("/api", bodyParser.json());
 app.use("/api", require("./context"));
 app.use("/api", require("./api"));

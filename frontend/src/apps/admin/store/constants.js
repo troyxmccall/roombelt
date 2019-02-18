@@ -1,1 +1,1 @@
-export const upcomingPremiumAcknowledgedProperty = "upcomingPremiumAcknowledgedProperty";
+export const upcomingPremiumAcknowledgedProperty = "upcomingPremiumAcknowledged";
