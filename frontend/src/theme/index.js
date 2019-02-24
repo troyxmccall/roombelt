@@ -3,6 +3,7 @@ export { default as Button } from "./components/Button";
 export { default as Badge } from "./components/Badge";
 export { default as Card } from "./components/Card";
 export { default as Modal } from "./components/Modal";
+export { default as BlueModal } from "./components/BlueModal";
 export { default as Time } from "./components/Time";
 export { default as Text } from "./components/Text";
 export { default as Loader } from "./components/Loader";

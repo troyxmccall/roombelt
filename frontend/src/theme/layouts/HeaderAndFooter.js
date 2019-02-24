@@ -47,7 +47,7 @@ const Responsive = styled.div`
 export default props => (
   <Layout>
     {props.header && (
-      <Section background={"white"} borderBottom padding={15}>
+      <Section background={"white"} borderBottom padding={8}>
         <Responsive>{props.header}</Responsive>
       </Section>
     )}

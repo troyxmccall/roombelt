@@ -1,20 +1,32 @@
+const axios = require("axios");
 const crypto = require("crypto");
 const Serialize = require("php-serialize");
 
 const config = require("../config");
 
-function ksort(obj) {
-  const keys = Object.keys(obj).sort();
-  const result = {};
+exports.cancelSubscription = async function(subscriptionId) {
+  const { data } = await axios.post("https://vendors.paddle.com/api/2.0/subscription/users_cancel", {
+    vendor_id: config.paddleVendorId,
+    vendor_auth_code: config.paddleApiKey,
+    subscription_id: subscriptionId
+  });
 
-  for (var i in keys) {
-    result[keys[i]] = obj[keys[i]];
-  }
+  return data.success ? null : data.error.message;
+};
 
-  return result;
-}
+exports.changeSubscriptionPlan = async function(subscriptionId, subscriptionPlanId) {
+  const { data } = await axios.post("https://vendors.paddle.com/api/2.0/subscription/users/update", {
+    vendor_id: config.paddleVendorId,
+    vendor_auth_code: config.paddleApiKey,
+    subscription_id: subscriptionId,
+    plan_id: subscriptionPlanId,
+    quantity: 1
+  });
 
-module.exports = function(payload) {
+  return data.success ? null : data.error.message;
+};
+
+exports.verifyPaddleAlert = function(payload) {
   if (!config.paddlePublicKey) {
     return false;
   }
@@ -44,3 +56,14 @@ module.exports = function(payload) {
 
   return verifier.verify(`-----BEGIN PUBLIC KEY-----\n${config.paddlePublicKey}\n-----END PUBLIC KEY-----`, signature);
 };
+
+function ksort(obj) {
+  const keys = Object.keys(obj).sort();
+  const result = {};
+
+  for (var i in keys) {
+    result[keys[i]] = obj[keys[i]];
+  }
+
+  return result;
+}

@@ -1,8 +1,9 @@
 const router = require("express-promise-router")();
-const verifyPaddleAlert = require("../services/verify-paddle-alert");
+const paddle = require("../services/paddle");
+const logger = require("../logger");
 
 router.post("/paddle", async (req, res) => {
-  if (!verifyPaddleAlert(req.body)) {
+  if (!paddle.verifyPaddleAlert(req.body)) {
     return res.sendStatus(400);
   }
 
@@ -10,9 +11,11 @@ router.post("/paddle", async (req, res) => {
   const subscriptionPassthrough = req.body.passthrough;
   const subscriptionId = req.body.subscription_id;
   const subscriptionPlanId = req.body.subscription_plan_id;
-  const subscriptionCancellationEffectiveTimestamp = new Date(req.body.cancellation_effective_date).getTime();
+  const subscriptionUpdateUrl = req.body.update_url;
 
   const user = await req.context.storage.oauth.getBySubscriptionPassthrough(subscriptionPassthrough);
+
+  logger.debug(`Received paddle event ${event} for passthrough ${subscriptionPassthrough}`);
 
   if (!user) {
     return res.sendStatus(400);
@@ -20,11 +23,13 @@ router.post("/paddle", async (req, res) => {
 
   switch (event) {
     case "subscription_created":
+      await req.context.storage.oauth.createSubscription(user.userId, subscriptionId, subscriptionPlanId, subscriptionUpdateUrl);
+      break;
     case "subscription_updated":
-      await req.context.storage.oauth.updateSubscription(user.userId, subscriptionId, subscriptionPlanId);
+      await req.context.storage.oauth.updateSubscription(user.userId, subscriptionPlanId);
       break;
     case "subscription_cancelled":
-      await req.context.storage.oauth.cancelSubscription(user.userId, subscriptionCancellationEffectiveTimestamp);
+      await req.context.storage.oauth.cancelSubscription(user.userId);
       break;
   }
   res.sendStatus(200);

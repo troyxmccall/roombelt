@@ -62,6 +62,14 @@ export function setOptionsForDevice(deviceId, deviceType, calendarId, language, 
   });
 }
 
+export function setSubscriptionPlan(subscriptionPlanId) {
+  return axios.put("/api/admin/subscription", { subscriptionPlanId });
+}
+
+export function cancelSubscription() {
+  return axios.delete("/api/admin/subscription");
+}
+
 export function getDeviceDetails(getAllCalendars) {
   return axios.get("/api/device", { params: { "all-calendars": getAllCalendars } });
 }

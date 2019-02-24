@@ -7,12 +7,23 @@ import {
   getConnectedDevices,
   getUserDetails,
   setOptionsForDevice,
-  setUserProperty
+  setUserProperty,
+  setSubscriptionPlan,
+  cancelSubscription
 } from "services/api";
 
-import { newDeviceDataSelector, editDeviceDataSelector, removedDeviceIdSelector } from "./selectors";
-import { isCheckoutOverlayOpenSelector } from "apps/admin/store/selectors";
+import {
+  newDeviceDataSelector,
+  editDeviceDataSelector,
+  removedDeviceIdSelector,
+  subscriptionUpdateUrlSelector, currentSubscriptionPlanSelector, canConnectAnotherDeviceSelector
+} from "./selectors";
+import {
+  isCheckoutOverlayOpenSelector,
+  subscriptionPassthroughSelector
+} from "apps/admin/store/selectors";
 import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
+import { wait } from "utils/time";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
@@ -26,6 +37,13 @@ export const adminActions = {
       getUserDetails()
     ]);
 
+    if (window.drift) {
+      window.drift.identify(user.subscriptionPassthrough, {
+        name: user.displayName,
+        subscription: user.subscriptionPassthrough
+      });
+    }
+
     dispatch(adminActions.$setCalendars(calendars));
     dispatch(adminActions.$setUserDetails(user));
     dispatch(adminActions.$setDevices(devices));
@@ -33,7 +51,14 @@ export const adminActions = {
 };
 
 export const connectDeviceWizardActions = {
-  show: action(),
+  $show: action(),
+  show: () => async (dispatch, getState) => {
+    if (canConnectAnotherDeviceSelector(getState())) {
+      dispatch(connectDeviceWizardActions.$show());
+    } else {
+      dispatch(monetizationActions.openPlanDialog());
+    }
+  },
   hide: action(),
   firstStep: {
     setConnectionCode: action(connectionCode => ({ connectionCode })),
@@ -132,12 +157,80 @@ export const monetizationActions = {
       return;
     }
 
+    const currentSubscriptionPlan = currentSubscriptionPlanSelector(getState());
+
     dispatch(monetizationActions.$toggleOverlay(true));
 
     window.Paddle.Checkout.open({
       product: productId,
+      locale: "en",
+      passthrough: subscriptionPassthroughSelector(getState()),
       closeCallback: () => dispatch(monetizationActions.$toggleOverlay(false)),
-      successCallback: () => dispatch(monetizationActions.$toggleOverlay(false))
+      successCallback: () => {
+        dispatch(monetizationActions.$toggleOverlay(false));
+        dispatch(monetizationActions.$waitUntilSubscriptionPlanIdChanges(currentSubscriptionPlan));
+      }
     });
+  },
+
+  openUpdateSubscriptionOverlay: () => (dispatch, getState) => {
+    dispatch(monetizationActions.$toggleOverlay(true));
+
+    const hideOverlay = () => dispatch(monetizationActions.$toggleOverlay(false));
+
+    window.Paddle.Checkout.open({
+      locale: "en",
+      override: subscriptionUpdateUrlSelector(getState()),
+      closeCallback: hideOverlay,
+      successCallback: hideOverlay
+    });
+  },
+
+  openPlanDialog: action(),
+  closePlanDialog: action(),
+
+  openCancelSubscriptionDialog: action(),
+  closeCancelSubscriptionDialog: action(),
+
+  confirmCancelSubscription: () => async (dispatch, getState) => {
+    try {
+      const currentSubscriptionPlan = currentSubscriptionPlanSelector(getState());
+
+      await cancelSubscription();
+
+      dispatch(monetizationActions.closeCancelSubscriptionDialog());
+      dispatch(monetizationActions.$waitUntilSubscriptionPlanIdChanges(currentSubscriptionPlan));
+    } catch (error) {
+      alert("Unable to cancel subscription. Please contact Roombelt support.");
+    }
+  },
+
+  selectSubscriptionPlan: subscriptionPlanId => async (dispatch, getState) => {
+    const currentSubscriptionPlan = currentSubscriptionPlanSelector(getState());
+
+    if (!currentSubscriptionPlan) {
+      dispatch(monetizationActions.openCheckoutOverlay(subscriptionPlanId));
+    } else {
+      try {
+        await setSubscriptionPlan(subscriptionPlanId);
+
+        dispatch(monetizationActions.$waitUntilSubscriptionPlanIdChanges(currentSubscriptionPlan));
+      } catch (error) {
+        alert("Unable to change subscription plan. Please contact Roombelt support.");
+      }
+    }
+  },
+
+  $toggleIsUpdatingSubscription: action((isUpdatingSubscription) => ({ isUpdatingSubscription })),
+  $waitUntilSubscriptionPlanIdChanges: (startingSubscriptionPlan) => async (dispatch, getState) => {
+    dispatch(monetizationActions.$toggleIsUpdatingSubscription(true));
+
+    while (startingSubscriptionPlan === currentSubscriptionPlanSelector(getState())) {
+      await wait(2000);
+      const user = await getUserDetails();
+      dispatch(adminActions.$setUserDetails(user));
+    }
+
+    dispatch(monetizationActions.$toggleIsUpdatingSubscription(false));
   }
 };

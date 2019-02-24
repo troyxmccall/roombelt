@@ -31,6 +31,24 @@ const whiteColors = props => {
   `;
 };
 
+const secondaryColors = props => {
+  if (!props.secondary) return null;
+
+  return css`
+    color: #495057;
+    background-color: #fff;
+    user-select: none;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+
+    &:hover:not([disabled]) {
+      color: #495057;
+      background-color: #f6f6f6;
+      border-color: rgba(0, 20, 49, 0.12);
+    }
+  `;
+};
+
 const variantColors = props => {
   const variantName = Object.keys(colors.variants).find(variantName => props[variantName]);
   if (!variantName) return;
@@ -114,6 +132,7 @@ const Button = styled(UnderlyingComponent)`
   ${defaultColors};
   ${whiteColors};
   ${variantColors};
+  ${secondaryColors};
   ${compactStyles};
 
   ${props => props.link && linkStyles} &[disabled] {

@@ -13,7 +13,9 @@ const result = {
   port: process.env["PORT"] || 3000,
   acceptHost: process.env["ACCEPT_HOST"] || undefined,
   logLevel: (process.env["LOG_LEVEL"] || "debug").toLowerCase(),
-  paddlePublicKey: process.env["PADDLE_PUBLIC_KEY"] || ""
+  paddleVendorId: process.env["PADDLE_VENDOR_ID"] || "",
+  paddlePublicKey: process.env["PADDLE_PUBLIC_KEY"] || "",
+  paddleApiKey: process.env["PADDLE_API_KEY"] || ""
 };
 
 if (!result.clientId || !result.clientSecret || !result.redirectUrl) {

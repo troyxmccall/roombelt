@@ -1,4 +1,8 @@
 const router = require("express-promise-router")();
+const Moment = require("moment");
+
+const logger = require("../logger");
+const paddle = require("../services/paddle");
 
 const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, calendarId, language, clockType, minutesForCheckIn }) => ({
   id: deviceId,
@@ -20,13 +24,15 @@ const calendarRepresentation = ({ id, location, summary, description, accessRole
   canModifyEvents: accessRole === "writer" || accessRole === "owner"
 });
 
-const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionPlanId, subscriptionCancellationEffectiveTimestamp }, { displayName, photoUrl }, properties) => ({
+const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionUpdateUrl, isSubscriptionCancelled }, { displayName, photoUrl }, properties, { subscriptionPlanId, subscriptionTrialEndTimestamp }) => ({
   displayName,
   avatarUrl: photoUrl,
   createdAt: new Date(createdAt).getTime(),
   subscriptionPassthrough,
   subscriptionPlanId,
-  subscriptionCancellationEffectiveTimestamp,
+  subscriptionTrialEndTimestamp,
+  subscriptionUpdateUrl,
+  isSubscriptionCancelled,
   properties
 });
 
@@ -39,11 +45,26 @@ router.use("/admin", async function(req, res) {
 });
 
 router.get("/admin/user", async function(req, res) {
-  const userDetails = await req.context.calendarProvider.getUserDetails();
   const userOAuth = await req.context.storage.oauth.getByUserId(req.context.session.userId);
+  const userDetails = await req.context.calendarProvider.getUserDetails();
   const userProperties = await req.context.storage.userProperties.getProperties(req.context.session.userId);
 
-  res.json(userRepresentation(userOAuth, userDetails, userProperties));
+  const getTrialEnd = () => {
+    if (userOAuth.subscriptionPlanId) {
+      return null;
+    }
+
+    if (Moment(userOAuth.createdAt).isBefore(Moment([2019, 2, 1]))) {
+      return Moment([2019, 3, 1]).valueOf();
+    }
+
+    return Moment(userOAuth.createdAt).add(1, "months").valueOf();
+  };
+
+  res.json(userRepresentation(userOAuth, userDetails, userProperties, {
+    subscriptionTrialEndTimestamp: getTrialEnd(),
+    subscriptionPlanId: userOAuth.isSubscriptionCancelled ? null : userOAuth.subscriptionPlanId
+  }));
 });
 
 router.put("/admin/user/property/:propertyId", async function(req, res) {
@@ -114,6 +135,28 @@ router.delete("/admin/device/:deviceId", async function(req, res) {
   }
 
   res.sendStatus(204);
+});
+
+router.put("/admin/subscription", async function(req, res) {
+  const oauth = await req.context.storage.oauth.getByUserId(req.context.session.userId);
+  const errorMessage = await paddle.changeSubscriptionPlan(oauth.subscriptionId, req.body.subscriptionPlanId);
+
+  if (errorMessage) {
+    logger.error(errorMessage);
+  }
+
+  res.sendStatus(errorMessage ? 400 : 200);
+});
+
+router.delete("/admin/subscription", async function(req, res) {
+  const oauth = await req.context.storage.oauth.getByUserId(req.context.session.userId);
+  const errorMessage = await paddle.cancelSubscription(oauth.subscriptionId);
+
+  if (errorMessage) {
+    logger.error(errorMessage);
+  }
+
+  res.sendStatus(errorMessage ? 400 : 200);
 });
 
 module.exports = router;

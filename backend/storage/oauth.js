@@ -12,7 +12,8 @@ module.exports = class {
       subscriptionPassthrough: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4 },
       subscriptionId: Sequelize.INTEGER,
       subscriptionPlanId: Sequelize.INTEGER,
-      subscriptionCancellationEffectiveTimestamp: Sequelize.INTEGER
+      subscriptionUpdateUrl: Sequelize.TEXT,
+      isSubscriptionCancelled: { type: Sequelize.BOOLEAN, defaultValue: false }
     });
   }
 
@@ -29,16 +30,21 @@ module.exports = class {
     return await this.Model.findOne({ where: { subscriptionPassthrough } });
   }
 
-  async updateSubscription(userId, subscriptionId, subscriptionPlanId) {
+  async createSubscription(userId, subscriptionId, subscriptionPlanId, subscriptionUpdateUrl) {
     await this.Model.upsert({
       userId,
       subscriptionId,
       subscriptionPlanId,
-      subscriptionCancellationEffectiveTimestamp: null
+      subscriptionUpdateUrl,
+      isSubscriptionCancelled: false
     });
   }
 
-  async cancelSubscription(userId, subscriptionCancellationEffectiveTimestamp) {
-    await this.Model.upsert({ userId, subscriptionCancellationEffectiveTimestamp });
+  async updateSubscription(userId, subscriptionPlanId) {
+    await this.Model.update({ subscriptionPlanId }, { where: { userId } });
+  }
+
+  async cancelSubscription(userId) {
+    await this.Model.update({ isSubscriptionCancelled: true }, { where: { userId } });
   }
 };

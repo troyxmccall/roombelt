@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 
 import IoPlusRound from "react-icons/lib/io/plus";
 import { PageTitle, Button } from "../../theme";
-import { connectDeviceWizardActions, monetizationActions } from "apps/admin/store/actions";
+import { connectDeviceWizardActions } from "apps/admin/store/actions";
 
 const ConnectDeviceButton = props => (
   <Button primary compact style={{ marginLeft: 10, fontSize: 13 }} onClick={props.onClick}>
