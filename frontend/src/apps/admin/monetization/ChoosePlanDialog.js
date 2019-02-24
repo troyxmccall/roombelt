@@ -41,7 +41,6 @@ const PricingCard = styled(Card)`
 const Price = styled.div`
   font-size: 30px;
   font-weight: 600;
-  padding-bottom: 10px;
   text-align: center;
   
   :before {
@@ -58,6 +57,16 @@ const Price = styled.div`
     font-weight: normal;
     content: ' /mo';
   }
+`;
+
+const VAT = styled.div`
+    font-size: 13px;
+    color: #555;
+    padding-bottom: 10px;
+
+    :before {
+      content: '+ VAT';
+    }
 `;
 
 const PlanName = styled.div`
@@ -120,6 +129,7 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
         <PricingCard>
           <PlanName current={isStarterCurrent}>Starter</PlanName>
           <Price>5</Price>
+          <VAT/>
           <Feature>Up to 5 devices</Feature>
           <Feature>48h support SLA</Feature>
           <ChoosePlan disabled={isStarterCurrent || connectedDevices > 5}
@@ -132,6 +142,7 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
         <PricingCard>
           <PlanName current={isGrowingCurrent}>Growing</PlanName>
           <Price>20</Price>
+          <VAT/>
           <Feature>Up to 10 devices</Feature>
           <Feature>24h support SLA</Feature>
           <ChoosePlan disabled={isGrowingCurrent || connectedDevices > 10}
@@ -144,6 +155,7 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
         <PricingCard>
           <PlanName current={isBusinessCurrent}>Business</PlanName>
           <Price>50</Price>
+          <VAT/>
           <Feature>Up to 20 devices</Feature>
           <Feature>24h support SLA</Feature>
           <ChoosePlan disabled={isBusinessCurrent}

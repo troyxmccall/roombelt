@@ -26,6 +26,16 @@ const Content = styled.div`
   padding: 10px 30px;
 `;
 
+const VAT = styled.div`
+    font-size: 13px;
+    color: #555;
+    padding-bottom: 10px;
+
+    :before {
+      content: '+ VAT';
+    }
+`;
+
 const Pricing = styled.div`
   display: flex;
   width: 100%;
@@ -47,7 +57,6 @@ const PricingItem = styled.div`
 const Price = styled.div`
   font-size: 30px;
   font-weight: 600;
-  padding-bottom: 10px;
   
   :before {
     font-size: 15px;
@@ -82,16 +91,19 @@ const UpcomingPremium = ({ isVisible, onAcknowledge }) => (
       <Pricing>
         <PricingItem>
           <Price>5</Price>
+          <VAT/>
           <Feature>Up to <strong>5</strong> devices</Feature>
           <Feature>48h support SLA</Feature>
         </PricingItem>
         <PricingItem>
           <Price>20</Price>
+          <VAT/>
           <Feature>Up to <strong>10</strong> devices</Feature>
           <Feature>24h support SLA</Feature>
         </PricingItem>
         <PricingItem>
           <Price>50</Price>
+          <VAT/>
           <Feature>Up to <strong>20</strong> devices</Feature>
           <Feature>24h support SLA</Feature>
         </PricingItem>
