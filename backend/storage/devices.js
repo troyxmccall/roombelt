@@ -38,6 +38,10 @@ module.exports = class {
     return await this.Model.findAll({ where: { userId } });
   }
 
+  async countDevicesForUser(userId) {
+    return await this.Model.count({ where: { userId } });
+  }
+
   async connectDevice(deviceId, userId) {
     await this.Model.update({ userId, connectionCode: null }, { where: { deviceId } });
   }

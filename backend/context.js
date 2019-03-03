@@ -1,8 +1,10 @@
 const router = require("express-promise-router")();
 const Sequelize = require("sequelize");
+const Moment = require("moment");
 const Storage = require("./storage");
-const GoogleCalendar = require("./services/google-calendar");
 const config = require("./config");
+const GoogleCalendar = require("./services/google-calendar");
+const premiumPlans = require("./services/premium-plans");
 
 const storage = new Storage(
   new Sequelize(config.databaseUrl, {
@@ -11,13 +13,36 @@ const storage = new Storage(
   })
 );
 
+async function getSubscriptionStatus(oauth) {
+  // if (!oauth) {
+    return { isPaymentRequired: false, isSubscriptionCancelled: false };
+  // }
+
+  const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
+
+  const now = Moment();
+  const endOfTrial = Moment(oauth.createdAt).add(30, "days");
+  const firstOfApril = Moment([2019, 3, 1]);
+  const isTrialExpired = !oauth.subscriptionPlanId && now.isAfter(endOfTrial) && now.isAfter(firstOfApril);
+
+  const currentPlan = premiumPlans[oauth.subscriptionPlanId];
+  const connectedDevicesCount = storage.devices.countDevicesForUser(oauth.userId);
+  const isUpgradeRequired = currentPlan && currentPlan.maxDevices < connectedDevicesCount;
+
+  const isPaymentRequired = isSubscriptionCancelled || isTrialExpired || isUpgradeRequired;
+
+  return { isPaymentRequired, isSubscriptionCancelled };
+}
+
 router.use(async (req, res) => {
   const sessionToken = req.cookies.sessionToken || req.token;
   const session = await storage.session.getSession(sessionToken) || await storage.session.createSession();
 
-  const calendarProvider = new GoogleCalendar(config, await storage.oauth.getByUserId(session.userId));
+  const oauth = await storage.oauth.getByUserId(session.userId);
+  const calendarProvider = new GoogleCalendar(config, oauth);
+  const subscription = await getSubscriptionStatus(oauth);
 
-  req.context = { storage, calendarProvider, session };
+  req.context = { storage, calendarProvider, session, subscription };
 
   const day = 1000 * 60 * 60 * 24;
   const year = day * 365;

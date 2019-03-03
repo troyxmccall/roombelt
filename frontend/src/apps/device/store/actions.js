@@ -3,6 +3,7 @@ import cancellationToken from "utils/cancellation-token";
 import screenfull from "screenfull";
 import axios from "axios";
 
+import * as api from "services/api";
 import { createDevice, getDeviceDetails, removeAuth } from "services/api";
 
 import {
@@ -13,14 +14,15 @@ import {
   isDashboardDeviceSelector,
   isInitializedSelector,
   isInOfflineModeSelector,
-  lastActivityOnShowCalendarsViewSelector, minutesForCheckInSelector, requireCheckInSelector,
+  lastActivityOnShowCalendarsViewSelector,
+  minutesForCheckInSelector,
+  requireCheckInSelector,
   showAllCalendarsViewSelector,
   timestampSelector
 } from "apps/device/store/selectors";
 import { changeLanguage } from "i18n";
 
 import i18next from "i18next";
-import * as api from "services/api";
 import { wait, waitUntilTrue } from "utils/time";
 
 
@@ -61,11 +63,15 @@ export const deviceActions = {
       }
 
       dispatch(deviceActions.$updateDeviceData(device));
+      dispatch(deviceActions.$setIsSubscriptionCancelled(false));
       dispatch(deviceActions.setLanguage(device.language));
       dispatch(deviceActions.$removeCurrentMeetingIfNotCheckedIn());
     } catch (error) {
       if (error.response && error.response.status === 404) {
         dispatch(deviceActions.$markRemoved());
+      }
+      if (error.response && error.response.status === 402) {
+        dispatch(deviceActions.$setIsSubscriptionCancelled(true));
       }
     }
 
@@ -173,6 +179,7 @@ export const deviceActions = {
     await checkVersion();
   },
 
+  $setIsSubscriptionCancelled: action(isSubscriptionCancelled => ({ isSubscriptionCancelled })),
   $markRemoved: action(),
   disconnectDevice: () => async () => {
     await removeAuth();

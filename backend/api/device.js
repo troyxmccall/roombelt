@@ -19,6 +19,10 @@ router.use("/device", async function(req, res) {
     return res.sendStatus(404);
   }
 
+  if(req.context.subscription.isSubscriptionCancelled) {
+    return res.sendStatus(402);
+  }
+
   return "next";
 });
 

@@ -44,6 +44,14 @@ router.use("/admin", async function(req, res) {
   return "next";
 });
 
+async function checkSubscription(req, res) {
+  if (req.context.subscription.isPaymentRequired) {
+    return res.sendStatus(402);
+  }
+
+  return "next";
+}
+
 router.get("/admin/user", async function(req, res) {
   const userOAuth = await req.context.storage.oauth.getByUserId(req.context.session.userId);
   const userDetails = await req.context.calendarProvider.getUserDetails();
@@ -58,7 +66,7 @@ router.get("/admin/user", async function(req, res) {
       return Moment([2019, 3, 1]).valueOf();
     }
 
-    return Moment(userOAuth.createdAt).add(1, "months").valueOf();
+    return Moment(userOAuth.createdAt).add(30, "days").valueOf();
   };
 
   res.json(userRepresentation(userOAuth, userDetails, userProperties, {
@@ -82,7 +90,7 @@ router.get("/admin/device", async function(req, res) {
   res.json(devices.map(deviceRepresentation));
 });
 
-router.post("/admin/device", async function(req, res) {
+router.post("/admin/device", checkSubscription, async function(req, res) {
   const device = await req.context.storage.devices.getDeviceByConnectionCode(req.body.connectionCode);
 
   if (!device) {
@@ -102,7 +110,7 @@ router.post("/admin/device", async function(req, res) {
   res.json(deviceRepresentation(device));
 });
 
-router.put("/admin/device/:deviceId", async function(req, res) {
+router.put("/admin/device/:deviceId", checkSubscription, async function(req, res) {
   const device = await req.context.storage.devices.getDeviceById(req.params.deviceId);
 
   if (!device || device.userId !== req.context.session.userId) {
@@ -127,7 +135,7 @@ router.put("/admin/device/:deviceId", async function(req, res) {
   res.sendStatus(204);
 });
 
-router.delete("/admin/device/:deviceId", async function(req, res) {
+router.delete("/admin/device/:deviceId", checkSubscription, async function(req, res) {
   const device = await req.context.storage.devices.getDeviceById(req.params.deviceId);
 
   if (device && device.userId === req.context.session.userId) {

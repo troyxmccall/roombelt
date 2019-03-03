@@ -3,10 +3,11 @@ import i18next from "i18next";
 import { connect } from "react-redux";
 import {
   connectionCodeSelector,
-  isDeviceRemovedSelector,
-  isDeviceConnectedSelector,
-  isDashboardDeviceSelector,
   isCalendarSelectedSelector,
+  isDashboardDeviceSelector,
+  isDeviceConnectedSelector,
+  isDeviceRemovedSelector,
+  isSubscriptionCancelledSelector,
   showAllCalendarsViewSelector
 } from "./store/selectors";
 
@@ -18,12 +19,13 @@ import NoCalendar from "./views/connect/NoCalendar";
 import FatalError from "theme/layouts/FatalError";
 import { deviceActions } from "apps/device/store/actions";
 
-const Router = ({ connectionCode, isDashboardDevice, isCalendarSelected, isDeviceConnected, isDeviceRemoved, isOffline, disconnectDevice, showAllCalendarsView }) => {
+const Router = ({ connectionCode, isDashboardDevice, isCalendarSelected, isDeviceConnected, isDeviceRemoved, isSubscriptionCancelled, isOffline, disconnectDevice, showAllCalendarsView }) => {
   if (isOffline) return <FatalError title={i18next.t("errors.unable-to-connect-server")}/>;
   if (isDeviceRemoved) return <FatalError title={i18next.t("errors.device-disconnected-title")}
                                           subtitle={i18next.t("errors.device-disconnected-message")}
                                           onClick={disconnectDevice}
                                           button={"OK"}/>;
+  if (isSubscriptionCancelled) return <FatalError title={i18next.t("errors.subscription-cancelled")}/>;
   if (isDashboardDevice) return <Dashboard/>;
   if (showAllCalendarsView) return <AllCalendars/>;
   if (isCalendarSelected) return <SingleCalendar/>;
@@ -41,6 +43,7 @@ const mapStateToProps = state => ({
   isDashboardDevice: isDashboardDeviceSelector(state),
   isCalendarSelected: isCalendarSelectedSelector(state),
   isDeviceRemoved: isDeviceRemovedSelector(state),
+  isSubscriptionCancelled: isSubscriptionCancelledSelector(state),
   showAllCalendarsView: showAllCalendarsViewSelector(state)
 });
 

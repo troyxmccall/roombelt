@@ -1,6 +1,4 @@
-import {
-  deviceActions, meetingActions
-} from "apps/device/store/actions";
+import { deviceActions, meetingActions } from "apps/device/store/actions";
 
 import { combineReducers } from "redux";
 import Moment from "moment";
@@ -56,6 +54,7 @@ const currentMeetingActions = (state = defaultCurrentMeetingActionsState, action
 };
 
 const appState = (state = {
+  isSubscriptionCancelled: false,
   isRemoved: false,
   isInitialized: false,
   isOffline: false,
@@ -67,6 +66,8 @@ const appState = (state = {
       return { ...state, isInitialized: true };
     case deviceActions.$markRemoved:
       return { ...state, isRemoved: true };
+    case deviceActions.$setIsSubscriptionCancelled:
+      return { ...state, isSubscriptionCancelled: action.isSubscriptionCancelled };
     case deviceActions.$updateOfflineStatus:
       return { ...state, isOffline: action.isOffline };
     case deviceActions.$updateShowAllCalendarsView:

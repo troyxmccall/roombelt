@@ -46,7 +46,8 @@
     "action-error-subtitle": "Jeśli ten problem będzie się powtarzał skontaktuj się z administratorem IT",
     "refresh-page": "Odśwież stronę",
     "device-disconnected-title": "Urządzenie usunięte",
-    "device-disconnected-message": "To urządzenie zostało usuniętę w panelu administracyjnym. Czy chesz połączyć je ponownie?"
+    "device-disconnected-message": "To urządzenie zostało usuniętę w panelu administracyjnym. Czy chesz połączyć je ponownie?",
+    "subscription-cancelled": "Subskrypcja na system Roombelt zostałą anulowana"
   },
   "dashboard": {
     "page-title": "Sale konferencyjne",
