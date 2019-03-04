@@ -7,13 +7,16 @@ import { deviceActions } from "apps/device/store/actions";
 
 const Wrapper = styled.div`
   position: fixed;
-  right: 0;
   bottom: 0;
-  opacity: 0.5;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.7;
   background: black;
   color: white;
   padding: 0.5em;
   cursor: pointer;
+  border: 0.05em solid white;
+  border-bottom: none;
 `;
 
 const FullScreenToggle = props => {

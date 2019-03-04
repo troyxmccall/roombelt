@@ -29,14 +29,15 @@ const Time = props => {
     <React.Fragment>
       {hour}
       <TimeSeparator blinking={props.blinking}>:</TimeSeparator>
-      {minutes} {suffix}
+      {minutes}<span style={props.suffixStyle}>{suffix}</span>
     </React.Fragment>
   );
 };
 
 Time.propTypes = {
   blinking: PropTypes.bool,
-  ampm: PropTypes.bool
+  ampm: PropTypes.bool,
+  suffixStyle: PropTypes.object
 };
 
 export default Time;

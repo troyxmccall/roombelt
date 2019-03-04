@@ -1,51 +1,82 @@
 import React from "react";
 import i18next from "i18next";
 import { connect } from "react-redux";
-import { Badge, Time } from "../../../../theme/index";
-import { MeetingHeader, MeetingTitle, MeetingSubtitle } from "./Components";
-import { currentMeetingSelector, nextMeetingSelector } from "../../store/selectors";
-import { isAmPmClockSelector, requireCheckInSelector } from "apps/device/store/selectors";
+import { Time } from "../../../../theme/index";
+import styled from "styled-components/macro";
+import colors from "dark/colors";
+import EventAvailable from "react-icons/lib/md/event-available";
+import AccountBox from "react-icons/lib/md/account-box";
+import {
+  currentMeetingSelector,
+  isAmPmClockSelector,
+  minutesAvailableTillNextMeetingSelector,
+  nextMeetingSelector
+} from "apps/device/store/selectors";
+import { prettyFormatMinutes } from "services/formatting";
 
-const CurrentMeeting = props => {
-  const { requireCheckIn, isAmPmClock } = props;
-  const { attendees, organizer, isCheckedIn, isAllDayEvent, startTimestamp, endTimestamp, summary } = props.currentMeeting;
+const Wrapper = styled.div`
+  color: ${colors.foreground.gray};
+  padding: 0.4em 1.2em;
+`;
 
-  const guestsCount = attendees.filter(u => u.displayName !== organizer.displayName).length;
-  const fromStart = Math.floor((props.currentTimestamp - startTimestamp) / 1000 / 60);
+const Indent = styled.div`
+  text-indent: -1.5em;
+  margin-left: 1.5em;
+  
+  :after {
+    display: block;
+    content: '';
+  }
+`;
 
-  const getHeader = () => {
-    if (isAllDayEvent) return <Badge danger>{i18next.t("availability.occupied-all-day")}</Badge>;
-    if (isCheckedIn) return <Badge danger>{i18next.t("availability.occupied")}</Badge>;
-    if (fromStart < 0) return <Badge info>{i18next.t("availability.starts.in", { count: -fromStart })}</Badge>;
-    if (fromStart === 0) return <Badge info>{i18next.t("availability.starts.now")}</Badge>;
-    if (requireCheckIn) return <Badge warning>{i18next.t("availability.starts.ago", { count: fromStart })}</Badge>;
+const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isAmPmClock }) => {
+  const getMeetingSummary = () => {
+    if (!currentMeeting && !nextMeeting) {
+      return i18next.t("availability.available-all-day");
+    }
 
-    return <Badge danger>{i18next.t("availability.occupied")}</Badge>;
+    if (!currentMeeting && nextMeeting) {
+      return i18next.t("availability.available-for", { time: prettyFormatMinutes(minutesToNextMeeting) });
+    }
+
+    return (
+      <>
+        {currentMeeting.summary || i18next.t("meeting.no-title")}
+        {" "}
+        {!currentMeeting.isAllDayEvent &&
+        <span style={{ whitespace: "nowrap", display: "inline-block", textIndent: 0 }}>
+          {<Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>}
+          {" – "}
+          {<Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>}
+        </span>}
+      </>
+    );
   };
 
+  const guests = currentMeeting && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
+
   return (
-    <React.Fragment>
-      <MeetingHeader>{getHeader()}</MeetingHeader>
-      <MeetingTitle>
-        {summary || i18next.t("meeting.no-title")}{" "}
-        {!isAllDayEvent && <>
-          <Time timestamp={startTimestamp} ampm={isAmPmClock}/>
-          {" - "}
-          <Time timestamp={endTimestamp} ampm={isAmPmClock}/>
-        </>}
-      </MeetingTitle>
-      <MeetingSubtitle>
-        {organizer.displayName} {guestsCount > 0 && i18next.t("meeting.guests", { count: guestsCount })}
-      </MeetingSubtitle>
-    </React.Fragment>
+    <Wrapper>
+      <Indent>
+        <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5em" }}/>
+        <span style={{ verticalAlign: "middle" }}>{getMeetingSummary()}</span>
+      </Indent>
+      {currentMeeting && <Indent>
+        <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5em" }}/>
+        <span style={{ verticalAlign: "middle" }}>
+          {currentMeeting.organizer.displayName}
+          {guests.length > 0 && guests.length <= 5 && (", " + guests.map(u => u.displayName).join(", "))}
+          {guests.length > 0 && guests.length > 5 && i18next.t("meeting.guests", { count: guests.length })}
+        </span>
+      </Indent>}
+    </Wrapper>
   );
 };
 
 const mapStateToProps = state => ({
-  currentTimestamp: state.timestamp,
   currentMeeting: currentMeetingSelector(state),
   nextMeeting: nextMeetingSelector(state),
-  requireCheckIn: requireCheckInSelector(state),
+  minutesToNextMeeting: minutesAvailableTillNextMeetingSelector(state),
   isAmPmClock: isAmPmClockSelector(state)
 });
 

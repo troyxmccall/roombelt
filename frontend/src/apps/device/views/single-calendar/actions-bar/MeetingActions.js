@@ -2,15 +2,17 @@ import React from "react";
 import i18next from "i18next";
 import { connect } from "react-redux";
 
-import { LoaderButton, Button } from "theme/index";
+import LoaderButton from "dark/LoaderButton";
+import Button from "dark/Button";
 import { prettyFormatMinutes } from "services/formatting";
 import {
   currentActionSourceSelector,
-  currentMeetingSelector, isAfterCurrentMeetingStartTimeSelector,
-  minutesAvailableTillNextMeetingSelector, requireCheckInSelector
+  currentMeetingSelector,
+  isAfterCurrentMeetingStartTimeSelector,
+  minutesAvailableTillNextMeetingSelector,
+  requireCheckInSelector
 } from "apps/device/store/selectors";
 
-import ButtonSet from "../../../components/ButtonSet";
 import { meetingActions } from "apps/device/store/actions";
 
 class MeetingStarted extends React.PureComponent {
@@ -45,11 +47,12 @@ class MeetingStarted extends React.PureComponent {
     return (
       <>
         <LoaderButton primary
+                      key={"start-early"}
                       onClick={() => startMeetingEarly("start-early")}
                       isLoading={currentActionSource === "start-early"}
                       children={i18next.t("actions.start-early")}/>
 
-        <Button white onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}>
+        <Button key={"cancel"} white onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}>
           {i18next.t("actions.cancel-meeting")}
         </Button>
       </>
@@ -62,11 +65,12 @@ class MeetingStarted extends React.PureComponent {
     return (
       <>
         <LoaderButton primary
+                      key={"check-in"}
                       onClick={() => checkInToMeeting("check-in")}
                       isLoading={currentActionSource === "check-in"}
                       children={i18next.t("actions.check-in")}/>
 
-        <Button white onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}>
+        <Button key={"cancel"} white onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}>
           {i18next.t("actions.cancel-meeting")}
         </Button>
       </>
@@ -78,11 +82,12 @@ class MeetingStarted extends React.PureComponent {
 
     const ExtendButton = ({ value, name }) => (
       <LoaderButton
+        key={name}
         white
         disabled={currentActionSource !== null}
         isLoading={currentActionSource === name}
         onClick={() => extendMeeting(value, name)}
-        children={"+" + prettyFormatMinutes(value)}
+        children={prettyFormatMinutes(value)}
       />
     );
 
@@ -90,21 +95,21 @@ class MeetingStarted extends React.PureComponent {
 
     return (
       <>
-        <Button white
+        <Button error
+                key={'end-now'}
                 disabled={currentActionSource !== null}
-                onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}
-                style={{ marginRight: 20 }}>
+                onClick={() => this.setState({ idOfMeetingToCancel: currentMeeting.id })}>
           {i18next.t("actions.end-now")}
         </Button>
 
         {minutesToNextMeeting > 0 && (
-          <ButtonSet>
+          <>
             <Button success disabled>{i18next.t("actions.extend")}</Button>
             {minutesToNextMeeting > 20 && <ExtendButton value={15} name="extend-15"/>}
             {minutesToNextMeeting > 40 && <ExtendButton value={30} name="extend-30"/>}
             {minutesToNextMeeting > 70 && <ExtendButton value={60} name="extend-60"/>}
             {showCustomExtensionTime && <ExtendButton value={minutesToNextMeeting} name="extend-custom"/>}
-          </ButtonSet>
+          </>
         )}
       </>
     );
@@ -118,10 +123,10 @@ class MeetingStarted extends React.PureComponent {
 
     return (
       <>
-        <Button disabled={isInProgress} onClick={() => this.setState({ idOfMeetingToCancel: null })} white>
+        <Button key={'back'} disabled={isInProgress} onClick={() => this.setState({ idOfMeetingToCancel: null })} white>
           {i18next.t("actions.back")}
         </Button>
-        <LoaderButton isLoading={isInProgress} onClick={onConfirm} danger>
+        <LoaderButton key={'confirm'} isLoading={isInProgress} onClick={onConfirm} error>
           {i18next.t("actions.confirm")}
         </LoaderButton>
       </>

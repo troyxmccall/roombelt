@@ -1,6 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Button, LoaderButton } from "theme/index";
+import LoaderButton from "dark/LoaderButton";
+import Button from "dark/Button";
+
 import { prettyFormatMinutes } from "services/formatting";
 import { currentActionSourceSelector, minutesAvailableTillNextMeetingSelector } from "apps/device/store/selectors";
 import { meetingActions } from "apps/device/store/actions";
