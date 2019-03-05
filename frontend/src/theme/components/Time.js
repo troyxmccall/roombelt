@@ -26,18 +26,19 @@ const Time = props => {
   const suffix = props.ampm ? suffix12h : "";
 
   return (
-    <React.Fragment>
+    <span>
       {hour}
       <TimeSeparator blinking={props.blinking}>:</TimeSeparator>
-      {minutes}<span style={props.suffixStyle}>{suffix}</span>
-    </React.Fragment>
+      {minutes}<span style={{ fontSize: props.smallSuffix ? "0.5em" : "1em" }}>{suffix}</span>
+    </span>
   );
 };
 
 Time.propTypes = {
   blinking: PropTypes.bool,
   ampm: PropTypes.bool,
-  suffixStyle: PropTypes.object
+  smallSuffix: PropTypes.bool,
+  timestamp: PropTypes.number
 };
 
 export default Time;

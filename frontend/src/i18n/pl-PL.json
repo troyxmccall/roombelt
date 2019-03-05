@@ -36,7 +36,8 @@
     "check-in": "Zamelduj się",
     "start-early": "Zacznij wcześniej",
     "cancel-meeting": "Odwołaj spotkanie",
-    "find-room": "Znajdź pokój"
+    "find-room": "Znajdź pokój",
+    "check-in-warning": "Spotkanie zostanie usunięte automatycznie za {{ count }} min."
   },
   "full-screen": "Pełen ekran",
   "errors": {

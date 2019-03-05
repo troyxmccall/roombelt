@@ -1,7 +1,7 @@
 import React from "react";
 import i18next from "i18next";
 import { connect } from "react-redux";
-import { Time } from "../../../../theme/index";
+import { Time } from "theme/index";
 import styled from "styled-components/macro";
 import colors from "dark/colors";
 import EventAvailable from "react-icons/lib/md/event-available";
@@ -16,12 +16,12 @@ import { prettyFormatMinutes } from "services/formatting";
 
 const Wrapper = styled.div`
   color: ${colors.foreground.gray};
-  padding: 0.4em 1.2em;
+  padding: 0.4rem 1.2rem;
 `;
 
 const Indent = styled.div`
-  text-indent: -1.5em;
-  margin-left: 1.5em;
+  text-indent: -1.5rem;
+  margin-left: 1.5rem;
   
   :after {
     display: block;
@@ -58,11 +58,11 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
   return (
     <Wrapper>
       <Indent>
-        <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5em" }}/>
+        <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>{getMeetingSummary()}</span>
       </Indent>
       {currentMeeting && <Indent>
-        <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5em" }}/>
+        <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
           {currentMeeting.organizer.displayName}
           {guests.length > 0 && guests.length <= 5 && (", " + guests.map(u => u.displayName).join(", "))}

@@ -22,34 +22,35 @@ import ActionsBar from "apps/device/views/single-calendar/actions-bar";
 import Button from "dark/Button";
 import Layout from "dark/Layout";
 import FullScreenToggle from "apps/device/components/FullScreenToggle";
+import i18next from "i18next";
 
 const Header = styled.div`
   background: ${colors.background.black};
   color: ${colors.foreground.white};
-  padding: .9em 1.2em .4em 1.2em;
+  padding: .9rem 1.2rem .4rem 1.2rem;
   display: flex;
   justify-content: space-between;
 `;
 
 const CalendarName = styled.span`
-  font-size: 1.5em;
+  font-size: 1.5rem;
 `;
 
 const TimeWrapper = styled.div`
-  font-size: 3em;
-  margin-top: -0.1em;
+  font-size: 3rem;
+  margin-top: -0.1rem;
 `;
 
 const StatusBar = styled(Partial)`
   display: flex;
   justify-content: space-between;
-  padding: 0.6em 1.2em;
+  padding: 0.6rem 1.2rem;
   color: ${colors.foreground.white};
   align-items: center;
 `;
 
 const ActionsWrapper = styled.div`
-  padding: 0.6em 1.2em;
+  padding: 0.6rem 1.2rem;
 `;
 
 const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock }) => (
@@ -60,13 +61,15 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
         {calendarName}
       </CalendarName>
       <TimeWrapper>
-        <Time timestamp={currentTimestamp} ampm={isAmPmClock} blinking suffixStyle={{ fontSize: "0.5em" }}/>
+        <Time timestamp={currentTimestamp} ampm={isAmPmClock} blinking smallSuffix/>
       </TimeWrapper>
     </Header>
 
     <StatusBar>
       <RoomStatus/>
-      <Button subtle style={{ padding: "0.5em 1em" }} onClick={showAllCalendarsView}>Find Room <MdLayers/></Button>
+      <Button subtle style={{ padding: "0.5rem", margin: '0 -0.5rem 0 0' }} onClick={showAllCalendarsView}>
+        {i18next.t("actions.find-room")} <MdLayers/>
+      </Button>
     </StatusBar>
 
     <CurrentMeeting/>

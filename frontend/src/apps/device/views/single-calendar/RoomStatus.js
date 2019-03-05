@@ -21,7 +21,7 @@ const RoomStatus = ({ currentMeeting, nextMeeting, currentTimestamp, requireChec
   const fromStart = Math.floor((currentTimestamp - currentMeeting.startTimestamp) / 1000 / 60);
 
   if (fromStart < 0) {
-    return <Status occupied>{i18next.t("availability.starts.in", { count: -fromStart })}</Status>;
+    return <Status warning>{i18next.t("availability.starts.in", { count: -fromStart })}</Status>;
   }
 
   if (fromStart === 0) {
@@ -36,7 +36,7 @@ const RoomStatus = ({ currentMeeting, nextMeeting, currentTimestamp, requireChec
 };
 
 const Wrapper = styled.div`
-  font-size: 2em;
+  font-size: 2rem;
 `;
 
 const mapStateToProps = state => ({

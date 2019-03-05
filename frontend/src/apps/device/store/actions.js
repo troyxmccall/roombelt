@@ -3,6 +3,7 @@ import cancellationToken from "utils/cancellation-token";
 import screenfull from "screenfull";
 import axios from "axios";
 
+import * as api from "services/api";
 import { createDevice, getDeviceDetails, removeAuth } from "services/api";
 
 import {
@@ -13,14 +14,13 @@ import {
   isDashboardDeviceSelector,
   isInitializedSelector,
   isInOfflineModeSelector,
-  lastActivityOnShowCalendarsViewSelector, minutesForCheckInSelector, requireCheckInSelector,
-  showAllCalendarsViewSelector,
-  timestampSelector
+  lastActivityOnShowCalendarsViewSelector,
+  minutesLeftForCheckInSelector,
+  showAllCalendarsViewSelector
 } from "apps/device/store/selectors";
 import { changeLanguage } from "i18n";
 
 import i18next from "i18next";
-import * as api from "services/api";
 import { wait, waitUntilTrue } from "utils/time";
 
 
@@ -80,31 +80,13 @@ export const deviceActions = {
     dispatch(deviceActions.$fetchDeviceData());
   },
   $removeCurrentMeetingIfNotCheckedIn: () => async (dispatch, getState) => {
-    if (!requireCheckInSelector(getState())) {
-      return;
-    }
-
+    const minutesLeftForCheckIn = minutesLeftForCheckInSelector(getState());
     const meeting = currentMeetingSelector(getState());
-    if (!meeting || meeting.isCheckedIn) {
-      return;
-    }
 
-    // Don't remove meetings 2 minutes after `minutesForCheckIn`
-    // This is to avoid removing meetings in-progress after Roombelt renews connection to the server
-    const minutesForCheckIn = minutesForCheckInSelector(getState());
-    const timeFromStartInMinutes = (timestampSelector(getState()) - meeting.startTimestamp) / 1000 / 60;
-    if (timeFromStartInMinutes <= minutesForCheckIn || timeFromStartInMinutes >= minutesForCheckIn + 2) {
-      return;
+    if (minutesLeftForCheckIn !== null && minutesLeftForCheckIn < 0) {
+      await api.deleteMeeting(meeting.id);
+      dispatch(deviceActions.$fetchDeviceData());
     }
-
-    // Don't automatically remove very long meetings (e.g. all day events)
-    const meetingDurationInMinutes = (meeting.endTimestamp - meeting.startTimestamp) / 1000 / 60;
-    if (meetingDurationInMinutes >= 240) {
-      return;
-    }
-
-    await api.deleteMeeting(meeting.id);
-    dispatch(deviceActions.$fetchDeviceData());
   },
 
   $updateClock: action(timestamp => ({ timestamp })),

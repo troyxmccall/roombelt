@@ -50,7 +50,7 @@ const NextMeeting = ({ nextMeeting, isAmPmClock }) =>
         <Time timestamp={nextMeeting.endTimestamp} ampm={isAmPmClock}/>
       </>}
     </NextMeetingTime>
-    <DateRange style={{ transform: "translateY(0.1em)" }}/>
+    <DateRange style={{ transform: "translateY(0.1rem)" }}/>
   </Wrapper>;
 
 const mapStateToProps = state => ({

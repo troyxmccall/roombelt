@@ -22,17 +22,27 @@ import Time from "theme/components/Time";
 import FullScreenToggle from "apps/device/components/FullScreenToggle";
 
 const Header = styled(Section).attrs({ header: true })`
-  padding: 0.85em;
-  font-size: 1.4em;
+  padding: 0.85rem;
+  font-size: 2rem;
   color: ${colors.foreground.white};
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
+const BackButton = styled(Button)`
+  font-size: .9rem;
+  width: 6rem;
+  z-index: 1; 
+`;
+
 const PageTitle = styled.span`
   vertical-align: middle;
-  margin-left: 1em;
+  margin-left: 1rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
 `;
 
 const Content = styled.div`
@@ -49,19 +59,16 @@ const LoaderWrapper = styled.div`
 
 const AllCalendarsView = ({ closeAllCalendarsView, calendars, areAllCalendarsLoaded, markUserActivity, timestamp, isAmPmClock }) => {
   return (
-    <Layout style={{ minHeight: "100%", height: 'auto' }}>
+    <Layout style={{ minHeight: "100%", height: "auto" }}>
       <Header>
-        <Button style={{ fontSize: "0.5em", width: "5em" }}
-                onClick={closeAllCalendarsView}>{i18next.t("actions.back")}</Button>
+        <BackButton onClick={closeAllCalendarsView}>{i18next.t("actions.back")}</BackButton>
         <PageTitle>{i18next.t("actions.find-room")}</PageTitle>
-        <div style={{ width: "5em", textAlign: "right" }}>
-          <Time timestamp={timestamp} ampm={isAmPmClock} suffixStyle={{ fontSize: "0.5em" }}/>
-        </div>
+        <Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/>
       </Header>
 
       <Content onScroll={markUserActivity}>
         {!areAllCalendarsLoaded && <LoaderWrapper><Loader white/></LoaderWrapper>}
-        {calendars.map((calendar, i) => <CalendarRow isFirst={i === 0} key={calendar.id} calendarId={calendar.id}/>)}
+        {calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
       </Content>
 
       <FullScreenToggle/>

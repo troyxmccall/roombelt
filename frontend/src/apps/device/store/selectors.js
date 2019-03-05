@@ -80,3 +80,28 @@ export const dashBoardMeetingsSelector = createSelector(
       .sort((eventA, eventB) => eventA.startTimestamp - eventB.startTimestamp);
   }
 );
+
+export const minutesLeftForCheckInSelector = createSelector(
+  [timestampSelector, requireCheckInSelector, currentMeetingSelector, minutesForCheckInSelector],
+  (currentTimestamp, requireCheckIn, meeting, minutesForCheckIn) => {
+    if (!requireCheckIn || !meeting || meeting.isCheckedIn) {
+      return null;
+    }
+
+
+    // Don't automatically remove very long meetings (e.g. all day events)
+    const meetingDurationInMinutes = (meeting.endTimestamp - meeting.startTimestamp) / 1000 / 60;
+    if (meetingDurationInMinutes >= 240) {
+      return null;
+    }
+
+    // Don't remove meetings 2 minutes after `minutesForCheckIn`
+    // This is to avoid removing meetings in-progress after Roombelt renews connection to the server
+    const timeFromStartInMinutes = (currentTimestamp - meeting.startTimestamp) / 1000 / 60;
+    if (timeFromStartInMinutes >= minutesForCheckIn + 2) {
+      return null;
+    }
+
+    return minutesForCheckIn - timeFromStartInMinutes;
+  }
+);

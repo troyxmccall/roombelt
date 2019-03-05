@@ -17,7 +17,7 @@ import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formattin
 import { Time } from "theme";
 import { deviceActions, meetingActions } from "apps/device/store/actions";
 import ActionError from "../../components/ActionError";
-import Section from "dark/Section";
+import Section, { partialMixin } from "dark/Section";
 import LoaderButton from "dark/LoaderButton";
 import Button from "dark/Button";
 import Status from "dark/Status";
@@ -29,11 +29,25 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const RowContent = styled.div`
-  margin: 0 1.2em 1em 1.2em;
+const RowWrapper = styled(Section)`
+  :first-child {
+    ${partialMixin}
+  }
+`;
+
+const RowCard = styled.div`
+  margin: 0 0.85rem 1rem 0.85rem;
   background: #424242;
-  padding: 0.6em 1em;
+  padding: 0.6rem 1rem;
   color: ${colors.foreground.white}
+`;
+
+const Content = styled.div`
+ font-size: 0.8rem; 
+ margin-top: 0.5rem;
+ line-height: 1.2rem;
+ min-height: 1.2rem; 
+ overflow: hidden;
 `;
 
 const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
@@ -53,7 +67,7 @@ const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
 };
 
 
-const CalendarRow = ({ isFirst, calendarId, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated, isAmPmClock }) => {
+const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, timestamp, currentActionSource, isCurrentActionSuccess, isCurrentActionError, isRetryingAction, createMeeting, acknowledgeMeetingCreated, isAmPmClock }) => {
   const startTimestamp = currentMeeting ? currentMeeting.endTimestamp : timestamp;
   const endTimestamp = nextMeeting ? nextMeeting.startTimestamp : Number.POSITIVE_INFINITY;
 
@@ -69,13 +83,6 @@ const CalendarRow = ({ isFirst, calendarId, calendarName, currentMeeting, nextMe
   const showMeetingDetails = !isAvailable && !showSuccessInfo && !showError;
   const showButtons = isAvailable && !showSuccessInfo && !showError;
 
-  const header = (
-    <Header>
-      <span style={{ fontSize: "1.2em" }}>{calendarName}</span>
-      {getAvailability(currentMeeting && currentMeeting.isAllDayEvent, timeToStart, minutesAvailable)}
-    </Header>
-  );
-
   const CreateButton = ({ value, name }) => (
     <LoaderButton
       disabled={currentActionSource !== null}
@@ -86,10 +93,14 @@ const CalendarRow = ({ isFirst, calendarId, calendarName, currentMeeting, nextMe
   );
 
   return (
-    <Section partial={isFirst}>
-      <RowContent>
-        {header}
-        <div style={{ fontSize: "0.8em", marginTop: "0.5em", lineHeight: "1.2em", minHeight: "1.2em" }}>
+    <RowWrapper>
+      <RowCard>
+        <Header>
+          <span style={{ fontSize: "1.2rem" }}>{calendarName}</span>
+          {getAvailability(currentMeeting && currentMeeting.isAllDayEvent, timeToStart, minutesAvailable)}
+        </Header>
+
+        <Content>
           {showMeetingDetails && <>
             {currentMeeting.summary}{" "}
             {currentMeeting && !currentMeeting.isAllDayEvent && <>
@@ -99,7 +110,7 @@ const CalendarRow = ({ isFirst, calendarId, calendarName, currentMeeting, nextMe
             </>}
           </>}
           {showSuccessInfo && <>
-            <span style={{ marginRight: "1em" }}>{i18next.t("meeting-created")}</span>
+            <span style={{ marginRight: "1rem" }}>{i18next.t("meeting-created")}</span>
             <Button primary onClick={acknowledgeMeetingCreated}>OK</Button>
           </>}
           {showError && <ActionError/>}
@@ -111,9 +122,9 @@ const CalendarRow = ({ isFirst, calendarId, calendarName, currentMeeting, nextMe
             {minutesAvailable > 130 && <CreateButton value={120} name={`${calendarId}-create-120`}/>}
             {minutesAvailable <= 130 && <CreateButton value={minutesAvailable} name={`${calendarId}-create-custom`}/>}
           </>}
-        </div>
-      </RowContent>
-    </Section>
+        </Content>
+      </RowCard>
+    </RowWrapper>
   );
 };
 
