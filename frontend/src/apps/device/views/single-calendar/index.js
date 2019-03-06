@@ -53,6 +53,10 @@ const ActionsWrapper = styled.div`
   padding: 0.6rem 1.2rem;
 `;
 
+const Spacer = styled.div`
+  flex-grow: 1;
+`;
+
 const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock }) => (
   <Layout>
     <PageLoaded/>
@@ -67,7 +71,7 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
 
     <StatusBar>
       <RoomStatus/>
-      <Button subtle style={{ padding: "0.5rem", margin: '0 -0.5rem 0 0' }} onClick={showAllCalendarsView}>
+      <Button subtle style={{ padding: "0.5rem", margin: "0 -0.5rem 0 0" }} onClick={showAllCalendarsView}>
         {i18next.t("actions.find-room")} <MdLayers/>
       </Button>
     </StatusBar>
@@ -78,7 +82,7 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
       <ActionsBar/>
     </ActionsWrapper>
 
-    <div style={{ flexGrow: 1 }}/>
+    <Spacer/>
 
     {nextMeeting && <NextMeeting/>}
 

@@ -38,10 +38,15 @@ const NextMeetingTime = styled.div`
   white-space: nowrap;
 `;
 
+const Spacer = styled.div`
+  flex-grow: 1;
+`;
+
+
 const NextMeeting = ({ nextMeeting, isAmPmClock }) =>
   <Wrapper>
     <NextLabel>{i18next.t("meeting.next")}</NextLabel>
-    <div style={{ flexGrow: 1 }}/>
+    <Spacer />
     <NextMeetingSummary>{nextMeeting.summary}</NextMeetingSummary>
     {" "}
     <NextMeetingTime>
