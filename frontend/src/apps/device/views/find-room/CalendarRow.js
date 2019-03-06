@@ -3,43 +3,67 @@ import i18next from "i18next";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 import {
-  calendarNameSelector, currentActionSourceSelector,
-  currentMeetingSelector, isActionErrorSelector, isActionSuccessSelector, isAmPmClockSelector, isRetryingActionSelector,
-  nextMeetingSelector, timestampSelector
+  calendarNameSelector,
+  currentActionSourceSelector,
+  currentMeetingSelector,
+  isActionErrorSelector,
+  isActionSuccessSelector,
+  isAmPmClockSelector,
+  isRetryingActionSelector,
+  nextMeetingSelector,
+  timestampSelector
 } from "apps/device/store/selectors";
 import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
-import { Card, Badge, Button, LoaderButton, Text, Time } from "theme";
-import ButtonSet from "../../components/ButtonSet";
+import { Time } from "theme";
 import { deviceActions, meetingActions } from "apps/device/store/actions";
 import ActionError from "../../components/ActionError";
+import Section, { partialMixin } from "dark/Section";
+import LoaderButton from "dark/LoaderButton";
+import Button from "dark/Button";
+import Status from "dark/Status";
+import colors from "dark/colors";
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
-const Row = styled(Card)`
-  margin-top: 1em;
-  
-  &:last-child {
-    margin-bottom: 1em;
+const RowWrapper = styled(Section)`
+  :first-child {
+    ${partialMixin}
   }
+`;
+
+const RowCard = styled.div`
+  margin: 0 0.85rem 1rem 0.85rem;
+  background: #424242;
+  padding: 0.6rem 1rem;
+  color: ${colors.foreground.white}
+`;
+
+const Content = styled.div`
+ font-size: 0.8rem; 
+ margin-top: 0.5rem;
+ line-height: 1.2rem;
+ min-height: 1.2rem; 
+ overflow: hidden;
 `;
 
 const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
-  if(isAllDayMeeting) {
-    return <Badge danger>{i18next.t("availability.occupied-all-day")}</Badge>;
+  if (isAllDayMeeting) {
+    return <Status occupied>{i18next.t("availability.occupied-all-day")}</Status>;
   }
 
   if (timeToStart >= 15 || minutesAvailable < 5) {
-    return <Badge danger>{i18next.t("availability.occupied")}</Badge>;
+    return <Status occupied>{i18next.t("availability.occupied")}</Status>;
   }
   if (timeToStart >= 1) {
-    return <Badge
-      warning>{i18next.t("availability.available-in", { time: prettyFormatMinutes(Math.ceil(timeToStart)) })}</Badge>;
+    return <Status
+      warning>{i18next.t("availability.available-in", { time: prettyFormatMinutes(Math.ceil(timeToStart)) })}</Status>;
   }
 
-  return <Badge success>{i18next.t("availability.available")}</Badge>;
+  return <Status available>{i18next.t("availability.available")}</Status>;
 };
 
 
@@ -59,13 +83,6 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
   const showMeetingDetails = !isAvailable && !showSuccessInfo && !showError;
   const showButtons = isAvailable && !showSuccessInfo && !showError;
 
-  const header = (
-    <Header>
-      {calendarName}
-      {getAvailability(currentMeeting && currentMeeting.isAllDayEvent, timeToStart, minutesAvailable)}
-    </Header>
-  );
-
   const CreateButton = ({ value, name }) => (
     <LoaderButton
       disabled={currentActionSource !== null}
@@ -76,32 +93,38 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
   );
 
   return (
-    <Row block>
-      {header}
-      {showMeetingDetails && <Text style={{ fontSize: "0.8em" }}>
-        {currentMeeting.summary}{" "}
-        {currentMeeting && !currentMeeting.isAllDayEvent && <>
-          <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
-          {" - "}
-          <Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>
-        </>}
-      </Text>}
-      {showSuccessInfo && <>
-        <Text style={{ marginRight: "1em", fontSize: "0.8em" }}>{i18next.t("meeting-created")}</Text>
-        <ButtonSet style={{ fontSize: "0.6em" }}>
-          <Button primary onClick={acknowledgeMeetingCreated}>OK</Button>
-        </ButtonSet>
-      </>}
-      {showError && <ActionError style={{ fontSize: "0.6em" }}/>}
-      {showButtons && <ButtonSet style={{ fontSize: "0.6em" }}>
-        <Button disabled success>Start</Button>
-        {minutesAvailable > 20 && <CreateButton value={15} name={`${calendarId}-create-15`}/>}
-        {minutesAvailable > 40 && <CreateButton value={30} name={`${calendarId}-create-30`}/>}
-        {minutesAvailable > 70 && <CreateButton value={60} name={`${calendarId}-create-60`}/>}
-        {minutesAvailable > 130 && <CreateButton value={120} name={`${calendarId}-create-120`}/>}
-        {minutesAvailable <= 130 && <CreateButton value={minutesAvailable} name={`${calendarId}-create-custom`}/>}
-      </ButtonSet>}
-    </Row>
+    <RowWrapper>
+      <RowCard>
+        <Header>
+          <span style={{ fontSize: "1.2rem" }}>{calendarName}</span>
+          {getAvailability(currentMeeting && currentMeeting.isAllDayEvent, timeToStart, minutesAvailable)}
+        </Header>
+
+        <Content>
+          {showMeetingDetails && <>
+            {currentMeeting.summary}{" "}
+            {currentMeeting && !currentMeeting.isAllDayEvent && <>
+              <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
+              {" - "}
+              <Time timestamp={currentMeeting.endTimestamp} ampm={isAmPmClock}/>
+            </>}
+          </>}
+          {showSuccessInfo && <>
+            <span style={{ marginRight: "1rem" }}>{i18next.t("meeting-created")}</span>
+            <Button primary onClick={acknowledgeMeetingCreated}>OK</Button>
+          </>}
+          {showError && <ActionError/>}
+          {showButtons && <>
+            <Button disabled success>Start</Button>
+            {minutesAvailable > 20 && <CreateButton value={15} name={`${calendarId}-create-15`}/>}
+            {minutesAvailable > 40 && <CreateButton value={30} name={`${calendarId}-create-30`}/>}
+            {minutesAvailable > 70 && <CreateButton value={60} name={`${calendarId}-create-60`}/>}
+            {minutesAvailable > 130 && <CreateButton value={120} name={`${calendarId}-create-120`}/>}
+            {minutesAvailable <= 130 && <CreateButton value={minutesAvailable} name={`${calendarId}-create-custom`}/>}
+          </>}
+        </Content>
+      </RowCard>
+    </RowWrapper>
   );
 };
 

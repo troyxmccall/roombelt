@@ -1,10 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import {
-  currentMeetingSelector,
-  isActionErrorSelector,
-  isRetryingActionSelector
-} from "apps/device/store/selectors";
+import { currentMeetingSelector, isActionErrorSelector, isRetryingActionSelector } from "apps/device/store/selectors";
 
 import ActionError from "../../../components/ActionError";
 import RoomAvailable from "./RoomAvailable";

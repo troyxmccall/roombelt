@@ -33,7 +33,8 @@
     "check-in": "Check in",
     "start-early": "Start early",
     "cancel-meeting": "Cancel meeting",
-    "find-room": "Find room"
+    "find-room": "Find room",
+    "check-in-warning": "This meeting will be cancelled automatically in {{ count }} min."
   },
   "full-screen": "Full screen",
   "errors": {

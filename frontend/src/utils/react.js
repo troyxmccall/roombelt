@@ -24,11 +24,3 @@ export const useIsVisible = (elRef) => {
 
   return isVisible;
 };
-
-export const useHotReload = (cb) => {
-  const [version, incrementVersion] = useState(0);
-
-  useEffect(() => {
-    if (module.hot) cb(() => incrementVersion(version + 1));
-  }, []);
-};

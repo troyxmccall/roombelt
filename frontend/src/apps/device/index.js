@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Provider } from "react-redux";
 
 import store from "./store";
 import { deviceActions } from "./store/actions";
-import Router from "./router";
-import { useHotReload } from "utils/react";
 
-export default () => {
-  useHotReload(update => module.hot.accept("./router", update));
-
-  useEffect(() => {
+export default class Device extends React.Component {
+  componentDidMount() {
     store.dispatch(deviceActions.initialize());
-  }, []);
 
-  return <Provider store={store} children={<Router/>}/>;
-};
+    if (module.hot) {
+      module.hot.accept("./router", () => this.forceUpdate());
+    }
+  }
+
+  render() {
+    const Router = require("./router").default;
+
+    return <Provider store={store} children={<Router/>}/>;
+  }
+}
+

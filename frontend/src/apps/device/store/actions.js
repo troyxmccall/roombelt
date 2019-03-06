@@ -17,6 +17,7 @@ import {
   lastActivityOnShowCalendarsViewSelector,
   minutesForCheckInSelector,
   requireCheckInSelector,
+  minutesLeftForCheckInSelector,
   showAllCalendarsViewSelector,
   timestampSelector
 } from "apps/device/store/selectors";
@@ -86,31 +87,13 @@ export const deviceActions = {
     dispatch(deviceActions.$fetchDeviceData());
   },
   $removeCurrentMeetingIfNotCheckedIn: () => async (dispatch, getState) => {
-    if (!requireCheckInSelector(getState())) {
-      return;
-    }
-
+    const minutesLeftForCheckIn = minutesLeftForCheckInSelector(getState());
     const meeting = currentMeetingSelector(getState());
-    if (!meeting || meeting.isCheckedIn) {
-      return;
-    }
 
-    // Don't remove meetings 2 minutes after `minutesForCheckIn`
-    // This is to avoid removing meetings in-progress after Roombelt renews connection to the server
-    const minutesForCheckIn = minutesForCheckInSelector(getState());
-    const timeFromStartInMinutes = (timestampSelector(getState()) - meeting.startTimestamp) / 1000 / 60;
-    if (timeFromStartInMinutes <= minutesForCheckIn || timeFromStartInMinutes >= minutesForCheckIn + 2) {
-      return;
+    if (minutesLeftForCheckIn !== null && minutesLeftForCheckIn < 0) {
+      await api.deleteMeeting(meeting.id);
+      dispatch(deviceActions.$fetchDeviceData());
     }
-
-    // Don't automatically remove very long meetings (e.g. all day events)
-    const meetingDurationInMinutes = (meeting.endTimestamp - meeting.startTimestamp) / 1000 / 60;
-    if (meetingDurationInMinutes >= 240) {
-      return;
-    }
-
-    await api.deleteMeeting(meeting.id);
-    dispatch(deviceActions.$fetchDeviceData());
   },
 
   $updateClock: action(timestamp => ({ timestamp })),

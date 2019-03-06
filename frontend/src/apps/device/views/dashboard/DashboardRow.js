@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React from "react";
 import i18next from "i18next";
-import { TableRow, TableRowColumn, Badge } from "theme/index";
 import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
-import { useIsVisible } from "utils/react";
+import DateRange from "react-icons/lib/md/date-range";
+import Status from "dark/Status";
+import DashboardRowView from "apps/device/views/dashboard/DashboardRowView";
 
 const t = (key, time) => i18next.t(key, { time: prettyFormatMinutes(time) });
 
@@ -20,18 +21,19 @@ const getStatusMessage = (meeting, timestamp) => {
 };
 
 export default ({ meeting, timestamp }) => {
-  const elRef = useRef();
-  const isVisible = useIsVisible(elRef);
+  const meetingSummary = (
+    <>
+      <DateRange style={{ verticalAlign: "middle" }}/>
+      <span style={{ verticalAlign: "middle", marginLeft: ".5em" }}>{meeting.summary}</span>
+    </>
+  );
 
   const hasStarted = timestamp > meeting.startTimestamp;
-
-  return (
-    <TableRow style={{ visibility: isVisible ? "visible" : "hidden" }}>
-      <TableRowColumn style={{ paddingRight: "1em" }} ref={elRef}>{meeting.summary}</TableRowColumn>
-      <TableRowColumn>{meeting.calendar.name}</TableRowColumn>
-      <TableRowColumn>
-        <Badge success={!hasStarted} danger={hasStarted}>{getStatusMessage(meeting, timestamp)}</Badge>
-      </TableRowColumn>
-    </TableRow>
+  const meetingStatus = (
+    <Status available={!hasStarted} occupied={hasStarted}>{getStatusMessage(meeting, timestamp)}</Status>
   );
+
+  return <DashboardRowView meetingRoom={meeting.calendar.name}
+                           meetingStatus={meetingStatus}
+                           meetingSummary={meetingSummary}/>;
 };

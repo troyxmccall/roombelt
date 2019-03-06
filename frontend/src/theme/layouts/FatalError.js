@@ -1,7 +1,8 @@
 import React from "react";
 import i18next from "i18next";
 import styled from "styled-components/macro";
-import { Button, PageTitle, PageSection, PageLoaded } from "..";
+import { PageTitle, PageSection, PageLoaded } from "..";
+import Button from "dark/Button";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -27,7 +28,7 @@ export default props => (
     <PageSection style={{ marginBottom: "2em" }}>
       {props.subtitle || i18next.t("errors.action-error-subtitle")}
     </PageSection>
-    <Button primary onClick={props.onClick || (() => window.location.reload())}>
+    <Button success onClick={props.onClick || (() => window.location.reload())}>
       {props.button || i18next.t("errors.refresh-page")}
     </Button>
   </Wrapper>

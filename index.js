@@ -3,7 +3,7 @@ const express = require("express");
 
 if (process.env["NODE_ENV"] === "development") {
   const proxy = require("http-proxy-middleware");
-  app.use("/*", proxy({ target: "http://localhost:3001", changeOrigin: true }));
+  app.use("/*", proxy({ target: "http://localhost:3001", changeOrigin: true, ws: true }));
 }
 
 app.use(express.static("frontend/build"));
