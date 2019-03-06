@@ -20,7 +20,7 @@
     "no-title": "(No title)",
     "guests": "and 1 guest",
     "guests_plural": "and {{ count }} guests",
-    "next": "Next meeting today",
+    "next": "Next",
     "quick-meeting-title": "Meeting in {{ roomName }}"
   },
   "actions": {

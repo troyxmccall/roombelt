@@ -20,7 +20,7 @@
     "no-title": "(ingen titel)",
     "guests": "och 1 gäst",
     "guests_plural": "och {{ count }} gäster",
-    "next": "Nästa möte idag",
+    "next": "Nästa",
     "quick-meeting-title": "Möte i {{ roomName }}"
   },
   "actions": {

@@ -20,7 +20,7 @@
     "no-title": "(Kein Titel)",
     "guests": "und ein Gast",
     "guests_plural": "und {{ count }} Gäste",
-    "next": "Nächstes Meeting",
+    "next": "Nächster",
     "quick-meeting-title": "Meeting in {{ roomName }}"
   },
   "actions": {
@@ -33,7 +33,8 @@
     "check-in": "Einchecken",
     "start-early": "Jetzt starten",
     "cancel-meeting": "Meeting absagen",
-    "find-room": "Raum finden"
+    "find-room": "Raum finden",
+    "check-in-warning": "Sein Meeting wird automatisch in {{ count }} Minuten abgesagt."
   },
   "full-screen": "Vollbild",
   "errors": {
@@ -43,7 +44,8 @@
     "action-error-subtitle": "Besteht das Problem weiterhin, wenden Sie sich bitte an ihren IT-Administrator",
     "refresh-page": "Seite neu laden",
     "device-disconnected-title": "Verbindung getrennt",
-    "device-disconnected-message": "Dieses Gerät wurde in der Administrations-Konsole getrennt. Wollen Sie erneut eine Verbindung herstellen?"
+    "device-disconnected-message": "Dieses Gerät wurde in der Administrations-Konsole getrennt. Wollen Sie erneut eine Verbindung herstellen?",
+    "subscription-cancelled": "Produktabonnement wurde gekündigt"
   },
   "dashboard": {
     "page-title": "Meetingräume",

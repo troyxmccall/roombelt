@@ -9,6 +9,7 @@ import { nextMeetingSelector } from "../../store/selectors";
 import { isAmPmClockSelector } from "apps/device/store/selectors";
 import Section from "dark/Section";
 import colors from "dark/colors";
+import i18next from "i18next";
 
 const Wrapper = styled(Section).attrs({ footer: true })`
   padding: 0.6em 1.2em;
@@ -39,7 +40,7 @@ const NextMeetingTime = styled.div`
 
 const NextMeeting = ({ nextMeeting, isAmPmClock }) =>
   <Wrapper>
-    <NextLabel>Next</NextLabel>
+    <NextLabel>{i18next.t("meeting.next")}</NextLabel>
     <div style={{ flexGrow: 1 }}/>
     <NextMeetingSummary>{nextMeeting.summary}</NextMeetingSummary>
     {" "}
