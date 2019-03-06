@@ -63,10 +63,18 @@ This is plan for manual tests run before every release.
 5. Click "Cancel meeting" and "Confirm".
 
 ### Check in
+0. Ensure that for your device you have "Require check-in" options selected
 1. Go to Google Calendar and remove all meetings for today.
 2. Create a meeting started 5 minutes ago in Google Calendar.
 3. Wait 30s and validate that the "Check in" button is visible.
 4. Click "Check in".
+
+### Remove meeting automatically
+0. Ensure that for your device you have "Require check-in" options selected
+1. Go to Google Calendar and remove all meetings for today.
+2. Create a meeting started 9 minutes ago in Google Calendar.
+3. Wait till it's 10 minutes after the meeting started, don't check-in
+4. The meeting should be removed automatically
 
 ### Cancel meeting that already started. 
 1. Go to Google Calendar and remove all meetings for today.
