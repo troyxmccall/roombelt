@@ -13,7 +13,7 @@ const getTime = time => {
   return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !!time.dateTime };
 };
 
-const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties }) => ({
+const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties, visibility }) => ({
   id,
   summary,
   organizer,
@@ -21,7 +21,8 @@ const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedPrope
   start: getTime(start),
   end: getTime(end),
   attendees: attendees || [],
-  isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true"
+  isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
+  isPrivate: visibility === "private" || visibility === "confidential"
 });
 
 const cache = new Cache(30);

@@ -10,7 +10,7 @@ const ActionsBar = ({ isActionError, isRetryingAction, currentMeeting }) => {
   if (isActionError || isRetryingAction) return <ActionError/>;
   if (!currentMeeting) return <RoomAvailable/>;
 
-  return <MeetingActions/>;
+  return !currentMeeting.isAllDayEvent && <MeetingActions/>;
 };
 
 const mapStateToProps = state => ({

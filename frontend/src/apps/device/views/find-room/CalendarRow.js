@@ -13,7 +13,7 @@ import {
   nextMeetingSelector,
   timestampSelector
 } from "apps/device/store/selectors";
-import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
+import { getMeetingSummary, prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
 import { Time } from "theme";
 import { deviceActions, meetingActions } from "apps/device/store/actions";
 import ActionError from "../../components/ActionError";
@@ -102,7 +102,7 @@ const CalendarRow = ({ calendarId, calendarName, currentMeeting, nextMeeting, ti
 
         <Content>
           {showMeetingDetails && <>
-            {currentMeeting.summary}{" "}
+            {getMeetingSummary(currentMeeting)}{" "}
             {currentMeeting && !currentMeeting.isAllDayEvent && <>
               <Time timestamp={currentMeeting.startTimestamp} ampm={isAmPmClock}/>
               {" - "}

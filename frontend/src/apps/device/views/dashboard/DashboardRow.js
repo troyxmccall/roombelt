@@ -1,6 +1,6 @@
 import React from "react";
 import i18next from "i18next";
-import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
+import { getMeetingSummary, prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
 import DateRange from "react-icons/lib/md/date-range";
 import Status from "dark/Status";
 import DashboardRowView from "apps/device/views/dashboard/DashboardRowView";
@@ -24,7 +24,7 @@ export default ({ meeting, timestamp }) => {
   const meetingSummary = (
     <>
       <DateRange style={{ verticalAlign: "middle" }}/>
-      <span style={{ verticalAlign: "middle", marginLeft: ".5em" }}>{meeting.summary}</span>
+      <span style={{ verticalAlign: "middle", marginLeft: ".5em" }}>{getMeetingSummary(meeting)}</span>
     </>
   );
 

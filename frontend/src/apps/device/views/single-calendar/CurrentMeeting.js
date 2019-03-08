@@ -12,7 +12,7 @@ import {
   minutesAvailableTillNextMeetingSelector,
   nextMeetingSelector
 } from "apps/device/store/selectors";
-import { prettyFormatMinutes } from "services/formatting";
+import { getMeetingSummary, prettyFormatMinutes } from "services/formatting";
 
 const Wrapper = styled.div`
   color: ${colors.foreground.gray};
@@ -30,7 +30,7 @@ const Indent = styled.div`
 `;
 
 const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isAmPmClock }) => {
-  const getMeetingSummary = () => {
+  const getTitle = () => {
     if (!currentMeeting && !nextMeeting) {
       return i18next.t("availability.available-all-day");
     }
@@ -41,7 +41,7 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
 
     return (
       <>
-        {currentMeeting.summary || i18next.t("meeting.no-title")}
+        {getMeetingSummary(currentMeeting)}
         {" "}
         {!currentMeeting.isAllDayEvent &&
         <span style={{ whitespace: "nowrap", display: "inline-block", textIndent: 0 }}>
@@ -53,15 +53,15 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     );
   };
 
-  const guests = currentMeeting && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
+  const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
   return (
     <Wrapper>
       <Indent>
         <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
-        <span style={{ verticalAlign: "middle" }}>{getMeetingSummary()}</span>
+        <span style={{ verticalAlign: "middle" }}>{getTitle()}</span>
       </Indent>
-      {currentMeeting && <Indent>
+      {currentMeeting && !currentMeeting.isPrivate && <Indent>
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
           {currentMeeting.organizer.displayName}

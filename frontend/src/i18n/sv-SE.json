@@ -17,7 +17,8 @@
     }
   },
   "meeting": {
-    "no-title": "(ingen titel)",
+    "no-title": "(Ingen titel)",
+    "private": "(Privat möte)",
     "guests": "och 1 gäst",
     "guests_plural": "och {{ count }} gäster",
     "next": "Nästa",

@@ -20,6 +20,7 @@
   },
   "meeting": {
     "no-title": "(Brak tematu)",
+    "private": "(Spotkanie prywatne)",
     "guests_0": "i 1 gość",
     "guests_1": "i {{ count }} gości",
     "guests_2": "i {{ count }} gości",

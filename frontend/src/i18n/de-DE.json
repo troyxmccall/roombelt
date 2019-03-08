@@ -18,6 +18,7 @@
   },
   "meeting": {
     "no-title": "(Kein Titel)",
+    "private": "(Privates treffen)",
     "guests": "und ein Gast",
     "guests_plural": "und {{ count }} Gäste",
     "next": "Nächster",

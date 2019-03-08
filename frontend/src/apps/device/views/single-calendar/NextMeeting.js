@@ -10,6 +10,7 @@ import { isAmPmClockSelector } from "apps/device/store/selectors";
 import Section from "dark/Section";
 import colors from "dark/colors";
 import i18next from "i18next";
+import { getMeetingSummary } from "services/formatting";
 
 const Wrapper = styled(Section).attrs({ footer: true })`
   padding: 0.6em 1.2em;
@@ -46,8 +47,8 @@ const Spacer = styled.div`
 const NextMeeting = ({ nextMeeting, isAmPmClock }) =>
   <Wrapper>
     <NextLabel>{i18next.t("meeting.next")}</NextLabel>
-    <Spacer />
-    <NextMeetingSummary>{nextMeeting.summary}</NextMeetingSummary>
+    <Spacer/>
+    <NextMeetingSummary>{getMeetingSummary(nextMeeting)}</NextMeetingSummary>
     {" "}
     <NextMeetingTime>
       {!nextMeeting.isAllDayEvent && <>

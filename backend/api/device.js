@@ -19,7 +19,7 @@ router.use("/device", async function(req, res) {
     return res.sendStatus(404);
   }
 
-  if(req.context.subscription.isSubscriptionCancelled) {
+  if (req.context.subscription.isSubscriptionCancelled) {
     return res.sendStatus(402);
   }
 
@@ -29,7 +29,15 @@ router.use("/device", async function(req, res) {
 async function getCalendarInfo(calendarId, calendarProvider) {
   const calendar = calendarId && await calendarProvider.getCalendar(calendarId);
   const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId);
-  const events = calendarId && calendarEvents.filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now()).slice(0, 10);
+  const events = calendarId && calendarEvents
+    .filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now())
+    .slice(0, 10)
+    .map(event => !event.isPrivate ? event : {
+      ...event,
+      summary: null,
+      organizer: {},
+      attendees: []
+    });
 
   return calendar && {
     id: calendarId,

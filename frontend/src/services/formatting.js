@@ -1,3 +1,5 @@
+import i18next from "i18next";
+
 export function timeDifferenceInMinutes(latterEventTimestamp, formerEventTimestamp) {
   if (latterEventTimestamp == null && formerEventTimestamp != null) {
     return Number.POSITIVE_INFINITY;
@@ -15,4 +17,10 @@ export function prettyFormatMinutes(totalMinutes) {
   const minutes = totalMinutes - hours * 60;
 
   return (hours ? `${hours} h ` : "") + (minutes ? `${minutes} min` : "");
+}
+
+export function getMeetingSummary(meeting) {
+  if (!meeting) return null;
+  if (meeting.isPrivate) return i18next.t("meeting.private");
+  return meeting.summary || i18next.t("meeting.no-title");
 }
