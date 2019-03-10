@@ -9,7 +9,8 @@ export const newDeviceDataSelector = state => ({
   calendarId: state.connectDeviceWizard.calendarId,
   deviceType: state.connectDeviceWizard.deviceType,
   language: state.connectDeviceWizard.language,
-  clockType: state.connectDeviceWizard.clockType
+  clockType: state.connectDeviceWizard.clockType,
+  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
 });
 
 export const editDeviceDataSelector = state => ({
@@ -18,7 +19,8 @@ export const editDeviceDataSelector = state => ({
   calendarId: state.editedDevice.data.calendarId,
   language: state.editedDevice.data.language,
   clockType: state.editedDevice.data.clockType,
-  minutesForCheckIn: state.editedDevice.data.minutesForCheckIn
+  minutesForCheckIn: state.editedDevice.data.minutesForCheckIn,
+  showAvailableRooms: state.editedDevice.data.showAvailableRooms
 });
 
 export const removedDeviceIdSelector = state => state.removedDevice;

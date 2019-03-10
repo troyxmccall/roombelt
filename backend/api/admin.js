@@ -4,12 +4,13 @@ const Moment = require("moment");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, calendarId, language, clockType, minutesForCheckIn }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, calendarId, language, clockType, minutesForCheckIn, showAvailableRooms }) => ({
   id: deviceId,
   createdAt,
   deviceType,
   calendarId,
   minutesForCheckIn,
+  showAvailableRooms,
   language: language || "en",
   clockType: clockType,
   isOnline: updatedAt > Date.now() - 70 * 1000,
@@ -131,6 +132,7 @@ router.put("/admin/device/:deviceId", checkSubscription, async function(req, res
   await req.context.storage.devices.setLanguageForDevice(req.params.deviceId, req.body.language);
   await req.context.storage.devices.setClockTypeForDevice(req.params.deviceId, req.body.clockType);
   await req.context.storage.devices.setMinutesForCheckIn(req.params.deviceId, req.body.minutesForCheckIn);
+  await req.context.storage.devices.setShowAvailableRooms(req.params.deviceId, req.body.showAvailableRooms);
 
   res.sendStatus(204);
 });

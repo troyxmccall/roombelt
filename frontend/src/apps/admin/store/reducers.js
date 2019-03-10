@@ -72,6 +72,8 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, clockType: action.clockType } };
     case editDeviceDialogActions.setMinutesForCheckIn:
       return { data: { ...state.data, minutesForCheckIn: action.minutesForCheckIn } };
+    case editDeviceDialogActions.setShowAvailableRooms:
+      return { data: { ...state.data, showAvailableRooms: action.showAvailableRooms } };
     default:
       return state;
   }
@@ -97,6 +99,7 @@ const defaultConnectDeviceWizardState = {
   language: "en-US",
   clockType: 12,
   minutesForCheckIn: 0,
+  showAvailableRooms: true,
   errorMessage: null,
   isSubmitting: false
 };
@@ -127,6 +130,8 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...state, language: action.language };
     case connectDeviceWizardActions.thirdStep.setClockType:
       return { ...state, clockType: action.clockType };
+    case connectDeviceWizardActions.thirdStep.setShowAvailableRooms:
+      return { ...state, showAvailableRooms: action.showAvailableRooms };
     case connectDeviceWizardActions.thirdStep.$startSubmitting:
       return { ...state, errorMessage: null, isSubmitting: true };
     default:

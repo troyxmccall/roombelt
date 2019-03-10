@@ -13,7 +13,7 @@ const ConnectDeviceButton = props => (
 
 const DevicesHeader = props => (
   <PageTitle style={{ display: "flex", justifyContent: "space-between" }}>
-    Dashboard
+    Your devices
     {props.hasAnyDevices && <ConnectDeviceButton onClick={props.onConnectDeviceClick}/>}
   </PageTitle>
 );

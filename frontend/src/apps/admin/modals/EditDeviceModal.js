@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 
-import { Modal, Button, LoaderButton, Select, Text } from "theme";
+import { Button, LoaderButton, Modal, Select, Text } from "theme";
 import { translations } from "i18n";
 import { editDeviceDialogActions } from "apps/admin/store/actions";
 
@@ -31,7 +31,7 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeClockType }) => {
+const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeShowAvailableRooms, onChangeClockType }) => {
   const select = useRef();
   useEffect(() => {
     if (isVisible) select.current.focus();
@@ -118,6 +118,16 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
           Enable to remove meetings automatically if nobody checks-in during first 10 minutes.
         </Text>
       </FormField>}
+
+      {device && device.deviceType === "dashboard" && <FormField>
+        <FormFieldLabel>Highlight available rooms</FormFieldLabel>
+        <Select
+          instanceId="edit-device-showAvailableRooms"
+          value={device && device.showAvailableRooms}
+          options={[{ label: "No", value: false }, { label: "Yes", value: true }]}
+          onChange={option => onChangeShowAvailableRooms(option.value)}
+        />
+      </FormField>}
     </Modal>
   );
 };
@@ -136,7 +146,8 @@ const mapDispatchToProps = dispatch => ({
   onChangeCalendar: calendarId => dispatch(editDeviceDialogActions.setCalendarId(calendarId)),
   onChangeLanguage: language => dispatch(editDeviceDialogActions.setLanguage(language)),
   onChangeClockType: clockType => dispatch(editDeviceDialogActions.setClockType(clockType)),
-  onChangeMinutesForCheckIn: minutes => dispatch(editDeviceDialogActions.setMinutesForCheckIn(minutes))
+  onChangeMinutesForCheckIn: minutes => dispatch(editDeviceDialogActions.setMinutesForCheckIn(minutes)),
+  onChangeShowAvailableRooms: value => dispatch(editDeviceDialogActions.setShowAvailableRooms(value))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDeviceModal);

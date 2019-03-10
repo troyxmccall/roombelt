@@ -1,9 +1,10 @@
+import ms from "ms";
 import React from "react";
 import i18next from "i18next";
 import { getMeetingSummary, prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
 import DateRange from "react-icons/lib/md/date-range";
 import Status from "dark/Status";
-import DashboardRowView from "apps/device/views/dashboard/DashboardRowView";
+import RowView from "./RowView";
 
 const t = (key, time) => i18next.t(key, { time: prettyFormatMinutes(time) });
 
@@ -29,11 +30,15 @@ export default ({ meeting, timestamp }) => {
   );
 
   const hasStarted = timestamp > meeting.startTimestamp;
+  const startsSoon = meeting.startTimestamp - timestamp < ms("5 min");
+
   const meetingStatus = (
-    <Status available={!hasStarted} occupied={hasStarted}>{getStatusMessage(meeting, timestamp)}</Status>
+    <Status available={!hasStarted && !startsSoon}
+            warning={!hasStarted && startsSoon}
+            occupied={hasStarted}>{getStatusMessage(meeting, timestamp)}</Status>
   );
 
-  return <DashboardRowView meetingRoom={meeting.calendar.name}
-                           meetingStatus={meetingStatus}
-                           meetingSummary={meetingSummary}/>;
+  return <RowView meetingRoom={meeting.calendar.name}
+                  meetingStatus={meetingStatus}
+                  meetingSummary={meetingSummary}/>;
 };

@@ -73,6 +73,7 @@ router.get("/device", async function(req, res) {
     clockType: req.context.device.clockType,
     connectionCode: req.context.device.connectionCode,
     minutesForCheckIn: req.context.device.minutesForCheckIn,
+    showAvailableRooms: req.context.device.showAvailableRooms,
     calendar,
     allCalendars
   });

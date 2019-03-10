@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { Text, Select, Button, LoaderButton } from "theme";
+import { Button, LoaderButton, Select, Text } from "theme";
 import WizardStepLayout from "./WizardStepLayout";
 import { translations } from "i18n";
 import { connectDeviceWizardActions } from "apps/admin/store/actions";
@@ -22,7 +22,7 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType }) => {
+const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
   const { isCurrentStep, isTransitioning } = useWizard();
 
   const calendarSelector = (
@@ -49,6 +49,25 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
     </>
   );
 
+  const showAllAvailableRoomsSelector = (
+    <>
+      <Text large block>
+        Highlight available rooms
+      </Text>
+      <Select
+        instanceId="wizard-device-show-available-rooms"
+        value={showAvailableRooms}
+        options={[{ label: "Yes", value: true }, { label: "No", value: false }]}
+        onChange={option => onSetShowAvailableRooms(option.value)}
+        styles={{ container: base => ({ ...base, marginTop: 15, marginBottom: 10 }) }}
+        menuPortalTarget={document.body}
+        autofocus={isCurrentStep && !isTransitioning}
+        tabIndex={isCurrentStep ? 0 : -1}
+      />
+    </>
+  );
+
+
   const languageSelector = (
     <>
       <Text large block style={{ marginTop: 15, marginBottom: 10 }}>Locale</Text>
@@ -61,7 +80,6 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
           getOptionValue={lang => lang.key}
           onChange={translation => onSetLanguage && onSetLanguage(translation && translation.key)}
           menuPortalTarget={document.body}
-          autofocus={isDashboard && isCurrentStep && !isTransitioning}
           tabIndex={isCurrentStep ? 0 : -1}
         />
         <Select
@@ -79,6 +97,7 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
   return (
     <WizardStepLayout img={require("./calendar.png")}>
       {!isDashboard && calendarSelector}
+      {isDashboard && showAllAvailableRoomsSelector}
       {languageSelector}
     </WizardStepLayout>
   );
@@ -97,7 +116,8 @@ const mapStateToProps = state => ({
   isSubmitting: state.connectDeviceWizard.isSubmitting,
   calendarId: state.connectDeviceWizard.calendarId,
   language: state.connectDeviceWizard.language,
-  clockType: state.connectDeviceWizard.clockType
+  clockType: state.connectDeviceWizard.clockType,
+  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -105,7 +125,8 @@ const mapDispatchToProps = dispatch => ({
   onSubmit: () => dispatch(connectDeviceWizardActions.thirdStep.submit()),
   onSetCalendar: calendarId => dispatch(connectDeviceWizardActions.thirdStep.setCalendarId(calendarId)),
   onSetLanguage: language => dispatch(connectDeviceWizardActions.thirdStep.setLanguage(language)),
-  onSetClockType: clockType => dispatch(connectDeviceWizardActions.thirdStep.setClockType(clockType))
+  onSetClockType: clockType => dispatch(connectDeviceWizardActions.thirdStep.setClockType(clockType)),
+  onSetShowAvailableRooms: value => dispatch(connectDeviceWizardActions.thirdStep.setShowAvailableRooms(value)),
 });
 
 export default {

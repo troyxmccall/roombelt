@@ -89,13 +89,14 @@ export const connectDeviceWizardActions = {
     setCalendarId: action(calendarId => ({ calendarId })),
     setLanguage: action(language => ({ language })),
     setClockType: action(clockType => ({ clockType })),
+    setShowAvailableRooms: action(showAvailableRooms => ({ showAvailableRooms })),
     previousStep: action(),
     $startSubmitting: action(),
     submit: () => async (dispatch, getState) => {
       dispatch(connectDeviceWizardActions.thirdStep.$startSubmitting());
 
-      const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelector(getState());
-      await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, clockType);
+      const { deviceId, deviceType, calendarId, language, clockType, showAvailableRooms } = newDeviceDataSelector(getState());
+      await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, showAvailableRooms, clockType);
 
       dispatch(adminActions.$setDevices(await getConnectedDevices()));
       dispatch(connectDeviceWizardActions.hide());
@@ -111,12 +112,13 @@ export const editDeviceDialogActions = {
   setLanguage: action(language => ({ language })),
   setClockType: action(clockType => ({ clockType })),
   setMinutesForCheckIn: action(minutesForCheckIn => ({ minutesForCheckIn })),
+  setShowAvailableRooms: action(showAvailableRooms => ({ showAvailableRooms })),
   $startSubmitting: action(),
   submit: () => async (dispatch, getState) => {
-    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, clockType } = editDeviceDataSelector(getState());
+    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, showAvailableRooms, clockType } = editDeviceDataSelector(getState());
 
     dispatch(editDeviceDialogActions.$startSubmitting());
-    await setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, clockType);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, showAvailableRooms, clockType);
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(editDeviceDialogActions.hide());

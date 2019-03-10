@@ -47,7 +47,7 @@ const MeetingStatus = styled.div`
   padding: 0 0.5rem;
 `;
 
-const DashboardRowView = ({ meetingSummary, meetingRoom, meetingStatus, header, style = {} }) => {
+export default ({ meetingSummary, meetingRoom, meetingStatus, header, style = {} }) => {
   const elRef = useRef();
   const isVisible = useIsVisible(elRef);
 
@@ -61,5 +61,3 @@ const DashboardRowView = ({ meetingSummary, meetingRoom, meetingStatus, header, 
     </RowWrapper>
   );
 };
-
-export default DashboardRowView;

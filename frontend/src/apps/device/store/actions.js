@@ -15,11 +15,8 @@ import {
   isInitializedSelector,
   isInOfflineModeSelector,
   lastActivityOnShowCalendarsViewSelector,
-  minutesForCheckInSelector,
-  requireCheckInSelector,
   minutesLeftForCheckInSelector,
-  showAllCalendarsViewSelector,
-  timestampSelector
+  showAllCalendarsViewSelector
 } from "apps/device/store/selectors";
 import { changeLanguage } from "i18n";
 

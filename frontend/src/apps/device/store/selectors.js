@@ -28,6 +28,7 @@ export const isDeviceConnectedSelector = createSelector(deviceSelector, device =
 export const isDashboardDeviceSelector = createSelector(deviceSelector, device => device && device.deviceType === "dashboard");
 export const isCalendarSelectedSelector = createSelector(deviceSelector, device => device && !!device.calendar);
 export const isAmPmClockSelector = createSelector(deviceSelector, device => device ? device.clockType === 12 : true);
+export const showAvailableRoomsSelector = createSelector(deviceSelector, device => device && device.showAvailableRooms);
 
 export const allCalendarsSelector = createSelector(deviceSelector, device => (device && device.allCalendars) || []);
 export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && !!device.allCalendars);
@@ -67,7 +68,7 @@ export const isAfterCurrentMeetingStartTimeSelector = createSelector(
   (currentTimestamp, currentMeeting) => currentTimestamp > currentMeeting.startTimestamp
 );
 
-export const dashBoardMeetingsSelector = createSelector(
+export const dashboardMeetingsSelector = createSelector(
   [timestampSelector, allCalendarsSelector],
   (currentTimestamp, allCalendars) => {
     const eventsByCalendars = allCalendars.map(calendar => calendar.events.map(event => ({ ...event, calendar })));

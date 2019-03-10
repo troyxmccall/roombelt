@@ -12,7 +12,8 @@ module.exports = class {
       calendarId: Sequelize.STRING,
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
-      minutesForCheckIn: { type: Sequelize.INTEGER, defaultValue: 0 }
+      minutesForCheckIn: { type: Sequelize.INTEGER, defaultValue: 0 },
+      showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false }
     });
   }
 
@@ -68,5 +69,9 @@ module.exports = class {
 
   async setMinutesForCheckIn(deviceId, minutesForCheckIn) {
     await this.Model.update({ minutesForCheckIn }, { where: { deviceId } });
+  }
+
+  async setShowAvailableRooms(deviceId, showAvailableRooms) {
+    await this.Model.update({ showAvailableRooms }, { where: { deviceId } });
   }
 };

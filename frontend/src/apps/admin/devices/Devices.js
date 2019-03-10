@@ -8,17 +8,17 @@ import { translations } from "../../../i18n";
 
 import {
   Card,
-  Text,
-  StatusIcon,
-  Table,
-  TableRow,
-  TableHeaderColumn,
-  TableRowColumn,
-  TableHeader,
-  TableBody,
   DropdownMenu,
   DropdownMenuItem,
-  Loader
+  Loader,
+  StatusIcon,
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+  Text
 } from "../../../theme/index";
 
 import EmptyState from "./EmptyState";
@@ -52,8 +52,16 @@ const SingleDeviceRow = props => (
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text>
-        {props.device.deviceType === "dashboard" && "-"}
-        {props.device.deviceType === "calendar" && (props.device.minutesForCheckIn ? "Yes" : "No")}
+        {props.device.deviceType === "dashboard" && <>
+          <Text muted small>Highlight available rooms:</Text>
+          <Text block>{props.device.showAvailableRooms ? "Yes" : "No"}</Text>
+        </>
+        }
+        {props.device.deviceType === "calendar" && <>
+          <Text muted small>Check-in required:</Text>
+          <Text block>{props.device.minutesForCheckIn ? "Yes" : "No"}</Text>
+        </>
+        }
       </Text>
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
@@ -106,7 +114,7 @@ const Devices = props => {
           <TableRow>
             <TableHeaderColumn>Calendar</TableHeaderColumn>
             <TableHeaderColumn>Locale</TableHeaderColumn>
-            <TableHeaderColumn>Require check-in</TableHeaderColumn>
+            <TableHeaderColumn>Settings</TableHeaderColumn>
             <TableHeaderColumn>Status</TableHeaderColumn>
             <TableHeaderColumn style={{ width: 50 }}/>
           </TableRow>
