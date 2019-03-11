@@ -1,27 +1,26 @@
 import { action } from "utils/redux";
 
 import {
+  cancelSubscription,
   connectDevice,
   disconnectDevice,
   getCalendars,
   getConnectedDevices,
   getUserDetails,
   setOptionsForDevice,
-  setUserProperty,
   setSubscriptionPlan,
-  cancelSubscription
+  setUserProperty
 } from "services/api";
 
 import {
-  newDeviceDataSelector,
+  canConnectAnotherDeviceSelector,
+  currentSubscriptionPlanSelector,
   editDeviceDataSelector,
+  newDeviceDataSelector,
   removedDeviceIdSelector,
-  subscriptionUpdateUrlSelector, currentSubscriptionPlanSelector, canConnectAnotherDeviceSelector
+  subscriptionUpdateUrlSelector
 } from "./selectors";
-import {
-  isCheckoutOverlayOpenSelector,
-  subscriptionPassthroughSelector
-} from "apps/admin/store/selectors";
+import { isCheckoutOverlayOpenSelector, subscriptionPassthroughSelector } from "apps/admin/store/selectors";
 import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
 import { wait } from "utils/time";
 
@@ -100,6 +99,8 @@ export const connectDeviceWizardActions = {
 
       dispatch(adminActions.$setDevices(await getConnectedDevices()));
       dispatch(connectDeviceWizardActions.hide());
+
+      dispatch(adminActions.$setUserDetails(await getUserDetails()));
     }
   }
 };
