@@ -7,6 +7,7 @@ const result = {
   clientId: process.env["GOOGLE_CLIENT_ID"],
   clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
   redirectUrl: process.env["GOOGLE_REDIRECT_URL"],
+  webHookUrl: process.env['GOOGLE_WEB_HOOK_URL'],
   databaseUrl: process.env["DATABASE_URL"],
   forceHttps: process.env["FORCE_HTTPS"] === "true" || process.env["FORCE_HTTPS"] === "1",
   disableFrameGuard: process.env["DISABLE_FRAME_GUARD"] === "true" || process.env["DISABLE_FRAME_GUARD"] === "1",

@@ -1,7 +1,12 @@
+const crypto = require("crypto");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const Cache = require("./cache");
 const Moment = require("moment");
+const logger = require("../logger");
+
+const CHANNEL_TTL_CALENDARS = 60 * 2;
+const CHANNEL_TTL_EVENTS = 60 * 5;
 
 const getTime = time => {
   if (!time) {
@@ -28,8 +33,8 @@ const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedPrope
 const cache = new Cache(30);
 
 module.exports = class {
-  constructor(keys, credentials) {
-    this.oauthClient = new OAuth2(keys.clientId, keys.clientSecret, keys.redirectUrl);
+  constructor(config, credentials) {
+    this.oauthClient = new OAuth2(config.clientId, config.clientSecret, config.redirectUrl);
 
     this.oauthClient.setCredentials({
       access_token: credentials && credentials.accessToken,
@@ -39,8 +44,9 @@ module.exports = class {
     this.calendarClient = google.calendar({ version: "v3", auth: this.oauthClient });
     this.peopleClient = google.people({ version: "v1", auth: this.oauthClient });
 
-    this.cacheKey = credentials && credentials.refreshToken;
-    this.clientId = keys.clientId;
+    this.cacheKey = credentials && crypto.createHash("md5").update(credentials.refreshToken).digest("hex");
+    this.clientId = config.clientId;
+    this.webHookUrl = config.webHookUrl;
   }
 
   getAuthUrl(forceConsent) {
@@ -93,50 +99,24 @@ module.exports = class {
   }
 
   async getCalendars() {
-    const cacheKey = `calendars-${this.cacheKey}`;
-    const cachedValue = cache.get(cacheKey);
-
-    if (cachedValue) {
-      return cachedValue;
-    }
-
-    const { data } = await new Promise((res, rej) =>
-      this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data)))
+    const getValue = () => new Promise((res, rej) => {
+        logger.debug(`Fetch calendars`);
+        this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data.data)));
+      }
     );
 
-    cache.set(cacheKey, data.items);
+    const token = `calendars-${this.cacheKey}`;
+    const { items } = await cache.get(token, getValue, () => this.watchCalendars(token, CHANNEL_TTL_CALENDARS));
 
-    return data.items;
+    return items;
   }
 
   async getCalendar(calendarId) {
-    const cacheKey = `calendar-${this.cacheKey}-${calendarId}`;
-    const cachedValue = cache.get(cacheKey);
-
-    if (cachedValue) {
-      return cachedValue;
-    }
-
-    const { data } = await new Promise((res, rej) =>
-      this.calendarClient.calendarList.get(
-        { calendarId: encodeURIComponent(calendarId) },
-        (err, data) => (err ? rej(err) : res(data))
-      )
-    );
-
-    cache.set(cacheKey, data);
-
-    return data;
+    const calendars = await this.getCalendars();
+    return calendars.find(calendar => calendar.id === calendarId);
   }
 
   async getEvents(calendarId) {
-    const cacheKey = `events-${this.cacheKey}-${calendarId}`;
-    const cachedValue = cache.get(cacheKey);
-
-    if (cachedValue) {
-      return cachedValue;
-    }
-
     const query = {
       calendarId: encodeURIComponent(calendarId),
       timeMin: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
@@ -145,19 +125,20 @@ module.exports = class {
       orderBy: "startTime"
     };
 
-    const { data } = await new Promise((res, rej) =>
-      this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data)))
-    );
+    const getValue = () => new Promise((res, rej) => {
+      logger.debug(`Fetch events for ${calendarId}`);
 
-    const result = data.items.map(mapEvent);
+      this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data)));
+    });
 
-    cache.set(cacheKey, result);
+    const token = `events-${this.cacheKey}-${calendarId}`;
+    const { items } = await cache.get(token, getValue, () => this.watchEvents(calendarId, token, CHANNEL_TTL_EVENTS));
 
-    return result;
+    return items.map(mapEvent);
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
 
     const query = {
       calendarId: encodeURIComponent(calendarId),
@@ -175,7 +156,7 @@ module.exports = class {
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
 
     const resource = {};
     if (startDateTime) resource.start = { dateTime: new Date(startDateTime).toISOString() };
@@ -194,7 +175,7 @@ module.exports = class {
   }
 
   async deleteEvent(calendarId, eventId) {
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
 
     const query = {
       calendarId: encodeURIComponent(calendarId),
@@ -205,4 +186,39 @@ module.exports = class {
       this.calendarClient.events.delete(query, (err, data) => (err ? rej(err) : res(data)))
     );
   }
+
+  async watchCalendars(token, ttl) {
+    if (!this.webHookUrl) return { ttl: 0 };
+
+    const channelId = crypto.randomBytes(64).toString("hex");
+
+    await new Promise((res, rej) =>
+      this.calendarClient.calendarList.watch(
+        { resource: { id: channelId, token, type: "web_hook", address: this.webHookUrl, params: { ttl } } },
+        (err, data) => (err ? rej(err) : res(data.data))
+      )
+    );
+
+    return { channelId, token, ttl };
+  }
+
+  async watchEvents(calendarId, token, ttl) {
+    if (!this.webHookUrl) return { ttl: 0 };
+
+    const channelId = crypto.randomBytes(64).toString("hex");
+
+    await new Promise((res, rej) => {
+      this.calendarClient.events.watch(
+        {
+          calendarId,
+          resource: { id: channelId, token, type: "web_hook", address: this.webHookUrl, params: { ttl } }
+        },
+        (err, data) => (err ? rej(err) : res(data.data))
+      );
+    });
+
+    return { channelId, token, ttl };
+  }
 };
+
+module.exports.cache = cache;

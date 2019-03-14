@@ -1,19 +1,44 @@
 module.exports = class Cache {
-  constructor(timeoutInSeconds = 30) {
-    this.timeout = timeoutInSeconds * 1000;
+  constructor() {
     this.cache = new Map();
   }
 
-  get(key) {
-    const entry = this.cache.get(key);
-    return (entry && entry.expiration > Date.now()) ? entry.value : null;
+  async get(token, getValue, watch) {
+    const entry = this.getEntry(token);
+
+    if (entry.channelExpiration > Date.now() && entry.isValueUpToDate) {
+      return entry.value;
+    }
+
+    if (entry.channelExpiration > Date.now() && !entry.isValueUpToDate) {
+      entry.value = await getValue(token);
+      entry.isValueUpToDate = true;
+
+      return entry.value;
+    }
+
+    entry.channelExpiration = Date.now() + 1000;
+
+    watch().then(({ channelId, ttl }) => {
+      entry.channelId = channelId;
+      entry.channelExpiration = Date.now() + ttl * 1000;
+    });
+
+    entry.value = await getValue(token);
+    entry.isValueUpToDate = true;
+
+    return entry.value;
   }
 
-  set(key, value) {
-    this.cache.set(key, { expiration: Date.now() + this.timeout, value });
+  invalidate(token) {
+    this.getEntry(token).isValueUpToDate = false;
   }
 
-  delete(key) {
-    this.cache.delete(key);
+  getEntry(token) {
+    if (!this.cache.has(token)) {
+      this.cache.set(token, { value: undefined, isValueUpToDate: false, channelExpiration: 0, channelId: null });
+    }
+
+    return this.cache.get(token);
   }
 };

@@ -1,4 +1,20 @@
 const router = require("express-promise-router")();
+const GoogleCalendar = require("../services/google-calendar");
+const logger = require("../logger");
+
+router.post("/google/web_hook", async (req, res) => {
+  const state = req.headers["x-goog-resource-state"];
+  const channelId = req.headers["x-goog-channel-id"];
+  const token = req.headers["x-goog-channel-token"];
+
+  if (state !== "sync" && GoogleCalendar.cache.getEntry(token).channelId === channelId) {
+    GoogleCalendar.cache.invalidate(token);
+  }
+
+  logger.debug(`${state} ${token} ${channelId}`);
+
+  res.sendStatus(204);
+});
 
 router.get("/oauth/callback", async (req, res) => {
   if (req.query.error === "access_denied") {

@@ -54,7 +54,9 @@ async function getUserCalendars(req) {
     .filter(calendarId => calendarId);
 
   const uniqueCalendarIds = [...new Set(calendarIds)];
-  return Promise.all(uniqueCalendarIds.map(calendarId => getCalendarInfo(calendarId, req.context.calendarProvider)));
+  const calendars = await Promise.all(uniqueCalendarIds.map(calendarId => getCalendarInfo(calendarId, req.context.calendarProvider)));
+
+  return calendars.filter(calendar => calendar);
 }
 
 router.get("/device", async function(req, res) {
