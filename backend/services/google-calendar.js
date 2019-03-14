@@ -76,7 +76,7 @@ module.exports = class {
 
   async isAccessTokenValid() {
     try {
-      await this.getCalendars();
+      await this.getUserDetails();
       return true;
     } catch (err) {
       return false;
