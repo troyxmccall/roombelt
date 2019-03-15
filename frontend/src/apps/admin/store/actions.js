@@ -144,11 +144,6 @@ export const monetizationActions = {
     }
   },
 
-  acknowledgeUpcomingPremiumPopup: () => (dispatch) => {
-    setUserProperty(upcomingPremiumAcknowledgedProperty, { isAcknowledged: true });
-    dispatch(adminActions.$setUserProperty(upcomingPremiumAcknowledgedProperty, true));
-  },
-
   $setIsCheckoutOverlayOpen: action(isCheckoutOverlayOpen => ({ isCheckoutOverlayOpen })),
   $toggleOverlay: isVisible => (dispatch) => {
     document.body.style.overflow = isVisible ? "hidden" : "auto";

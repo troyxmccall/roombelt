@@ -27,14 +27,6 @@ export const removedDeviceIdSelector = state => state.removedDevice;
 
 export const isCheckoutOverlayOpenSelector = state => state.monetization.isCheckoutOverlayOpen;
 
-export const isUpcomingPremiumPopupVisibleSelector = state => {
-  const isLoaded = state.user.isLoaded;
-  const hasNotAcknowledgedYet = !state.user.properties[upcomingPremiumAcknowledgedProperty];
-  const isOldUser = state.user.createdAt < Date.now() - ms("7 days");
-
-  return isLoaded && isOldUser && hasNotAcknowledgedYet;
-};
-
 export const isCancelSubscriptionDialogOpenSelector = state => state.monetization.isCancelSubscriptionDialogOpen;
 
 export const isUpdatingSubscriptionDialogOpen = state => state.monetization.isUpdatingSubscription;
