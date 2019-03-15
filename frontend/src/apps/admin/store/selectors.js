@@ -1,7 +1,5 @@
-import ms from "ms";
 import Moment from "moment";
 import premiumPlans from "services/premium-plans";
-import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
 
 export const newDeviceDataSelector = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,

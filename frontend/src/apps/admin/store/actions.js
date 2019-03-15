@@ -8,8 +8,7 @@ import {
   getConnectedDevices,
   getUserDetails,
   setOptionsForDevice,
-  setSubscriptionPlan,
-  setUserProperty
+  setSubscriptionPlan
 } from "services/api";
 
 import {
@@ -21,7 +20,6 @@ import {
   subscriptionUpdateUrlSelector
 } from "./selectors";
 import { isCheckoutOverlayOpenSelector, subscriptionPassthroughSelector } from "apps/admin/store/selectors";
-import { upcomingPremiumAcknowledgedProperty } from "apps/admin/store/constants";
 import { wait } from "utils/time";
 
 export const adminActions = {

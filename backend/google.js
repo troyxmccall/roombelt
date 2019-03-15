@@ -1,8 +1,8 @@
 const router = require("express-promise-router")();
-const GoogleCalendar = require("../services/google-calendar");
-const logger = require("../logger");
+const GoogleCalendar = require("./services/google-calendar");
+const logger = require("./logger");
 
-router.post("/google/web_hook", async (req, res) => {
+router.post("/web_hook", async (req, res) => {
   const state = req.headers["x-goog-resource-state"];
   const channelId = req.headers["x-goog-channel-id"];
   const token = req.headers["x-goog-channel-token"];
@@ -16,7 +16,7 @@ router.post("/google/web_hook", async (req, res) => {
   res.sendStatus(204);
 });
 
-router.get("/oauth/callback", async (req, res) => {
+router.get("/oauth_callback", require("./context"), async (req, res) => {
   if (req.query.error === "access_denied") {
     return res.redirect("/");
   }
