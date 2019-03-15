@@ -1,9 +1,14 @@
 import React from "react";
 import i18next from "i18next";
-import styled from "styled-components/macro";
+import styled, { keyframes } from "styled-components/macro";
 import { connect } from "react-redux";
 import IoAndroidExpand from "react-icons/lib/io/android-expand";
 import { deviceActions } from "apps/device/store/actions";
+
+const autoHide = keyframes`
+  from { visibility: visible }
+  to { visibility: hidden }
+`;
 
 const Wrapper = styled.div`
   position: fixed;
@@ -17,6 +22,8 @@ const Wrapper = styled.div`
   cursor: pointer;
   border: 0.05em solid white;
   border-bottom: none;
+  
+  animation: ${autoHide} 60s forwards;
 `;
 
 const FullScreenToggle = props => {
