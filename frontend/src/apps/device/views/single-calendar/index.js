@@ -21,7 +21,6 @@ import CurrentMeeting from "apps/device/views/single-calendar/CurrentMeeting";
 import ActionsBar from "apps/device/views/single-calendar/actions-bar";
 import Button from "dark/Button";
 import Layout from "dark/Layout";
-import FullScreenToggle from "apps/device/components/FullScreenToggle";
 import i18next from "i18next";
 
 const Header = styled.div`
@@ -85,8 +84,6 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
     <Spacer/>
 
     {nextMeeting && <NextMeeting/>}
-
-    <FullScreenToggle/>
   </Layout>
 );
 

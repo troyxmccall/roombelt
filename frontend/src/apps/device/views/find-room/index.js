@@ -19,7 +19,6 @@ import Button from "dark/Button";
 import Layout from "dark/Layout";
 import Section from "dark/Section";
 import Time from "theme/components/Time";
-import FullScreenToggle from "apps/device/components/FullScreenToggle";
 
 const Header = styled(Section).attrs({ header: true })`
   padding: 0.85rem;
@@ -70,8 +69,6 @@ const AllCalendarsView = ({ closeAllCalendarsView, calendars, areAllCalendarsLoa
         {!areAllCalendarsLoaded && <LoaderWrapper><Loader white/></LoaderWrapper>}
         {calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
       </Content>
-
-      <FullScreenToggle/>
     </Layout>
   );
 };

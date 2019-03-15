@@ -5,7 +5,8 @@ import styled from "styled-components/macro";
 import {
   allCalendarsSelector,
   dashboardMeetingsSelector,
-  isAmPmClockSelector, showAvailableRoomsSelector,
+  isAmPmClockSelector,
+  showAvailableRoomsSelector,
   timestampSelector
 } from "apps/device/store/selectors";
 import EventRow from "./EventRow";
@@ -15,7 +16,6 @@ import Layout from "dark/Layout";
 import Section from "dark/Section";
 import colors from "dark/colors";
 import Time from "theme/components/Time";
-import FullScreenToggle from "apps/device/components/FullScreenToggle";
 import RowView from "./RowView";
 import CalendarRow from "./CalendarRow";
 
@@ -52,7 +52,6 @@ const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRoo
       {showAvailableRooms && calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
       {events.map(event => <EventRow key={event.id} meeting={event} timestamp={timestamp}/>)}
     </DashboardWrapper>
-    <FullScreenToggle/>
   </Layout>
 ;
 

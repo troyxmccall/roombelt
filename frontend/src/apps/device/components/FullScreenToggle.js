@@ -4,6 +4,7 @@ import styled, { keyframes } from "styled-components/macro";
 import { connect } from "react-redux";
 import IoAndroidExpand from "react-icons/lib/io/android-expand";
 import { deviceActions } from "apps/device/store/actions";
+import { isCalendarSelectedSelector, isDashboardDeviceSelector } from "apps/device/store/selectors";
 
 const autoHide = keyframes`
   from { visibility: visible }
@@ -27,7 +28,11 @@ const Wrapper = styled.div`
 `;
 
 const FullScreenToggle = props => {
-  if (!props.isFullScreenSupported || props.isFullScreen) return null;
+  const isConnected = props.isCalendarSelected || props.isDashboardDevice;
+
+  if (!isConnected || !props.isFullScreenSupported || props.isFullScreen) {
+    return null;
+  }
 
   return (
     <Wrapper onClick={props.requestFullScreen}>
@@ -37,6 +42,8 @@ const FullScreenToggle = props => {
 };
 
 const mapStateToProps = state => ({
+  isDashboardDevice: isDashboardDeviceSelector(state),
+  isCalendarSelected: isCalendarSelectedSelector(state),
   isFullScreenSupported: state.fullScreen.isSupported,
   isFullScreen: state.fullScreen.isFullScreen
 });
