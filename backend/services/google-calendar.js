@@ -106,7 +106,9 @@ module.exports = class {
     );
 
     const token = `calendars-${this.cacheKey}`;
-    const { items } = await cache.get(token, getValue, () => this.watchCalendars(token, CHANNEL_TTL_CALENDARS));
+    const { items } = this.webHookUrl
+      ? await cache.get(token, getValue, () => this.watchCalendars(token, CHANNEL_TTL_CALENDARS))
+      : await getValue();
 
     return items;
   }
@@ -132,7 +134,9 @@ module.exports = class {
     });
 
     const token = `events-${this.cacheKey}-${calendarId}`;
-    const { items } = await cache.get(token, getValue, () => this.watchEvents(calendarId, token, CHANNEL_TTL_EVENTS));
+    const { items } = this.webHookUrl
+      ? await cache.get(token, getValue, () => this.watchEvents(calendarId, token, CHANNEL_TTL_EVENTS))
+      : await getValue();
 
     return items.map(mapEvent);
   }
@@ -188,8 +192,6 @@ module.exports = class {
   }
 
   async watchCalendars(token, ttl) {
-    if (!this.webHookUrl) return { ttl: 0 };
-
     const channelId = crypto.randomBytes(64).toString("hex");
 
     await new Promise((res, rej) =>
@@ -203,8 +205,6 @@ module.exports = class {
   }
 
   async watchEvents(calendarId, token, ttl) {
-    if (!this.webHookUrl) return { ttl: 0 };
-
     const channelId = crypto.randomBytes(64).toString("hex");
 
     await new Promise((res, rej) => {
