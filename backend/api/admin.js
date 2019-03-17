@@ -17,14 +17,6 @@ const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, cale
   msSinceLastActivity: Date.now() - updatedAt
 });
 
-const calendarRepresentation = ({ id, location, summary, description, accessRole }) => ({
-  id,
-  location,
-  summary,
-  description,
-  canModifyEvents: accessRole === "writer" || accessRole === "owner"
-});
-
 const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionUpdateUrl, isSubscriptionCancelled }, { displayName, photoUrl }, properties, { subscriptionPlanId, subscriptionTrialEndTimestamp }) => ({
   displayName,
   avatarUrl: photoUrl,
@@ -82,8 +74,7 @@ router.put("/admin/user/property/:propertyId", async function(req, res) {
 });
 
 router.get("/admin/calendar", async function(req, res) {
-  const calendars = await req.context.calendarProvider.getCalendars();
-  res.json(calendars.map(calendarRepresentation));
+  res.json(await req.context.calendarProvider.getCalendars({ invalidateCache: true }));
 });
 
 router.get("/admin/device", async function(req, res) {

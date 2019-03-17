@@ -20,6 +20,7 @@ app.use("/api", require("./context"));
 app.use("/api", require("./api"));
 
 app.use("/google", cookieParser(), require("./google"));
+app.use("/office365", cookieParser(), require("./office365"));
 
 app.listen(config.port, config.acceptHost, err => {
   if (err) {

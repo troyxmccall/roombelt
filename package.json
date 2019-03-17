@@ -17,6 +17,7 @@
     "docker:publish": "cross-env-shell docker push ziolko/roombelt:$npm_package_version && docker push ziolko/roombelt:latest"
   },
   "dependencies": {
+    "@microsoft/microsoft-graph-client": "^1.5.2",
     "body-parser": "^1.18.2",
     "chalk": "^2.4.1",
     "cookie-parser": "^1.4.3",
@@ -26,10 +27,12 @@
     "express-promise-router": "^3.0.2",
     "googleapis": "^27.0.0",
     "helmet": "^3.15.0",
+    "jsonwebtoken": "^8.5.0",
     "ms": "^2.1.1",
     "pg": "^7.7.1",
     "php-serialize": "^2.1.0",
     "sequelize": "^4.41.2",
+    "simple-oauth2": "^2.2.1",
     "sqlite3": "^4.0.4",
     "winston": "^3.2.1"
   },

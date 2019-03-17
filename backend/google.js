@@ -7,8 +7,9 @@ router.post("/web_hook", async (req, res) => {
   const channelId = req.headers["x-goog-channel-id"];
   const token = req.headers["x-goog-channel-token"];
 
-  if (state !== "sync" && GoogleCalendar.cache.getEntry(token).channelId === channelId) {
-    GoogleCalendar.cache.invalidate(token);
+  if (state !== "sync" && GoogleCalendar.watchersCache.get(token) === channelId) {
+    logger.debug(`clearing cache for ${channelId} ${token}`);
+    GoogleCalendar.valuesCache.delete(token);
   }
 
   logger.debug(`${state} ${token} ${channelId}`);
@@ -25,7 +26,7 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const tokens = await req.context.calendarProvider.getAuthTokens(req.query.code).then(undefined, () => null);
+  const tokens = await req.context.calendarProviders.google.getAuthTokens(req.query.code).then(undefined, () => null);
 
   if (!tokens) {
     return res.sendStatus(401);
@@ -36,7 +37,7 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
   const savedTokens = await req.context.storage.oauth.getByUserId(tokens.userId);
 
   if (!savedTokens.refreshToken) {
-    return res.redirect(req.context.calendarProvider.getAuthUrl(true));
+    return res.redirect(req.context.calendarProviders.google.getAuthUrl(true));
   }
 
   await req.context.storage.session.updateSession(req.context.session.token, {

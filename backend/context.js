@@ -3,8 +3,10 @@ const Sequelize = require("sequelize");
 const Moment = require("moment");
 const Storage = require("./storage");
 const config = require("./config");
-const GoogleCalendar = require("./services/google-calendar");
 const premiumPlans = require("./services/premium-plans");
+
+const GoogleCalendar = require("./services/google-calendar");
+const Office365Calendar = require("./services/office365-calendar");
 
 const storage = new Storage(
   new Sequelize(config.databaseUrl, {
@@ -15,7 +17,7 @@ const storage = new Storage(
 
 async function getSubscriptionStatus(oauth) {
   // if (!oauth) {
-    return { isPaymentRequired: false, isSubscriptionCancelled: false };
+  return { isPaymentRequired: false, isSubscriptionCancelled: false };
   // }
 
   const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
@@ -39,10 +41,20 @@ router.use(async (req, res) => {
   const session = await storage.session.getSession(sessionToken) || await storage.session.createSession();
 
   const oauth = await storage.oauth.getByUserId(session.userId);
-  const calendarProvider = new GoogleCalendar(config, oauth);
+  const googleCalendarProvider = new GoogleCalendar(config.google, oauth);
+  const office365CalendarProvider = new Office365Calendar(config.office365, oauth);
   const subscription = await getSubscriptionStatus(oauth);
 
-  req.context = { storage, calendarProvider, session, subscription };
+  req.context = {
+    storage,
+    calendarProvider: oauth && (oauth.provider === "office365" ? office365CalendarProvider : googleCalendarProvider),
+    calendarProviders: {
+      google: googleCalendarProvider,
+      office365: office365CalendarProvider
+    },
+    session,
+    subscription
+  };
 
   const day = 1000 * 60 * 60 * 24;
   const year = day * 365;

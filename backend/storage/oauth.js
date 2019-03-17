@@ -3,8 +3,9 @@ const Sequelize = require("sequelize");
 module.exports = class {
   constructor(sequelize) {
     this.Model = this.Model = sequelize.define("oauth", {
-      // google oauth
+      // oauth
       userId: { type: Sequelize.STRING, primaryKey: true },
+      provider: Sequelize.STRING,
       accessToken: Sequelize.STRING,
       refreshToken: Sequelize.STRING,
 
@@ -17,9 +18,9 @@ module.exports = class {
     });
   }
 
-  async saveTokens({ userId, accessToken, refreshToken }) {
-    const fieldsToUpdate = refreshToken ? ["accessToken", "refreshToken"] : ["accessToken"];
-    await this.Model.upsert({ userId, accessToken, refreshToken }, { fields: fieldsToUpdate });
+  async saveTokens({ userId, accessToken, refreshToken, provider }) {
+    const fieldsToUpdate = refreshToken ? ["accessToken", "refreshToken", "provider"] : ["accessToken", "provider"];
+    await this.Model.upsert({ userId, accessToken, refreshToken, provider }, { fields: fieldsToUpdate });
   }
 
   async getByUserId(userId) {

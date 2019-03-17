@@ -1,12 +1,15 @@
 const crypto = require("crypto");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
-const Cache = require("./cache");
 const Moment = require("moment");
 const logger = require("../logger");
+const Cache = require("./cache");
 
 const CHANNEL_TTL_CALENDARS = 60 * 2;
 const CHANNEL_TTL_EVENTS = 60 * 5;
+
+const valuesCache = Cache("google");
+const watchersCache = Cache("google-watchers");
 
 const getTime = time => {
   if (!time) {
@@ -25,12 +28,10 @@ const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedPrope
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),
   end: getTime(end),
-  attendees: attendees || [],
+  attendees: attendees.map(attendee => ({ displayName: attendee.displayName })) || [],
   isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
   isPrivate: visibility === "private" || visibility === "confidential"
 });
-
-const cache = new Cache(30);
 
 module.exports = class {
   constructor(config, credentials) {
@@ -67,6 +68,7 @@ module.exports = class {
     });
 
     return {
+      provider: "google",
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       idToken: tokens.id_token,
@@ -98,19 +100,37 @@ module.exports = class {
     };
   }
 
-  async getCalendars() {
-    const getValue = () => new Promise((res, rej) => {
-        logger.debug(`Fetch calendars`);
-        this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data.data)));
-      }
-    );
+  async getCalendars(options = { invalidateCache: false }) {
+    const cacheKey = `calendars-${this.cacheKey}`;
 
-    const token = `calendars-${this.cacheKey}`;
-    const { items } = this.webHookUrl
-      ? await cache.get(token, getValue, () => this.watchCalendars(token, CHANNEL_TTL_CALENDARS))
-      : await getValue();
+    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+      logger.debug(`Set calendars watcher`);
 
-    return items;
+      const channelId = crypto.randomBytes(64).toString("hex");
+      watchersCache.set(cacheKey, channelId, 5);
+
+      this.$watchCalendars(cacheKey, channelId, CHANNEL_TTL_CALENDARS)
+        .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_CALENDARS - 10));
+    }
+
+    if (options.invalidateCache) {
+      valuesCache.delete(cacheKey);
+    }
+
+    if (!valuesCache.get(cacheKey)) {
+      logger.debug(`Fetch calendars`);
+
+      const { items } = await new Promise((res, rej) => this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data.data))));
+      const calendars = items.map(calendar => ({
+        id: calendar.id,
+        summary: calendar.summary,
+        canModifyEvents: calendar.accessRole === "writer" || calendar.accessRole === "owner"
+      }));
+
+      valuesCache.set(cacheKey, calendars, CHANNEL_TTL_CALENDARS);
+    }
+
+    return valuesCache.get(cacheKey);
   }
 
   async getCalendar(calendarId) {
@@ -119,6 +139,18 @@ module.exports = class {
   }
 
   async getEvents(calendarId) {
+    const cacheKey = `events-${this.cacheKey}-${calendarId}`;
+
+    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+      logger.debug(`Set events watcher for calendar ${calendarId}`);
+
+      const channelId = crypto.randomBytes(64).toString("hex");
+      watchersCache.set(cacheKey, channelId, 5);
+
+      this.$watchEvents(calendarId, cacheKey, channelId, CHANNEL_TTL_EVENTS)
+        .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_EVENTS - 10));
+    }
+
     const query = {
       calendarId: encodeURIComponent(calendarId),
       timeMin: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
@@ -127,22 +159,18 @@ module.exports = class {
       orderBy: "startTime"
     };
 
-    const getValue = () => new Promise((res, rej) => {
+    if (!valuesCache.get(cacheKey)) {
       logger.debug(`Fetch events for ${calendarId}`);
 
-      this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data)));
-    });
+      const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
+      valuesCache.set(cacheKey, items.map(mapEvent), CHANNEL_TTL_EVENTS);
+    }
 
-    const token = `events-${this.cacheKey}-${calendarId}`;
-    const { items } = this.webHookUrl
-      ? await cache.get(token, getValue, () => this.watchEvents(calendarId, token, CHANNEL_TTL_EVENTS))
-      : await getValue();
-
-    return items.map(mapEvent);
+    return valuesCache.get(cacheKey);
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
-    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const query = {
       calendarId: encodeURIComponent(calendarId),
@@ -160,7 +188,7 @@ module.exports = class {
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
-    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const resource = {};
     if (startDateTime) resource.start = { dateTime: new Date(startDateTime).toISOString() };
@@ -179,7 +207,7 @@ module.exports = class {
   }
 
   async deleteEvent(calendarId, eventId) {
-    cache.invalidate(`events-${this.cacheKey}-${calendarId}`);
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const query = {
       calendarId: encodeURIComponent(calendarId),
@@ -191,34 +219,27 @@ module.exports = class {
     );
   }
 
-  async watchCalendars(token, ttl) {
-    const channelId = crypto.randomBytes(64).toString("hex");
-
-    await new Promise((res, rej) =>
+  $watchCalendars(key, channelId, ttl) {
+    return new Promise((res, rej) =>
       this.calendarClient.calendarList.watch(
-        { resource: { id: channelId, token, type: "web_hook", address: this.webHookUrl, params: { ttl } } },
+        { resource: { id: channelId, token: key, type: "web_hook", address: this.webHookUrl, params: { ttl } } },
         (err, data) => (err ? rej(err) : res(data.data))
       )
     );
-
-    return { channelId, token, ttl };
   }
 
-  async watchEvents(calendarId, token, ttl) {
-    const channelId = crypto.randomBytes(64).toString("hex");
-
-    await new Promise((res, rej) => {
+  $watchEvents(calendarId, key, channelId, ttl) {
+    return new Promise((res, rej) => {
       this.calendarClient.events.watch(
         {
           calendarId,
-          resource: { id: channelId, token, type: "web_hook", address: this.webHookUrl, params: { ttl } }
+          resource: { id: channelId, token: key, type: "web_hook", address: this.webHookUrl, params: { ttl } }
         },
         (err, data) => (err ? rej(err) : res(data.data))
       );
     });
-
-    return { channelId, token, ttl };
   }
 };
 
-module.exports.cache = cache;
+module.exports.valuesCache = valuesCache;
+module.exports.watchersCache = watchersCache;

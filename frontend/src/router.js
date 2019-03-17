@@ -1,11 +1,11 @@
 import React from "react";
 import i18next from "i18next";
 import { withRouter } from "react-router";
-import { Switch, Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { getAuth } from "./services/api";
 
 import FatalError from "./theme/layouts/FatalError";
-import LoginApp from "./apps/Login";
+import LoginApp from "./apps/login/Login";
 import AdminApp from "./apps/admin";
 import DeviceApp from "./apps/device";
 import { createDevice, isOnline } from "services/api";
@@ -16,10 +16,10 @@ class Login extends React.PureComponent {
 
 class Admin extends React.PureComponent {
   async componentDidMount() {
-    const { scope, adminUrl, isAccessTokenValid } = await getAuth();
+    const { scope, isAccessTokenValid } = await getAuth();
 
     if (scope !== "admin" || !isAccessTokenValid) {
-      window.location = adminUrl;
+      window.location = "/";
     }
   }
 
