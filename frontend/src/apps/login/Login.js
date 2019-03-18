@@ -30,6 +30,7 @@ const MenuButton = styled(Button)`
 const LogoImg = styled.img`
   margin-right: 10px;
   height: 20px;
+  margin-bottom: 2px;
 `;
 
 const SimpleLink = ({ to, className, children }) => <Link to={to} className={className} children={children}/>;
@@ -46,10 +47,10 @@ export default () => {
       <PageLoaded/>
       <PageLogo withName size={30}/>
       <MenuButton block href={authUrl.google} white>
-        <LogoImg alt="Google logo" src={buttonGoogle}/> Sign in with Google
+        <LogoImg alt="Google logo" src={buttonGoogle}/><span>Sign in with Google</span>
       </MenuButton>
       <MenuButton block href={authUrl.office365} white>
-        <LogoImg alt="Microsoft logo" src={buttonMicrosoft}/> Sign in with Microsoft
+        <LogoImg alt="Microsoft logo" src={buttonMicrosoft}/><span>Sign in with Microsoft</span>
       </MenuButton>
       <MenuButton block to={"/device"} white as={SimpleLink}>Register device</MenuButton>
     </CardAndFooterLayout>
