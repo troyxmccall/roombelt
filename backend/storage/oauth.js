@@ -4,10 +4,10 @@ module.exports = class {
   constructor(sequelize) {
     this.Model = this.Model = sequelize.define("oauth", {
       // oauth
-      userId: { type: Sequelize.STRING, primaryKey: true },
+      userId: { type: Sequelize.TEXT, primaryKey: true },
       provider: Sequelize.STRING,
-      accessToken: Sequelize.STRING,
-      refreshToken: Sequelize.STRING,
+      accessToken: Sequelize.TEXT,
+      refreshToken: Sequelize.TEXT,
 
       // subscriptions
       subscriptionPassthrough: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4 },
