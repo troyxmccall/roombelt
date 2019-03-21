@@ -1,10 +1,12 @@
 const crypto = require("crypto");
+const axios = require("axios");
 const simpleOAuth2 = require("simple-oauth2");
 const jwt = require("jsonwebtoken");
 const graph = require("@microsoft/microsoft-graph-client");
 const Moment = require("moment");
 const ms = require("ms");
 const Cache = require("./cache");
+const qs = require("qs");
 
 const isCheckedInExtension = "Com.Roombelt.IsCheckedIn";
 const cache = Cache("office-365");
@@ -19,24 +21,25 @@ const getTime = (time, isAllDayEvent) => {
   return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !isAllDayEvent };
 };
 
-const authProvider = (oauth2, credentials) => {
-  const authCache = Cache("office365-cache");
+const serviceAuthProvider = (config, credentials) => async cb => {
+  if (!credentials || !credentials.refreshToken) {
+    return cb(null, null);
+  }
 
-  return async cb => {
-    if (!credentials || !credentials.refreshToken) {
-      return cb(null, null);
-    }
+  const cacheKey = `service-auth-${credentials.userId}`;
 
-    let authData = authCache.get(credentials.userId) || { expiration: 0 };
+  if (!cache.get(cacheKey)) {
+    const { data: { access_token, expires_in } } = await axios.post(`https://login.microsoftonline.com/${credentials.tenantId}/oauth2/v2.0/token`, qs.stringify({
+      grant_type: "client_credentials",
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
+      scope: "https://graph.microsoft.com/.default"
+    }));
 
-    if (Date.now() > authData.expiration - ms("5 min")) {
-      const { token } = await oauth2.accessToken.create({ refresh_token: credentials.refreshToken }).refresh();
-      authData = { expiration: token.expires_at.getTime(), accessToken: token.access_token };
-      authCache.set(credentials.userId, authData);
-    }
+    cache.set(cacheKey, access_token, expires_in - 60 * 5);
+  }
 
-    cb(null, authData.accessToken);
-  };
+  cb(null, cache.get(cacheKey));
 };
 
 const consumeStream = (stream) => new Promise(resolve => {
@@ -59,14 +62,16 @@ module.exports = class {
       }
     });
 
-    this.client = graph.Client.init({
-      authProvider: authProvider(this.oauth2, credentials)
+    this.serviceClient = graph.Client.init({
+      authProvider: serviceAuthProvider(config, credentials),
+      defaultVersion: "beta"
     });
 
     this.clientId = config.clientId;
     this.redirectUrl = config.redirectUrl;
-    this.authScope = "openid profile offline_access User.Read Calendars.ReadWrite";
+    this.authScope = "openid profile";
     this.cacheKey = credentials && crypto.createHash("md5").update(credentials.refreshToken).digest("hex");
+    this.credentials = credentials;
   }
 
   getAuthUrl() {
@@ -74,6 +79,10 @@ module.exports = class {
       redirect_uri: this.redirectUrl,
       scope: this.authScope
     });
+  }
+
+  getAdminAuthUrl() {
+    return `https://login.microsoftonline.com/common/adminconsent?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUrl)}`;
   }
 
   async getAuthTokens(authCode) {
@@ -95,14 +104,18 @@ module.exports = class {
       provider: "office365",
       accessToken: token.access_token,
       refreshToken: token.refresh_token,
-      idToken: token.id_token,
-      userId: user.sub
+      userId: user.oid,
+      tenantId: user.tid
     };
   }
 
   async isAccessTokenValid() {
+    if (!this.credentials) {
+      return false;
+    }
+
     try {
-      await this.client.api("/me").get();
+      await this.serviceClient.api(`/users/${this.credentials.userId}`).get();
       return true;
     } catch (error) {
       console.log(error);
@@ -111,7 +124,7 @@ module.exports = class {
   }
 
   async getUserPhoto() {
-    const photo = await this.client.api("/me/photo/$value")
+    const photo = await this.serviceClient.api(`/users/${this.credentials.userId}/photo/$value`)
       .responseType(graph.ResponseType.RAW)
       .get()
       .then(null, () => null);
@@ -125,7 +138,7 @@ module.exports = class {
   }
 
   async getUserDetails() {
-    const userDetails = await this.client.api("/me").get();
+    const userDetails = await this.serviceClient.api(`/users/${this.credentials.userId}`).get();
 
     return {
       displayName: (userDetails.displayName) || "Unknown",
@@ -142,11 +155,11 @@ module.exports = class {
     }
 
     if (!cache.get(cacheKey)) {
-      const { value } = await this.client.api("/me/calendars").get();
+      const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).get();
       const calendars = value.map(calendar => ({
-        id: calendar.id,
+        id: calendar.address,
         summary: calendar.name,
-        canModifyEvents: calendar.canEdit
+        canModifyEvents: true
       }));
 
       cache.set(cacheKey, calendars, CACHE_TTL);
@@ -160,11 +173,19 @@ module.exports = class {
     return calendars.find(calendar => calendar.id === calendarId);
   }
 
+  async assertCalendar(calendarId) {
+    if (!await this.getCalendar(calendarId)) {
+      throw new Error("Unknown calendar: " + calendarId);
+    }
+  }
+
   async getEvents(calendarId) {
+    await this.assertCalendar(calendarId);
+
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (!cache.get(cacheKey)) {
-      const { value } = await this.client.api(`/me/calendars/${encodeURIComponent(calendarId)}/events`)
+      const { value } = await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`)
         .query({
           StartDateTime: new Date(Date.now() - ms("1 day")).toISOString(),
           EndDateTime: new Date(Date.now() + ms("1 day")).toISOString(),
@@ -192,9 +213,11 @@ module.exports = class {
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
+    await this.assertCalendar(calendarId);
+
     cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
-    await this.client.api(`/me/calendars/${encodeURIComponent(calendarId)}/events`).post({
+    await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`).post({
       subject: summary,
       start: { timezone: "UTC", dateTime: Moment(startDateTime).toISOString(false) },
       end: { timezone: "UTC", dateTime: Moment(endDateTime).toISOString(false) },
@@ -207,12 +230,14 @@ module.exports = class {
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
+    await this.assertCalendar(calendarId);
+
     cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
-    const path = `/me/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`;
+    const path = `/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`;
 
     if (isCheckedIn) {
-      await this.client.api(`${path}/extensions/${isCheckedInExtension}`)
+      await this.serviceClient.api(`${path}/extensions/${isCheckedInExtension}`)
         .patch({
           "@odata.type": "microsoft.graph.openTypeExtension",
           extensionName: isCheckedInExtension,
@@ -223,12 +248,14 @@ module.exports = class {
     const resource = {};
     if (startDateTime) resource.start = { timezone: "UTC", dateTime: Moment(startDateTime).toISOString(false) };
     if (endDateTime) resource.end = { timezone: "UTC", dateTime: Moment(endDateTime).toISOString(false) };
-    await this.client.api(path).patch(resource);
+    await this.serviceClient.api(path).patch(resource);
   }
 
   async deleteEvent(calendarId, eventId) {
+    await this.assertCalendar(calendarId);
+
     cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
-    await this.client.api(`/me/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`).delete();
+    await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`).delete();
   }
 };

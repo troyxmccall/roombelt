@@ -5,6 +5,7 @@ module.exports = class {
     this.Model = this.Model = sequelize.define("oauth", {
       // oauth
       userId: { type: Sequelize.TEXT, primaryKey: true },
+      tenantId: Sequelize.TEXT,
       provider: Sequelize.STRING,
       accessToken: Sequelize.TEXT,
       refreshToken: Sequelize.TEXT,
@@ -18,9 +19,9 @@ module.exports = class {
     });
   }
 
-  async saveTokens({ userId, accessToken, refreshToken, provider }) {
+  async saveTokens({ userId, tenantId, accessToken, refreshToken, provider }) {
     const fieldsToUpdate = refreshToken ? ["accessToken", "refreshToken", "provider"] : ["accessToken", "provider"];
-    await this.Model.upsert({ userId, accessToken, refreshToken, provider }, { fields: fieldsToUpdate });
+    await this.Model.upsert({ userId, tenantId, accessToken, refreshToken, provider }, { fields: fieldsToUpdate });
   }
 
   async getByUserId(userId) {

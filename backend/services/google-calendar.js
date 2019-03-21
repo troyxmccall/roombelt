@@ -71,8 +71,8 @@ module.exports = class {
       provider: "google",
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
-      idToken: tokens.id_token,
-      userId: verification.payload.sub
+      userId: verification.payload.sub,
+      tenantId: verification.payload.tid
     };
   }
 
