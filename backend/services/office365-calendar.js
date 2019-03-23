@@ -118,6 +118,7 @@ module.exports = class {
     try {
       logger.debug(`isAccessTokenValid: ${this.credentials.userId}`);
 
+      await cache.delete(`service-auth-${this.credentials.userId}`);
       await this.serviceClient.api(`/users/${this.credentials.userId}`).get();
 
       logger.debug(`isAccessTokenValid: ${this.credentials.userId} [success]`);
