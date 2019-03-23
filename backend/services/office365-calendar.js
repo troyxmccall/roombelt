@@ -110,6 +110,10 @@ module.exports = class {
     };
   }
 
+  async refreshAccessToken() {
+    await cache.delete(`service-auth-${this.credentials.userId}`);
+  }
+
   async isAccessTokenValid() {
     if (!this.credentials) {
       return false;
@@ -118,7 +122,6 @@ module.exports = class {
     try {
       logger.debug(`isAccessTokenValid: ${this.credentials.userId}`);
 
-      await cache.delete(`service-auth-${this.credentials.userId}`);
       await this.serviceClient.api(`/users/${this.credentials.userId}`).get();
 
       logger.debug(`isAccessTokenValid: ${this.credentials.userId} [success]`);

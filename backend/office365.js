@@ -12,6 +12,7 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
       }
 
       await new Promise(res => setTimeout(res, 1000));
+      await req.context.calendarProviders.office365.refreshAccessToken();
     }
 
     return res.redirect("/");
