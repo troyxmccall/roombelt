@@ -7,6 +7,7 @@ const Moment = require("moment");
 const ms = require("ms");
 const Cache = require("./cache");
 const qs = require("qs");
+const logger = require("../logger");
 
 const isCheckedInExtension = "Com.Roombelt.IsCheckedIn";
 const cache = Cache("office-365");
@@ -115,7 +116,12 @@ module.exports = class {
     }
 
     try {
+      logger.debug(`isAccessTokenValid: ${this.credentials.userId}`);
+
       await this.serviceClient.api(`/users/${this.credentials.userId}`).get();
+
+      logger.debug(`isAccessTokenValid: ${this.credentials.userId} [success]`);
+
       return true;
     } catch (error) {
       console.log(error);
