@@ -28,7 +28,7 @@ const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedPrope
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),
   end: getTime(end),
-  attendees: attendees.map(attendee => ({ displayName: attendee.displayName })) || [],
+  attendees: (attendees && attendees.map(attendee => ({ displayName: attendee.displayName }))) || [],
   isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
   isPrivate: visibility === "private" || visibility === "confidential"
 });
@@ -142,7 +142,7 @@ module.exports = class {
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (options.invalidateCache) {
-      cache.delete(cacheKey);
+      valuesCache.delete(cacheKey);
     }
 
     if (!watchersCache.get(cacheKey) && this.webHookUrl) {
