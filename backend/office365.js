@@ -6,7 +6,15 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
   }
 
   if (req.query && req.query["admin_consent"] === "True") {
-    return res.redirect("/admin");
+    for (let i = 0; i < 30; i++) {
+      if (await req.context.calendarProviders.office365.isAccessTokenValid()) {
+        return res.redirect("/admin");
+      }
+
+      await new Promise(res => setTimeout(res, 1000));
+    }
+
+    return res.redirect("/");
   }
 
   if (!req.query || !req.query.code) {
