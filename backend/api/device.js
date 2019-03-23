@@ -98,7 +98,7 @@ router.post("/device/meeting", async function(req, res) {
   const calendarId = req.body.calendarId || req.context.device.calendarId;
 
   const calendar = await req.context.calendarProvider.getCalendar(calendarId);
-  const events = await req.context.calendarProvider.getEvents(calendarId);
+  const events = await req.context.calendarProvider.getEvents(calendarId, { invalidateCache: true });
   const nextEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) > Date.now());
 
   const desiredStartTime = Date.now() + (req.body.timeInMinutes || 15) * 60 * 1000;
@@ -115,7 +115,7 @@ router.post("/device/meeting", async function(req, res) {
 });
 
 router.put("/device/meeting/:meetingId", async function(req, res) {
-  const events = await req.context.calendarProvider.getEvents(req.context.device.calendarId);
+  const events = await req.context.calendarProvider.getEvents(req.context.device.calendarId, { invalidateCache: true });
   const event = events.find(event => event.id === req.params.meetingId);
 
   if (event === -1) {

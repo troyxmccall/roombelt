@@ -173,19 +173,27 @@ module.exports = class {
     return calendars.find(calendar => calendar.id === calendarId);
   }
 
+  async invalidateCalendarCache(calendarId) {
+    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+  }
+
   async assertCalendar(calendarId) {
     if (!await this.getCalendar(calendarId)) {
       throw new Error("Unknown calendar: " + calendarId);
     }
   }
 
-  async getEvents(calendarId) {
+  async getEvents(calendarId, options = { invalidateCache: false }) {
     await this.assertCalendar(calendarId);
 
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
+    if (options.invalidateCache) {
+      cache.delete(cacheKey);
+    }
+
     if (!cache.get(cacheKey)) {
-      const { value } = await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`)
+      const { value } = await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/calendarView`)
         .query({
           StartDateTime: new Date(Date.now() - ms("1 day")).toISOString(),
           EndDateTime: new Date(Date.now() + ms("1 day")).toISOString(),
@@ -215,8 +223,6 @@ module.exports = class {
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
     await this.assertCalendar(calendarId);
 
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
-
     await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`).post({
       subject: summary,
       start: { timezone: "UTC", dateTime: Moment(startDateTime).toISOString(false) },
@@ -227,12 +233,12 @@ module.exports = class {
         isCheckedIn
       }]
     });
+
+    await this.invalidateCalendarCache(calendarId);
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
     await this.assertCalendar(calendarId);
-
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
 
     const path = `/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`;
 
@@ -248,14 +254,15 @@ module.exports = class {
     const resource = {};
     if (startDateTime) resource.start = { timezone: "UTC", dateTime: Moment(startDateTime).toISOString(false) };
     if (endDateTime) resource.end = { timezone: "UTC", dateTime: Moment(endDateTime).toISOString(false) };
+
     await this.serviceClient.api(path).patch(resource);
+
+    await this.invalidateCalendarCache(calendarId);
   }
 
   async deleteEvent(calendarId, eventId) {
     await this.assertCalendar(calendarId);
-
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
-
     await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`).delete();
+    await this.invalidateCalendarCache(calendarId);
   }
 };

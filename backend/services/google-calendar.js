@@ -138,8 +138,12 @@ module.exports = class {
     return calendars.find(calendar => calendar.id === calendarId);
   }
 
-  async getEvents(calendarId) {
+  async getEvents(calendarId, options = { invalidateCache: false }) {
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
+
+    if (options.invalidateCache) {
+      cache.delete(cacheKey);
+    }
 
     if (!watchersCache.get(cacheKey) && this.webHookUrl) {
       logger.debug(`Set events watcher for calendar ${calendarId}`);
@@ -170,8 +174,6 @@ module.exports = class {
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
-
     const query = {
       calendarId: encodeURIComponent(calendarId),
       resource: {
@@ -185,11 +187,11 @@ module.exports = class {
     await new Promise((res, rej) =>
       this.calendarClient.events.insert(query, (err, data) => (err ? rej(err) : res(data)))
     );
+
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
-
     const resource = {};
     if (startDateTime) resource.start = { dateTime: new Date(startDateTime).toISOString() };
     if (endDateTime) resource.end = { dateTime: new Date(endDateTime).toISOString() };
@@ -204,11 +206,11 @@ module.exports = class {
     await new Promise((res, rej) =>
       this.calendarClient.events.patch(query, (err, data) => (err ? rej(err) : res(data)))
     );
+
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async deleteEvent(calendarId, eventId) {
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
-
     const query = {
       calendarId: encodeURIComponent(calendarId),
       eventId: encodeURIComponent(eventId)
@@ -217,6 +219,8 @@ module.exports = class {
     await new Promise((res, rej) =>
       this.calendarClient.events.delete(query, (err, data) => (err ? rej(err) : res(data)))
     );
+
+    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   $watchCalendars(key, channelId, ttl) {
