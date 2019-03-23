@@ -69,7 +69,7 @@ module.exports = class {
 
     this.clientId = config.clientId;
     this.redirectUrl = config.redirectUrl;
-    this.authScope = "openid profile";
+    this.authScope = "openid profile offline_access";
     this.cacheKey = credentials && crypto.createHash("md5").update(credentials.refreshToken).digest("hex");
     this.credentials = credentials;
   }
