@@ -41,8 +41,8 @@ router.use(async (req, res) => {
   const session = await storage.session.getSession(sessionToken) || await storage.session.createSession();
 
   const oauth = await storage.oauth.getByUserId(session.userId);
-  const googleCalendarProvider = new GoogleCalendar(config.google, oauth);
-  const office365CalendarProvider = new Office365Calendar(config.office365, oauth);
+  const googleCalendarProvider = new GoogleCalendar(config.google, (oauth && oauth.provider === "google") ? oauth : null);
+  const office365CalendarProvider = new Office365Calendar(config.office365, (oauth && oauth.provider) === "office365" ? oauth : null);
   const subscription = await getSubscriptionStatus(oauth);
 
   req.context = {
