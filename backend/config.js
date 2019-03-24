@@ -15,6 +15,7 @@ const result = {
     clientId: process.env["OFFICE365_CLIENT_ID"],
     clientSecret: process.env["OFFICE365_CLIENT_SECRET"],
     redirectUrl: process.env["OFFICE365_REDIRECT_URL"],
+    redirectUrlAdmin: process.env["OFFICE365_REDIRECT_URL_ADMIN"],
   },
 
   databaseUrl: process.env["DATABASE_URL"],

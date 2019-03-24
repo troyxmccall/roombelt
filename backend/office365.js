@@ -5,19 +5,6 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
     return res.redirect("/");
   }
 
-  if (req.query && req.query["admin_consent"] === "True") {
-    for (let i = 0; i < 30; i++) {
-      if (await req.context.calendarProviders.office365.isAccessTokenValid()) {
-        return res.redirect("/admin");
-      }
-
-      await new Promise(res => setTimeout(res, 1000));
-      await req.context.calendarProviders.office365.refreshAccessToken();
-    }
-
-    return res.redirect("/");
-  }
-
   if (!req.query || !req.query.code) {
     return res.sendStatus(400);
   }
@@ -35,11 +22,29 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
     scope: "admin"
   });
 
+  return res.redirect("/office365/check_access");
+});
+
+router.get("/oauth_callback_admin", require("./context"), async (req, res) => {
+  if (req.query && req.query["admin_consent"] === "True") {
+    for (let i = 0; i < 30; i++) {
+      if (await req.context.calendarProviders.office365.isAccessTokenValid()) {
+        return res.redirect("/admin");
+      }
+
+      await new Promise(res => setTimeout(res, 1000));
+      await req.context.calendarProviders.office365.refreshAccessToken();
+    }
+  }
+
+  return res.redirect("/");
+});
+
+router.get("/check_access", require("./context"), async (req, res) => {
   if (!await req.context.calendarProviders.office365.isAccessTokenValid()) {
     return res.redirect(req.context.calendarProviders.office365.getAdminAuthUrl());
   }
 
   return res.redirect("/admin");
 });
-
 module.exports = router;

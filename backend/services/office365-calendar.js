@@ -70,6 +70,7 @@ module.exports = class {
 
     this.clientId = config.clientId;
     this.redirectUrl = config.redirectUrl;
+    this.redirectUrlAdmin = config.redirectUrlAdmin;
     this.authScope = "openid profile offline_access";
     this.cacheKey = credentials && crypto.createHash("md5").update(credentials.refreshToken).digest("hex");
     this.credentials = credentials;
@@ -83,7 +84,7 @@ module.exports = class {
   }
 
   getAdminAuthUrl() {
-    return `https://login.microsoftonline.com/common/adminconsent?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUrl)}`;
+    return `https://login.microsoftonline.com/common/adminconsent?client_id=${this.clientId}&redirect_uri=${encodeURIComponent(this.redirectUrlAdmin)}`;
   }
 
   async getAuthTokens(authCode) {
