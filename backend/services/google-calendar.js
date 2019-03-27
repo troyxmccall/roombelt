@@ -24,14 +24,23 @@ const getTime = time => {
 const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties, visibility }) => ({
   id,
   summary,
-  organizer,
+  organizer: organizer && { displayName: organizer.displayName || organizer.email },
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),
   end: getTime(end),
-  attendees: (attendees && attendees.map(attendee => ({ displayName: attendee.displayName }))) || [],
+  attendees: (attendees && attendees.map(attendee => ({ displayName: attendee.displayName || attendee.email }))) || [],
   isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
   isPrivate: visibility === "private" || visibility === "confidential"
 });
+
+const isEventAccepted = event => {
+  if (event.status === "cancelled") {
+    return false;
+  }
+
+  const currentAttendee = event.attendees && event.attendees.find(attendee => attendee.self);
+  return !currentAttendee || currentAttendee.responseStatus !== "declined";
+};
 
 module.exports = class {
   constructor(config, credentials) {
@@ -167,7 +176,8 @@ module.exports = class {
       logger.debug(`Fetch events for ${calendarId}`);
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
-      valuesCache.set(cacheKey, items.map(mapEvent), CHANNEL_TTL_EVENTS);
+
+      valuesCache.set(cacheKey, items.filter(isEventAccepted).map(mapEvent), CHANNEL_TTL_EVENTS);
     }
 
     return valuesCache.get(cacheKey);
