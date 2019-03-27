@@ -53,7 +53,11 @@ router.use(async (req, res) => {
       office365: office365CalendarProvider
     },
     session,
-    subscription
+    subscription,
+    removeSession: async () => {
+      await storage.session.deleteSession(req.context.session.token);
+      res.clearCookie("sessionToken", { httpOnly: true });
+    }
   };
 
   const day = 1000 * 60 * 60 * 24;

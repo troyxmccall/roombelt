@@ -22,6 +22,11 @@ app.use("/api", require("./api"));
 app.use("/google", cookieParser(), require("./google"));
 app.use("/office365", cookieParser(), require("./office365"));
 
+app.get("/logout", cookieParser(), require("./context"), async (req, res) => {
+  await req.context.removeSession(req, res);
+  res.redirect("/");
+});
+
 app.listen(config.port, config.acceptHost, err => {
   if (err) {
     console.error(err);

@@ -3,7 +3,7 @@ import styled from "styled-components/macro";
 import { connect } from "react-redux";
 
 import Logo from "../Logo";
-import { Text } from "theme";
+import { DropdownMenu, DropdownMenuItem, Text } from "theme";
 import { monetizationActions } from "apps/admin/store/actions";
 import { currentSubscriptionPlanSelector, daysOfTrialLeftSelector } from "apps/admin/store/selectors";
 
@@ -14,11 +14,6 @@ const User = styled.a`
   padding: 8px;
   border: 1px solid transparent;
   border-radius: 2px;
-  
-  :hover {
-    border: 1px solid #ddd;
-    background: #fafbfb;
-  }
 `;
 
 const UserAvatar = styled.span`
@@ -38,12 +33,9 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const Header = props => (
-  <Wrapper>
-    <a href="https://roombelt.com" style={{ textDecoration: "none" }}>
-      <Logo size={24} withName/>
-    </a>
-    <User onClick={props.openChoosePlanDialog}>
+const Header = props => {
+  const user = (
+    <User>
       <UserAvatar img={props.avatarUrl}/>
       <div>
         <Text block small>
@@ -55,8 +47,22 @@ const Header = props => (
         </Text>
       </div>
     </User>
-  </Wrapper>
-);
+  );
+
+  return (
+    <Wrapper>
+      <a href="https://roombelt.com" style={{ textDecoration: "none" }}>
+        <Logo size={24} withName/>
+      </a>
+
+      <DropdownMenu trigger={user} arrowPosition="left: 10px">
+        <DropdownMenuItem onClick={props.openChoosePlanDialog}>Subscription settings</DropdownMenuItem>
+        <DropdownMenuItem as="a" href="https://docs.roombelt.com">Help</DropdownMenuItem>
+        <DropdownMenuItem as="a" href="/logout">Log out</DropdownMenuItem>
+      </DropdownMenu>
+    </Wrapper>
+  );
+};
 
 const mapStateToProps = state => ({
   avatarUrl: state.user.avatarUrl,

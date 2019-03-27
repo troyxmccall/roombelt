@@ -34,4 +34,8 @@ module.exports = class {
   async updateSession(token, update) {
     await this.Model.update(update, { where: { token } });
   }
+
+  async deleteSession(token) {
+    await this.Model.destroy({ where: { token } });
+  }
 };

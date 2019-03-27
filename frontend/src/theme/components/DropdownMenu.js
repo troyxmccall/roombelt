@@ -1,5 +1,6 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled, { css } from "styled-components/macro";
+import colors from "../colors";
 
 const Wrapper = styled.div`
   display: inline-block;
@@ -13,9 +14,9 @@ const Dropdown = styled.ul`
   position: absolute;
   right: 0;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  min-width: 12rem;
-  padding: 0.5rem 0;
   margin: 0.125rem 0 0;
+  padding: 0;
+  min-width: 10rem;
   font-size: 14px;
   color: #6e7687;
   text-align: left;
@@ -24,17 +25,40 @@ const Dropdown = styled.ul`
   background-clip: padding-box;
   border: 1px solid rgba(0, 40, 100, 0.12);
   border-radius: 3px;
+  
+  ${props => props.arrowPosition && css`
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        ${props.arrowPosition};
+        top: -6px;
+        width: 0; 
+        height: 0; 
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid #ddd;
+      }
+      
+      &::after {
+        border-bottom-color: white;
+        top: -5px;
+      }
+  `}
 `;
 
 export const DropdownMenuItem = styled.li`
-  padding: 0.25rem 1.5rem;
+  display: block;
+  padding: 0.7rem;
+  color: ${colors.foreground};
+  border-bottom: 1px solid #eee;
   white-space: nowrap;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     color: #16181b;
     text-decoration: none;
-    background-color: #f8f9fa;
+    background: #fafbfb;
   }
 `;
 
@@ -51,7 +75,7 @@ export class DropdownMenu extends React.PureComponent {
       <span ref={this.triggerRef} onClick={this.toggle}>
         {this.props.trigger}
       </span>
-      <Dropdown visible={this.state.isVisible}>{this.props.children}</Dropdown>
+      <Dropdown arrowPosition={this.props.arrowPosition} visible={this.state.isVisible}>{this.props.children}</Dropdown>
     </Wrapper>
   );
 

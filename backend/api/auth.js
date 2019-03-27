@@ -21,8 +21,8 @@ router.put("/auth/device", async function(req, res) {
   res.sendStatus(200);
 });
 
-router.delete("/auth", async function(req, res) {
-  res.clearCookie("sessionToken", { httpOnly: true });
+router.delete("/auth", async (req, res) => {
+  await req.context.removeSession(req, res);
   res.sendStatus(204);
 });
 
