@@ -16,9 +16,9 @@ const storage = new Storage(
 );
 
 async function getSubscriptionStatus(oauth) {
-  // if (!oauth) {
-  return { isPaymentRequired: false, isSubscriptionCancelled: false };
-  // }
+  if (!oauth) {
+    return { isPaymentRequired: false, isSubscriptionCancelled: false };
+  }
 
   const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
 
