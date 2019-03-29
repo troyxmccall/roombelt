@@ -6,6 +6,7 @@ import Logo from "../Logo";
 import { DropdownMenu, DropdownMenuItem, Text } from "theme";
 import { monetizationActions } from "apps/admin/store/actions";
 import { currentSubscriptionPlanSelector, daysOfTrialLeftSelector } from "apps/admin/store/selectors";
+import premiumPlans from "services/premium-plans";
 
 const User = styled.a`
   display: inline-flex;
@@ -49,6 +50,8 @@ const Header = props => {
     </User>
   );
 
+  const isOnPremises = props.currentSubscriptionPlan === premiumPlans.ON_PREMISES;
+
   return (
     <Wrapper>
       <a href="https://roombelt.com" style={{ textDecoration: "none" }}>
@@ -56,7 +59,9 @@ const Header = props => {
       </a>
 
       <DropdownMenu trigger={user} arrowPosition="left: 10px">
-        <DropdownMenuItem onClick={props.openChoosePlanDialog}>Subscription settings</DropdownMenuItem>
+        {!isOnPremises && <DropdownMenuItem onClick={props.openChoosePlanDialog}>
+          Subscription settings
+        </DropdownMenuItem>}
         <DropdownMenuItem as="a" href="https://docs.roombelt.com">Help</DropdownMenuItem>
         <DropdownMenuItem as="a" href="/logout">Log out</DropdownMenuItem>
       </DropdownMenu>

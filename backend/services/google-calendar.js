@@ -60,6 +60,8 @@ module.exports = class {
   }
 
   getAuthUrl(forceConsent) {
+    if (!this.clientId) return null;
+
     const scopes = ["https://www.googleapis.com/auth/calendar", "profile", "email"];
 
     return this.oauthClient.generateAuthUrl({
@@ -136,7 +138,7 @@ module.exports = class {
         canModifyEvents: calendar.accessRole === "writer" || calendar.accessRole === "owner"
       }));
 
-      valuesCache.set(cacheKey, calendars, CHANNEL_TTL_CALENDARS);
+      valuesCache.set(cacheKey, calendars, this.webHookUrl ? CHANNEL_TTL_CALENDARS : 30);
     }
 
     return valuesCache.get(cacheKey);
@@ -177,7 +179,7 @@ module.exports = class {
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
 
-      valuesCache.set(cacheKey, items.filter(isEventAccepted).map(mapEvent), CHANNEL_TTL_EVENTS);
+      valuesCache.set(cacheKey, items.filter(isEventAccepted).map(mapEvent), this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
     }
 
     return valuesCache.get(cacheKey);

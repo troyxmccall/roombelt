@@ -16,8 +16,12 @@ const storage = new Storage(
 );
 
 async function getSubscriptionStatus(oauth) {
+  if (!config.paddleApiKey) {
+    return { isPaymentEnabled: false, isPaymentRequired: false, isSubscriptionCancelled: false };
+  }
+
   if (!oauth) {
-    return { isPaymentRequired: false, isSubscriptionCancelled: false };
+    return { isPaymentEnabled: true, isPaymentRequired: false, isSubscriptionCancelled: false };
   }
 
   const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
@@ -33,7 +37,7 @@ async function getSubscriptionStatus(oauth) {
 
   const isPaymentRequired = isSubscriptionCancelled || isTrialExpired || isUpgradeRequired;
 
-  return { isPaymentRequired, isSubscriptionCancelled };
+  return { isPaymentEnabled: true, isPaymentRequired, isSubscriptionCancelled };
 }
 
 router.use(async (req, res) => {

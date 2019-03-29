@@ -77,6 +77,8 @@ module.exports = class {
   }
 
   getAuthUrl() {
+    if (!this.clientId) return null;
+
     return this.oauth2.authorizationCode.authorizeURL({
       redirect_uri: this.redirectUrl,
       scope: this.authScope

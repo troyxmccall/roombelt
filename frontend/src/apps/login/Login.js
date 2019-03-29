@@ -46,12 +46,12 @@ export default () => {
     <CardAndFooterLayout footer={<Footer/>}>
       <PageLoaded/>
       <PageLogo withName size={30}/>
-      <MenuButton block href={authUrl.google} white>
+      {authUrl.google && <MenuButton block href={authUrl.google} white>
         <LogoImg alt="Google logo" src={buttonGoogle}/><span>Sign in with Google</span>
-      </MenuButton>
-      <MenuButton block href={authUrl.office365} white>
+      </MenuButton>}
+      {authUrl.office365 && <MenuButton block href={authUrl.office365} white>
         <LogoImg alt="Microsoft logo" src={buttonMicrosoft}/><span>Sign in with Microsoft</span>
-      </MenuButton>
+      </MenuButton>}
       <MenuButton block to={"/device"} white as={SimpleLink}>Register device</MenuButton>
     </CardAndFooterLayout>
   );

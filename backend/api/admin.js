@@ -51,7 +51,7 @@ router.get("/admin/user", async function(req, res) {
   const userProperties = await req.context.storage.userProperties.getProperties(req.context.session.userId);
 
   const getTrialEnd = () => {
-    if (userOAuth.subscriptionPlanId) {
+    if (!req.context.subscription.isPaymentEnabled || userOAuth.subscriptionPlanId) {
       return null;
     }
 
@@ -62,9 +62,15 @@ router.get("/admin/user", async function(req, res) {
     return Moment(userOAuth.createdAt).add(30, "days").valueOf();
   };
 
+  const getSubscriptionPlanId = () => {
+    if (!req.context.subscription.isPaymentEnabled) return 1;
+    if (userOAuth.isSubscriptionCancelled) return null;
+    return userOAuth.subscriptionPlanId;
+  };
+
   res.json(userRepresentation(userOAuth, userDetails, userProperties, {
     subscriptionTrialEndTimestamp: getTrialEnd(),
-    subscriptionPlanId: userOAuth.isSubscriptionCancelled ? null : userOAuth.subscriptionPlanId
+    subscriptionPlanId: getSubscriptionPlanId()
   }));
 });
 
