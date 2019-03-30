@@ -13,6 +13,8 @@ const FooterLink = styled.a`
 
 const Footer = styled(props => (
   <div {...props}>
+    Roombelt v{process.env.REACT_APP_VERSION}
+    {" | "}
     Copyright © 2019 <FooterLink href={"https://github.com/ziolko"}>Mateusz Zieliński</FooterLink>
     {" | "}
     <FooterLink href={"https://docs.roombelt.com/legal/terms-and-conditions"}>Terms and Conditions</FooterLink>
