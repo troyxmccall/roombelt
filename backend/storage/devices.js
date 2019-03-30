@@ -13,6 +13,7 @@ module.exports = class {
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
       minutesForCheckIn: { type: Sequelize.INTEGER, defaultValue: 0 },
+      minutesForStartEarly: { type: Sequelize.INTEGER, defaultValue: 5 },
       showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false }
     });
   }
@@ -69,6 +70,10 @@ module.exports = class {
 
   async setMinutesForCheckIn(deviceId, minutesForCheckIn) {
     await this.Model.update({ minutesForCheckIn }, { where: { deviceId } });
+  }
+
+  async setMinutesForStartEarly(deviceId, minutesForStartEarly) {
+    await this.Model.update({ minutesForStartEarly }, { where: { deviceId } });
   }
 
   async setShowAvailableRooms(deviceId, showAvailableRooms) {

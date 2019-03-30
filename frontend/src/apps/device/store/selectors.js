@@ -35,11 +35,12 @@ export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, devi
 
 export const requireCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn > 0);
 export const minutesForCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn);
+export const minutesForStartEarlySelector = createSelector(deviceSelector, device => device && device.minutesForStartEarly);
 export const calendarNameSelector = createSelector(calendarSelector, calendar => calendar && calendar.name);
 
-export const currentMeetingSelector = createSelector([calendarSelector, timestampSelector],
-  (calendar, currentTimestamp) => calendar && calendar.events.find(
-    event => event.startTimestamp < currentTimestamp + 5 * 60 * 1000 && event.endTimestamp > currentTimestamp
+export const currentMeetingSelector = createSelector([calendarSelector, timestampSelector, minutesForStartEarlySelector],
+  (calendar, currentTimestamp, minutesForStartEarly) => calendar && calendar.events.find(
+    event => event.startTimestamp < currentTimestamp + minutesForStartEarly * 60 * 1000 && event.endTimestamp > currentTimestamp
   ));
 
 export const nextMeetingSelector = createSelector(

@@ -18,6 +18,7 @@ export const editDeviceDataSelector = state => ({
   language: state.editedDevice.data.language,
   clockType: state.editedDevice.data.clockType,
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn,
+  minutesForStartEarly: state.editedDevice.data.minutesForStartEarly,
   showAvailableRooms: state.editedDevice.data.showAvailableRooms
 });
 

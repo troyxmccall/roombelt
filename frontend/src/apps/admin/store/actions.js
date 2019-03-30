@@ -93,7 +93,7 @@ export const connectDeviceWizardActions = {
       dispatch(connectDeviceWizardActions.thirdStep.$startSubmitting());
 
       const { deviceId, deviceType, calendarId, language, clockType, showAvailableRooms } = newDeviceDataSelector(getState());
-      await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, showAvailableRooms, clockType);
+      await setOptionsForDevice(deviceId, deviceType, calendarId, language, 0, 5, showAvailableRooms, clockType);
 
       dispatch(adminActions.$setDevices(await getConnectedDevices()));
       dispatch(connectDeviceWizardActions.hide());
@@ -111,13 +111,14 @@ export const editDeviceDialogActions = {
   setLanguage: action(language => ({ language })),
   setClockType: action(clockType => ({ clockType })),
   setMinutesForCheckIn: action(minutesForCheckIn => ({ minutesForCheckIn })),
+  setMinutesForStartEarly: action(minutesForStartEarly => ({ minutesForStartEarly })),
   setShowAvailableRooms: action(showAvailableRooms => ({ showAvailableRooms })),
   $startSubmitting: action(),
   submit: () => async (dispatch, getState) => {
-    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, showAvailableRooms, clockType } = editDeviceDataSelector(getState());
+    const { deviceId, deviceType, calendarId, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, clockType } = editDeviceDataSelector(getState());
 
     dispatch(editDeviceDialogActions.$startSubmitting());
-    await setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, showAvailableRooms, clockType);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, clockType);
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(editDeviceDialogActions.hide());

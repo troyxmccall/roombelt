@@ -52,12 +52,13 @@ export function getCalendars() {
   return axios.get("/api/admin/calendar");
 }
 
-export function setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, showAvailableRooms, clockType) {
+export function setOptionsForDevice(deviceId, deviceType, calendarId, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, clockType) {
   return axios.put(`/api/admin/device/${encodeURIComponent(deviceId)}`, {
     deviceType,
     calendarId,
     language,
     minutesForCheckIn,
+    minutesForStartEarly,
     showAvailableRooms,
     clockType
   });

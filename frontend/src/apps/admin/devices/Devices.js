@@ -58,8 +58,8 @@ const SingleDeviceRow = props => (
         </>
         }
         {props.device.deviceType === "calendar" && <>
-          <Text muted small>Check-in required:</Text>
-          <Text block>{props.device.minutesForCheckIn ? "Yes" : "No"}</Text>
+          <Text muted small>Check-in:</Text>
+          <Text block>{props.device.minutesForStartEarly} min / {props.device.minutesForCheckIn ? "Required" : "Not required"}</Text>
         </>
         }
       </Text>

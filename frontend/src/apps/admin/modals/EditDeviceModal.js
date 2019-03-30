@@ -31,7 +31,7 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeShowAvailableRooms, onChangeClockType }) => {
+const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType }) => {
   const select = useRef();
   useEffect(() => {
     if (isVisible) select.current.focus();
@@ -107,11 +107,25 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
       </FormField>
 
       {device && device.deviceType === "calendar" && <FormField>
-        <FormFieldLabel>Require check-in</FormFieldLabel>
+        <FormFieldLabel>Start early</FormFieldLabel>
+        <Select
+          instanceId="edit-device-require-check-in"
+          value={device && device.minutesForStartEarly}
+          options={[
+            { label: "Enabled 5 minutes before meeting", value: 5 },
+            { label: "Enabled 10 minutes before meeting", value: 10 },
+            { label: "Enabled 15 minutes before meeting", value: 15 }
+          ]}
+          onChange={option => onChangeMinutesForStartEarly(option.value)}
+        />
+      </FormField>}
+
+      {device && device.deviceType === "calendar" && <FormField>
+        <FormFieldLabel>Check-in</FormFieldLabel>
         <Select
           instanceId="edit-device-require-check-in"
           value={device && device.minutesForCheckIn}
-          options={[{ label: "No", value: 0 }, { label: "Yes", value: 10 }]}
+          options={[{ label: "Not required", value: 0 }, { label: "Required in first 10 minutes", value: 10 }]}
           onChange={option => onChangeMinutesForCheckIn(option.value)}
         />
         <Text block small muted style={{ marginTop: 5 }}>
@@ -147,6 +161,7 @@ const mapDispatchToProps = dispatch => ({
   onChangeLanguage: language => dispatch(editDeviceDialogActions.setLanguage(language)),
   onChangeClockType: clockType => dispatch(editDeviceDialogActions.setClockType(clockType)),
   onChangeMinutesForCheckIn: minutes => dispatch(editDeviceDialogActions.setMinutesForCheckIn(minutes)),
+  onChangeMinutesForStartEarly: minutes => dispatch(editDeviceDialogActions.setMinutesForStartEarly(minutes)),
   onChangeShowAvailableRooms: value => dispatch(editDeviceDialogActions.setShowAvailableRooms(value))
 });
 
