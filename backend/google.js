@@ -26,7 +26,7 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const tokens = await req.context.calendarProviders.google.getAuthTokens(req.query.code).then(undefined, () => null);
+  const tokens = await req.context.calendarProviders.google.getAuthTokens(req.query.code).then(undefined, e => console.error(e));
 
   if (!tokens) {
     return res.sendStatus(401);
