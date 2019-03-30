@@ -19,7 +19,7 @@ router.use("/device", async function(req, res) {
     return res.sendStatus(404);
   }
 
-  if (req.context.subscription.isSubscriptionCancelled) {
+  if (req.context.subscriptionStatus && req.context.subscriptionStatus.areDevicesBlocked) {
     return res.sendStatus(402);
   }
 

@@ -38,7 +38,7 @@ router.use("/admin", async function(req, res) {
 });
 
 async function checkSubscription(req, res) {
-  if (req.context.subscription.isPaymentRequired) {
+  if (req.context.subscriptionStatus && req.context.subscriptionStatus.isAdminPanelBlocked) {
     return res.sendStatus(402);
   }
 
@@ -51,7 +51,7 @@ router.get("/admin/user", async function(req, res) {
   const userProperties = await req.context.storage.userProperties.getProperties(req.context.session.userId);
 
   const getTrialEnd = () => {
-    if (!req.context.subscription.isPaymentEnabled || userOAuth.subscriptionPlanId) {
+    if (!req.context.subscriptionStatus || userOAuth.subscriptionPlanId) {
       return null;
     }
 
@@ -63,7 +63,7 @@ router.get("/admin/user", async function(req, res) {
   };
 
   const getSubscriptionPlanId = () => {
-    if (!req.context.subscription.isPaymentEnabled) return 1;
+    if (!req.context.subscriptionStatus) return 1;
     if (userOAuth.isSubscriptionCancelled) return null;
     return userOAuth.subscriptionPlanId;
   };

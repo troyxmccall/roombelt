@@ -16,12 +16,8 @@ const storage = new Storage(
 );
 
 async function getSubscriptionStatus(oauth) {
-  if (!config.paddleApiKey) {
-    return { isPaymentEnabled: false, isPaymentRequired: false, isSubscriptionCancelled: false };
-  }
-
-  if (!oauth) {
-    return { isPaymentEnabled: true, isPaymentRequired: false, isSubscriptionCancelled: false };
+  if (!config.paddleApiKey || !oauth) {
+    return null;
   }
 
   const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
@@ -30,24 +26,25 @@ async function getSubscriptionStatus(oauth) {
   const endOfTrial = Moment(oauth.createdAt).add(30, "days");
   const firstOfApril = Moment([2019, 3, 1]);
   const isTrialExpired = !oauth.subscriptionPlanId && now.isAfter(endOfTrial) && now.isAfter(firstOfApril);
+  const isTrialLongExpired = isTrialExpired && now.isAfter(endOfTrial.add(3, "days")) && now.isAfter(firstOfApril.add(3, "days"));
 
   const currentPlan = premiumPlans[oauth.subscriptionPlanId];
   const connectedDevicesCount = storage.devices.countDevicesForUser(oauth.userId);
   const isUpgradeRequired = currentPlan && currentPlan.maxDevices < connectedDevicesCount;
 
-  const isPaymentRequired = isSubscriptionCancelled || isTrialExpired || isUpgradeRequired;
-
-  return { isPaymentEnabled: true, isPaymentRequired, isSubscriptionCancelled };
+  return {
+    isAdminPanelBlocked: isSubscriptionCancelled || isUpgradeRequired || isTrialExpired,
+    areDevicesBlocked: isSubscriptionCancelled || isUpgradeRequired || isTrialLongExpired
+  };
 }
 
 router.use(async (req, res) => {
-  const sessionToken = req.cookies.sessionToken || req.token;
-  const session = await storage.session.getSession(sessionToken) || await storage.session.createSession();
+  const session = await storage.session.getSession(req.cookies.sessionToken) || await storage.session.createSession();
 
   const oauth = await storage.oauth.getByUserId(session.userId);
   const googleCalendarProvider = new GoogleCalendar(config.google, (oauth && oauth.provider === "google") ? oauth : null);
   const office365CalendarProvider = new Office365Calendar(config.office365, (oauth && oauth.provider) === "office365" ? oauth : null);
-  const subscription = await getSubscriptionStatus(oauth);
+  const subscriptionStatus = await getSubscriptionStatus(oauth);
 
   req.context = {
     storage,
@@ -57,7 +54,7 @@ router.use(async (req, res) => {
       office365: office365CalendarProvider
     },
     session,
-    subscription,
+    subscriptionStatus,
     removeSession: async () => {
       await storage.session.deleteSession(req.context.session.token);
       res.clearCookie("sessionToken", { httpOnly: true });

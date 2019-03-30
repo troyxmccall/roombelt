@@ -112,8 +112,8 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
     </>
   );
 
-  const trialInfo = `Your free trial ends in ${daysOfTrialLeft} days. If you are happy with the product you can end the trial now and start subscription below.`;
-  const endOfTrialInfo = "Your free trial is over. Choose one of the subscription plans below.";
+  const trialInfo = `Your free trial ends in ${daysOfTrialLeft} days. Connected devices will stop working soon after that. If you are happy with the product you can end the trial now and start subscription below.`;
+  const endOfTrialInfo = "Your free trial is over. Connected devices will stop working. Choose one of the subscription plans below.";
   const paidInfo = `You are currently on the ${subscriptionPlan && subscriptionPlan.name} plan which allows you to connect up to ${subscriptionPlan && subscriptionPlan.maxDevices} devices. You can change the plan below.`;
   const needsUpgradeInfo = `You connected more devices than allowed in your current plan. Change the subscription plan below.`;
 
