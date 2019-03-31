@@ -15,6 +15,7 @@ export const editDeviceDataSelector = state => ({
   deviceId: state.editedDevice.data.id,
   deviceType: state.editedDevice.data.deviceType,
   calendarId: state.editedDevice.data.calendarId,
+  location: state.editedDevice.data.location,
   language: state.editedDevice.data.language,
   clockType: state.editedDevice.data.clockType,
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn,

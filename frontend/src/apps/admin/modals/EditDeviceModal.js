@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 
-import { Button, LoaderButton, Modal, Select, Text } from "theme";
+import { Button, Input, LoaderButton, Modal, Select, Text } from "theme";
 import { translations } from "i18n";
 import { editDeviceDialogActions } from "apps/admin/store/actions";
 
@@ -31,7 +31,7 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType }) => {
+const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType }) => {
   const select = useRef();
   useEffect(() => {
     if (isVisible) select.current.focus();
@@ -85,7 +85,13 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
           ref={select}
         />
       </FormField>
-
+      {device && device.deviceType === "dashboard" && <FormField>
+        <FormFieldLabel>Location (optional)</FormFieldLabel>
+        <Input style={{ fontSize: 16, fontFamily: "inherit" }}
+               value={device && device.location}
+               onChange={event => onChangeLocation(event.target.value)}
+               placeholder="e.g. reception"/>
+      </FormField>}
       <FormField>
         <FormFieldLabel>Locale</FormFieldLabel>
         <LocaleWrapper>
@@ -158,6 +164,7 @@ const mapDispatchToProps = dispatch => ({
   onCancel: () => dispatch(editDeviceDialogActions.hide()),
   onChangeType: deviceType => dispatch(editDeviceDialogActions.setDeviceType(deviceType)),
   onChangeCalendar: calendarId => dispatch(editDeviceDialogActions.setCalendarId(calendarId)),
+  onChangeLocation: location => dispatch(editDeviceDialogActions.setLocation(location)),
   onChangeLanguage: language => dispatch(editDeviceDialogActions.setLanguage(language)),
   onChangeClockType: clockType => dispatch(editDeviceDialogActions.setClockType(clockType)),
   onChangeMinutesForCheckIn: minutes => dispatch(editDeviceDialogActions.setMinutesForCheckIn(minutes)),

@@ -66,6 +66,8 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, deviceType: action.deviceType } };
     case editDeviceDialogActions.setCalendarId:
       return { data: { ...state.data, calendarId: action.calendarId } };
+    case editDeviceDialogActions.setLocation:
+      return { data: { ...state.data, location: action.location } };
     case editDeviceDialogActions.setLanguage:
       return { data: { ...state.data, language: action.language } };
     case editDeviceDialogActions.setClockType:

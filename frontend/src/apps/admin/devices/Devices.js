@@ -34,7 +34,7 @@ const SingleDeviceRow = props => (
   <CalendarRowWrapper>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
-        {props.device.deviceType === "dashboard" && <em>Dashboard</em>}
+        {props.device.deviceType === "dashboard" && (props.device.location ? props.device.location : <em>Dashboard</em>)}
         {props.device.deviceType === "calendar" && (props.calendar ? props.calendar.summary :
           <em>No calendar connected</em>)}
       </Text>
@@ -59,7 +59,9 @@ const SingleDeviceRow = props => (
         }
         {props.device.deviceType === "calendar" && <>
           <Text muted small>Check-in:</Text>
-          <Text block>{props.device.minutesForStartEarly} min / {props.device.minutesForCheckIn ? "Required" : "Not required"}</Text>
+          <Text block>
+            {props.device.minutesForStartEarly} min / {props.device.minutesForCheckIn ? "Required" : "Not required"}
+          </Text>
         </>
         }
       </Text>
@@ -112,7 +114,7 @@ const Devices = props => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHeaderColumn>Calendar</TableHeaderColumn>
+            <TableHeaderColumn>Device</TableHeaderColumn>
             <TableHeaderColumn>Locale</TableHeaderColumn>
             <TableHeaderColumn>Settings</TableHeaderColumn>
             <TableHeaderColumn>Status</TableHeaderColumn>
