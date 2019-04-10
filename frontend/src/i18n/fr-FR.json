@@ -1,0 +1,63 @@
+{
+  "key": "fr-FR",
+  "language": "Français",
+  "availability": {
+    "available": "Disponible",
+    "available-for": "Disponible pendant {{ time }}",
+    "available-in": "Disponible dans {{ time }}",
+    "available-all-day": "Disponible toute la journée",
+    "occupied": "Occupée",
+    "occupied-all-day": "Occupée toute la journée",
+    "starts": {
+      "now": "Commence maintenant",
+      "ago": "Commencé il y a 1 minute",
+      "ago_plural": "Commencé il y a {{ count }} minutes",
+      "in": "Commence dans 1 minute",
+      "in_plural": "Commence dans {{ count }} minutes"
+    }
+  },
+  "meeting": {
+    "no-title": "(Sans titre)",
+    "private": "(Réunion privée)",
+    "guests": "et 1 invité",
+    "guests_plural": "et {{ count }} invités",
+    "next": "À venir",
+    "quick-meeting-title": "Meeting in {{ roomName }}"
+  },
+  "actions": {
+    "end-now": "Libérer",
+    "confirm": "Confirmer",
+    "extend": "Prolonger",
+    "back": "Précédent",
+    "cancel": "Annuler",
+    "retry": "Recommencer",
+    "check-in": "Check in",
+    "start-early": "Commencer plus tôt",
+    "cancel-meeting": "Annuler la réunion",
+    "find-room": "Trouver une salle",
+    "check-in-warning": "Cette réunion sera annulée dans {{ count }} min."
+  },
+  "full-screen": "Pein écran",
+  "errors": {
+    "unable-to-connect-server": "Serveur injoignable",
+    "check-internet-and-try-again": "Vérifiez votre connexion et recommencez",
+    "action-error-title": "Une erreur s'est produite",
+    "action-error-subtitle": "Si le problème persiste contactez votre administrateur",
+    "refresh-page": "Rafraîchir la page",
+    "device-disconnected-title": "Appareil déconnecté",
+    "device-disconnected-message": "Cet appareil a été déconnecté dans le panneau d'administration. Souhaitez-vous le reconnecter ?",
+    "subscription-cancelled": "L'abonnement à Roombelt à été annulé"
+  },
+  "dashboard": {
+    "page-title": "Salles de réunion",
+    "calendar": "Salle",
+    "meeting": "Réunion",
+    "status": "Status",
+    "starts-in": "Commence dans {{ time }}",
+    "starts-now": "Commence maintenant",
+    "started-ago": "Commencé il y a {{ time }}",
+    "ends-in": "Termine dans {{ time }}",
+    "all-day-meeting": "Réunion toute la journée"
+  },
+  "meeting-created": "Réunion créée. Vous pouvez entrer."
+}
