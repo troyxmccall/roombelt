@@ -20,11 +20,11 @@ const LocaleWrapper = styled.div`
   display: flex;
   justify-content: stretch;
   width: 100%;
-  
+
   > :first-child {
     flex: 1 1 0;
   }
-  
+
   > :last-child {
     width: 130px;
     margin-left: 20px;
@@ -131,7 +131,12 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
         <Select
           instanceId="edit-device-require-check-in"
           value={device && device.minutesForCheckIn}
-          options={[{ label: "Not required", value: 0 }, { label: "Required in first 10 minutes", value: 10 }]}
+          options={[
+            { label: "Not required", value: 0 },
+            { label: "Required in first 5 minutes", value: 5 },
+            { label: "Required in first 10 minutes", value: 10 },
+            { label: "Required in first 15 minutes", value: 15 }
+          ]}
           onChange={option => onChangeMinutesForCheckIn(option.value)}
         />
         <Text block small muted style={{ marginTop: 5 }}>
