@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import moment from "moment";
 
 import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
-import { translations } from "../../../i18n";
+import { translations } from "i18n";
 
 import {
   Card,
@@ -19,7 +19,7 @@ import {
   TableRow,
   TableRowColumn,
   Text
-} from "../../../theme/index";
+} from "theme";
 
 import EmptyState from "./EmptyState";
 import { editDeviceDialogActions, removeDeviceDialogActions } from "apps/admin/store/actions";
@@ -34,7 +34,8 @@ const SingleDeviceRow = props => (
   <CalendarRowWrapper>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
-        {props.device.deviceType === "dashboard" && (props.device.location ? props.device.location : <em>Dashboard</em>)}
+        {props.device.deviceType === "dashboard" && (props.device.location ? props.device.location :
+          <em>Dashboard</em>)}
         {props.device.deviceType === "calendar" && (props.calendar ? props.calendar.summary :
           <em>No calendar connected</em>)}
       </Text>
@@ -60,7 +61,9 @@ const SingleDeviceRow = props => (
         {props.device.deviceType === "calendar" && <>
           <Text muted small>Check-in:</Text>
           <Text block>
-            {props.device.minutesForStartEarly} min / {props.device.minutesForCheckIn ? "Required" : "Not required"}
+            Allowed {props.device.minutesForStartEarly} min before meeting
+            <br/>
+            {props.device.minutesForCheckIn ? `Required in the first ${props.device.minutesForCheckIn} min` : "Not required"}
           </Text>
         </>
         }
