@@ -115,12 +115,12 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
       {device && device.deviceType === "calendar" && <FormField>
         <FormFieldLabel>Start early</FormFieldLabel>
         <Select
-          instanceId="edit-device-require-check-in"
+          instanceId="edit-device-minutes-for-start-early"
           value={device && device.minutesForStartEarly}
           options={[
-            { label: "Enabled 5 minutes before meeting", value: 5 },
-            { label: "Enabled 10 minutes before meeting", value: 10 },
-            { label: "Enabled 15 minutes before meeting", value: 15 }
+            { label: "Allowed 5 minutes before meeting", value: 5 },
+            { label: "Allowed 10 minutes before meeting", value: 10 },
+            { label: "Allowed 15 minutes before meeting", value: 15 }
           ]}
           onChange={option => onChangeMinutesForStartEarly(option.value)}
         />
@@ -133,9 +133,9 @@ const EditDeviceModal = ({ isVisible, isSaving, device, calendars, onCancel, onS
           value={device && device.minutesForCheckIn}
           options={[
             { label: "Not required", value: 0 },
-            { label: "Required in first 5 minutes", value: 5 },
-            { label: "Required in first 10 minutes", value: 10 },
-            { label: "Required in first 15 minutes", value: 15 }
+            { label: "Required in the first 5 minutes", value: 5 },
+            { label: "Required in the first 10 minutes", value: 10 },
+            { label: "Required in the first 15 minutes", value: 15 }
           ]}
           onChange={option => onChangeMinutesForCheckIn(option.value)}
         />
