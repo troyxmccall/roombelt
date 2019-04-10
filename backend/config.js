@@ -15,10 +15,11 @@ const result = {
     clientId: process.env["OFFICE365_CLIENT_ID"],
     clientSecret: process.env["OFFICE365_CLIENT_SECRET"],
     redirectUrl: process.env["OFFICE365_REDIRECT_URL"],
-    redirectUrlAdmin: process.env["OFFICE365_REDIRECT_URL_ADMIN"],
+    redirectUrlAdmin: process.env["OFFICE365_REDIRECT_URL_ADMIN"]
   },
 
   databaseUrl: process.env["DATABASE_URL"],
+  updateDatabaseSchema: process.env["UPDATE_DATABASE_SCHEMA"] === "true" || process.env["UPDATE_DATABASE_SCHEMA"] === "1",
   forceHttps: process.env["FORCE_HTTPS"] === "true" || process.env["FORCE_HTTPS"] === "1",
   disableFrameGuard: process.env["DISABLE_FRAME_GUARD"] === "true" || process.env["DISABLE_FRAME_GUARD"] === "1",
   port: process.env["PORT"] || 3000,

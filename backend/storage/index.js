@@ -2,6 +2,7 @@ const Devices = require("./devices");
 const Session = require("./session");
 const OAuth = require("./oauth");
 const UserProperties = require("./user-properties");
+const config = require("../config");
 
 module.exports = class {
   constructor(sequelize) {
@@ -10,9 +11,11 @@ module.exports = class {
     this.devices = new Devices(sequelize);
     this.userProperties = new UserProperties(sequelize);
 
-    sequelize.sync({ alter: true }).catch(error => {
-      console.error(error.message);
-      process.exit(1);
-    });
+    if (config.updateDatabaseSchema) {
+      sequelize.sync({ alter: true }).catch(error => {
+        console.error(error.message);
+        process.exit(1);
+      });
+    }
   }
 };
