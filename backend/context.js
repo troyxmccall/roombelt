@@ -10,8 +10,7 @@ const Office365Calendar = require("./services/office365-calendar");
 
 const storage = new Storage(
   new Sequelize(config.databaseUrl, {
-    logging: process.env.NODE_ENV !== "production" && console.log,
-    operatorsAliases: false
+    logging: process.env.NODE_ENV !== "production" && console.log
   })
 );
 
