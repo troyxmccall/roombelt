@@ -26,8 +26,8 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
 });
 
 router.get("/oauth_callback_admin", require("./context"), async (req, res) => {
-  if (req.query && req.query["admin_consent"] === "True") {
-    for (let i = 0; i < 30; i++) {
+  if (req.query && req.query["admin_consent"] === "True" && !req.query["error"]) {
+    for (let i = 0; i < 10; i++) {
       if (await req.context.calendarProviders.office365.isAccessTokenValid()) {
         return res.redirect("/admin");
       }
@@ -37,7 +37,16 @@ router.get("/oauth_callback_admin", require("./context"), async (req, res) => {
     }
   }
 
-  return res.redirect("/");
+  return res.status(400).send(`
+    <html lang="en">
+      <body>
+        <h1>Authorization error</h1>
+        <p>Ensure that you use a school or work account. Roombelt does not support personal Office365 accounts.</p>
+        <p>If this problem continues to occur <a href="mailto:mateusz@roombelt.com">contact support</a>.</p>
+        <a href="/">Back</a>
+      </body>
+    </html>
+`)
 });
 
 router.get("/check_access", require("./context"), async (req, res) => {
