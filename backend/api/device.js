@@ -20,6 +20,7 @@ router.use("/device", async function(req, res) {
   }
 
   if (req.context.subscriptionStatus && req.context.subscriptionStatus.areDevicesBlocked) {
+    logger.info(`Invalid subscription. User: ${req.context.session.userId}. Device: ${req.context.session.deviceId}`);
     return res.sendStatus(402);
   }
 
