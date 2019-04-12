@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
+import queryString from "query-string";
 
-import { Button, PageLoaded } from "../../theme";
+import { Alert, Button, PageLoaded } from "../../theme";
 import Logo from "../Logo";
 import Footer from "../Footer";
 import CardAndFooterLayout from "../../theme/layouts/CardAndFooter";
@@ -10,6 +11,7 @@ import { getAuth } from "services/api";
 
 import buttonGoogle from "./logo-google.svg";
 import buttonMicrosoft from "./logo-microsoft.svg";
+import DriftWidget from "../DriftWidget";
 
 const PageLogo = styled(Logo)`
   margin-bottom: 40px;
@@ -42,10 +44,19 @@ export default () => {
     getAuth().then(auth => setAuthUrl(auth.authUrl));
   }, []);
 
+  const showOffice365LoginError = queryString.parse(window.location.search).error === "office365_login_error";
+
   return (
     <CardAndFooterLayout footer={<Footer/>}>
       <PageLoaded/>
+      <DriftWidget />
       <PageLogo withName size={30}/>
+      {showOffice365LoginError && (
+        <Alert error style={{ maxWidth: 300 }}>
+          <strong>Authentication error</strong><br/>
+          Please ensure that you use a school or work Office365 account and try again. <br/>
+        </Alert>
+      )}
       {authUrl.google && <MenuButton block href={authUrl.google} white>
         <LogoImg alt="Google logo" src={buttonGoogle}/><span>Sign in with Google</span>
       </MenuButton>}

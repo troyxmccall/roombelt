@@ -8,7 +8,7 @@ import DevicesHeader from "./DevicesHeader";
 import Devices from "./devices/Devices";
 import ModalsContainer from "./modals/ModalsContainer";
 import ConnectDeviceWizard from "./wizard";
-import DriftWidget from "./DriftWidget";
+import DriftWidget from "../DriftWidget";
 import Footer from "../Footer";
 import ChoosePlanDialog from "./monetization/ChoosePlanDialog";
 import CancelSubscriptionDialog from "./monetization/CancelSubscriptionDialog";

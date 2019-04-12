@@ -51,6 +51,7 @@
     "nodemon": "^1.18.7",
     "prettier": "1.11.1",
     "prop-types": "^15.6.1",
+    "query-string": "^6.4.2",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-icons": "^2.2.7",

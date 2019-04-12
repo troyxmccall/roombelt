@@ -10,6 +10,11 @@ const styles = {
     color: #24587e;
     background-color: #daeefc;
     border-color: #cbe7fb;
+  `,
+  error: css`
+    color: #6b1110;
+    background-color: #f5d2d2;
+    border-color: #f1c1c0;
   `
 };
 
@@ -23,4 +28,5 @@ export default styled.div`
 
   ${props => props.primary && styles.primary};
   ${props => props.info && styles.info};
+  ${props => props.error && styles.error};
 `;
