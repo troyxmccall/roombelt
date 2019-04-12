@@ -5,7 +5,10 @@ import React from "react";
 let isInitialized = false;
 
 function showDrift() {
-  if (isInitialized) return;
+  if (isInitialized) {
+    window.drift.show();
+    return;
+  }
 
   isInitialized = true;
 
@@ -45,5 +48,10 @@ export default class extends React.PureComponent {
   componentDidMount() {
     showDrift();
   }
+
+  componentWillUnmount() {
+    window.drift.hide();
+  }
+
   render = () => null;
 }
