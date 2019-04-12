@@ -4,9 +4,9 @@ const Moment = require("moment");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms }) => ({
   id: deviceId,
-  createdAt,
+  createdAt: new Date(createdAt).getTime(),
   deviceType,
   calendarId,
   location,
@@ -15,8 +15,8 @@ const deviceRepresentation = ({ deviceId, createdAt, updatedAt, deviceType, cale
   showAvailableRooms,
   language: language || "en",
   clockType: clockType,
-  isOnline: updatedAt > Date.now() - 70 * 1000,
-  msSinceLastActivity: Date.now() - updatedAt
+  isOnline: lastActivityAt > Date.now() - 70 * 1000,
+  msSinceLastActivity: Date.now() - lastActivityAt
 });
 
 const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionUpdateUrl, isSubscriptionCancelled }, { displayName, photoUrl }, properties, { subscriptionPlanId, subscriptionTrialEndTimestamp }) => ({

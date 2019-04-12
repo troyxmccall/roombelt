@@ -13,6 +13,7 @@ module.exports = class {
       calendarId: Sequelize.STRING,
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
+      lastActivityAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
       minutesForCheckIn: { type: Sequelize.INTEGER, defaultValue: 0 },
       minutesForStartEarly: { type: Sequelize.INTEGER, defaultValue: 5 },
       showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false }
@@ -50,7 +51,7 @@ module.exports = class {
   }
 
   async heartbeatDevice(deviceId) {
-    await this.Model.update({}, { where: { deviceId } });
+    await this.Model.update({ lastActivityAt: new Date() }, { where: { deviceId } });
   }
 
   async setTypeForDevice(deviceId, deviceType) {

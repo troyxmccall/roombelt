@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components/macro";
 import moment from "moment";
+import ms from "ms";
 
 import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
 import { translations } from "i18n";
@@ -75,7 +76,7 @@ const SingleDeviceRow = props => (
         {props.device.isOnline ? "Online" : "Offline"}
       </Text>
       <Text muted small>
-        Seen {moment(Date.now() - props.device.msSinceLastActivity).fromNow()}
+        {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
       </Text>
     </TableRowColumn>
     <TableRowColumn style={{ textAlign: "right" }}>
@@ -100,6 +101,8 @@ const Devices = props => {
   if (props.isLoaded && props.devices.length === 0) {
     return <EmptyState/>;
   }
+
+  props.devices.sort((a, b) => b.createdAt - a.createdAt);
 
   const rows = props.devices.map(device => (
     <SingleDeviceRow
