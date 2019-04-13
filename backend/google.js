@@ -7,9 +7,9 @@ router.post("/web_hook", async (req, res) => {
   const channelId = req.headers["x-goog-channel-id"];
   const token = req.headers["x-goog-channel-token"];
 
-  if (state !== "sync" && GoogleCalendar.watchersCache.get(token) === channelId) {
+  if (state !== "sync" && await GoogleCalendar.watchersCache.get(token) === channelId) {
     logger.debug(`clearing cache for ${channelId} ${token}`);
-    GoogleCalendar.valuesCache.delete(token);
+    await GoogleCalendar.valuesCache.delete(token);
   }
 
   logger.debug(`${state} ${token} ${channelId}`);

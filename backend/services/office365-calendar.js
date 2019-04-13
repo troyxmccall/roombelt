@@ -29,7 +29,8 @@ const serviceAuthProvider = (config, credentials) => async cb => {
 
   const cacheKey = `service-auth-${credentials.userId}`;
 
-  if (!cache.get(cacheKey)) {
+  let result = await cache.get(cacheKey);
+  if (!result) {
     const { data: { access_token, expires_in } } = await axios.post(`https://login.microsoftonline.com/${credentials.tenantId}/oauth2/v2.0/token`, qs.stringify({
       grant_type: "client_credentials",
       client_id: config.clientId,
@@ -37,10 +38,11 @@ const serviceAuthProvider = (config, credentials) => async cb => {
       scope: "https://graph.microsoft.com/.default"
     }));
 
-    cache.set(cacheKey, access_token, expires_in - 60 * 5);
+    result = access_token;
+    await cache.set(cacheKey, access_token, expires_in - 60 * 5);
   }
 
-  cb(null, cache.get(cacheKey));
+  cb(null, result);
 };
 
 const consumeStream = (stream) => new Promise(resolve => {
@@ -164,21 +166,22 @@ module.exports = class {
     const cacheKey = `calendars-${this.cacheKey}`;
 
     if (options.invalidateCache) {
-      cache.delete(cacheKey);
+      await cache.delete(cacheKey);
     }
 
-    if (!cache.get(cacheKey)) {
+    let result = await cache.get(cacheKey);
+    if (!result) {
       const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).get();
-      const calendars = value.map(calendar => ({
+      result = value.map(calendar => ({
         id: calendar.address,
         summary: calendar.name,
         canModifyEvents: true
       }));
 
-      cache.set(cacheKey, calendars, CACHE_TTL);
+      await cache.set(cacheKey, result, CACHE_TTL);
     }
 
-    return cache.get(cacheKey);
+    return result;
   }
 
   async getCalendar(calendarId) {
@@ -187,7 +190,7 @@ module.exports = class {
   }
 
   async invalidateCalendarCache(calendarId) {
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await cache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async assertCalendar(calendarId) {
@@ -202,10 +205,11 @@ module.exports = class {
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (options.invalidateCache) {
-      cache.delete(cacheKey);
+      await cache.delete(cacheKey);
     }
 
-    if (!cache.get(cacheKey)) {
+    let result = await cache.get(cacheKey);
+    if (!result) {
       const { value } = await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/calendarView`)
         .query({
           StartDateTime: new Date(Date.now() - ms("1 day")).toISOString(),
@@ -215,7 +219,7 @@ module.exports = class {
         .header("Prefer", `outlook.timezone="UTC"`)
         .get();
 
-      const events = value.map(event => ({
+      result = value.map(event => ({
         id: event.id,
         summary: event.subject,
         organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
@@ -227,10 +231,10 @@ module.exports = class {
         isPrivate: event.sensitivity === "private"
       }));
 
-      cache.set(cacheKey, events, CACHE_TTL);
+      await cache.set(cacheKey, result, CACHE_TTL);
     }
 
-    return cache.get(cacheKey);
+    return result;
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {

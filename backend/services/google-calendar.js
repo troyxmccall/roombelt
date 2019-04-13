@@ -114,34 +114,35 @@ module.exports = class {
   async getCalendars(options = { invalidateCache: false }) {
     const cacheKey = `calendars-${this.cacheKey}`;
 
-    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+    if (!await watchersCache.get(cacheKey) && this.webHookUrl) {
       logger.debug(`Set calendars watcher`);
 
       const channelId = crypto.randomBytes(64).toString("hex");
-      watchersCache.set(cacheKey, channelId, 5);
+      await watchersCache.set(cacheKey, channelId, 5);
 
       this.$watchCalendars(cacheKey, channelId, CHANNEL_TTL_CALENDARS)
         .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_CALENDARS - 10));
     }
 
     if (options.invalidateCache) {
-      valuesCache.delete(cacheKey);
+      await valuesCache.delete(cacheKey);
     }
 
-    if (!valuesCache.get(cacheKey)) {
+    let result = await valuesCache.get(cacheKey);
+    if (!result) {
       logger.debug(`Fetch calendars`);
 
       const { items } = await new Promise((res, rej) => this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data.data))));
-      const calendars = items.map(calendar => ({
+      result = items.map(calendar => ({
         id: calendar.id,
         summary: calendar.summary,
         canModifyEvents: calendar.accessRole === "writer" || calendar.accessRole === "owner"
       }));
 
-      valuesCache.set(cacheKey, calendars, this.webHookUrl ? CHANNEL_TTL_CALENDARS : 30);
+      await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_CALENDARS : 30);
     }
 
-    return valuesCache.get(cacheKey);
+    return result;
   }
 
   async getCalendar(calendarId) {
@@ -153,14 +154,14 @@ module.exports = class {
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (options.invalidateCache) {
-      valuesCache.delete(cacheKey);
+      await valuesCache.delete(cacheKey);
     }
 
-    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+    if (!await watchersCache.get(cacheKey) && this.webHookUrl) {
       logger.debug(`Set events watcher for calendar ${calendarId}`);
 
       const channelId = crypto.randomBytes(64).toString("hex");
-      watchersCache.set(cacheKey, channelId, 5);
+      await watchersCache.set(cacheKey, channelId, 5);
 
       this.$watchEvents(calendarId, cacheKey, channelId, CHANNEL_TTL_EVENTS)
         .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_EVENTS - 10));
@@ -174,15 +175,17 @@ module.exports = class {
       orderBy: "startTime"
     };
 
-    if (!valuesCache.get(cacheKey)) {
+    let result = await valuesCache.get(cacheKey);
+    if (!result) {
       logger.debug(`Fetch events for ${calendarId}`);
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
 
-      valuesCache.set(cacheKey, items.filter(isEventAccepted).map(mapEvent), this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
+      result = items.filter(isEventAccepted).map(mapEvent);
+      await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
     }
 
-    return valuesCache.get(cacheKey);
+    return result;
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
@@ -200,7 +203,7 @@ module.exports = class {
       this.calendarClient.events.insert(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
@@ -219,7 +222,7 @@ module.exports = class {
       this.calendarClient.events.patch(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async deleteEvent(calendarId, eventId) {
@@ -232,7 +235,7 @@ module.exports = class {
       this.calendarClient.events.delete(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   $watchCalendars(key, channelId, ttl) {

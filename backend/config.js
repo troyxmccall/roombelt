@@ -19,6 +19,7 @@ const result = {
   },
 
   databaseUrl: process.env["DATABASE_URL"],
+  redisUrl: process.env["REDIS_URL"],
   updateDatabaseSchema: process.env["UPDATE_DATABASE_SCHEMA"] === "true" || process.env["UPDATE_DATABASE_SCHEMA"] === "1",
   forceHttps: process.env["FORCE_HTTPS"] === "true" || process.env["FORCE_HTTPS"] === "1",
   disableFrameGuard: process.env["DISABLE_FRAME_GUARD"] === "true" || process.env["DISABLE_FRAME_GUARD"] === "1",
