@@ -156,8 +156,8 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
           <PlanName current={isBusinessCurrent}>Business</PlanName>
           <Price>50</Price>
           <VAT/>
-          <Feature>Up to 20 devices</Feature>
-          <Feature>24h support SLA</Feature>
+          <Feature>20 devices included</Feature>
+          <Feature>$5 / device above the limit</Feature>
           <ChoosePlan disabled={isBusinessCurrent}
                       success={isBusinessHighlighted}
                       secondary={!isBusinessHighlighted}
