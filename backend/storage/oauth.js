@@ -4,7 +4,7 @@ module.exports = class {
   constructor(sequelize) {
     this.Model = this.Model = sequelize.define("oauth", {
       // oauth
-      userId: { type: Sequelize.TEXT, primaryKey: true },
+      userId: { type: Sequelize.STRING, primaryKey: true },
       tenantId: Sequelize.TEXT,
       provider: Sequelize.STRING,
       accessToken: Sequelize.TEXT,

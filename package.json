@@ -1,6 +1,6 @@
 {
   "name": "roombelt",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "engines": {
     "node": "10.15.1",
@@ -30,6 +30,7 @@
     "ioredis": "^4.9.0",
     "jsonwebtoken": "^8.5.0",
     "ms": "^2.1.1",
+    "mysql2": "^1.6.5",
     "pg": "^7.7.1",
     "php-serialize": "^2.1.0",
     "sequelize": "5.3.1",
