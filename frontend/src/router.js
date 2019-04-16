@@ -8,7 +8,7 @@ import FatalError from "./theme/layouts/FatalError";
 import LoginApp from "./apps/login/Login";
 import AdminApp from "./apps/admin";
 import DeviceApp from "./apps/device";
-import { createDevice, isOnline } from "services/api";
+import { isOnline } from "services/api";
 
 class Login extends React.PureComponent {
   render = () => <LoginApp/>;
@@ -27,14 +27,6 @@ class Admin extends React.PureComponent {
 }
 
 class Device extends React.PureComponent {
-  async componentDidMount() {
-    const { scope } = await getAuth();
-
-    if (scope !== "device") {
-      createDevice();
-    }
-  }
-
   render = () => <DeviceApp/>;
 }
 
