@@ -31,6 +31,7 @@ const defaultCurrentMeetingActionsState = {
   currentAction: null,
   isRetrying: false,
   isError: false,
+  errorStatusCode: null,
   isSuccess: false
 };
 
@@ -43,7 +44,7 @@ const currentMeetingActions = (state = defaultCurrentMeetingActionsState, action
     case meetingActions.$setActionIsRetrying:
       return { ...state, isRetrying: true };
     case meetingActions.$setActionError:
-      return { ...state, isError: true, isRetrying: false };
+      return { ...state, isError: true, errorStatusCode: action.errorStatusCode, isRetrying: false };
     case meetingActions.$setActionSuccess:
       return { ...state, isSuccess: true, isRetrying: false };
     case meetingActions.endAction:

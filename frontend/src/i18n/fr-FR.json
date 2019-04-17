@@ -43,6 +43,7 @@
     "check-internet-and-try-again": "Vérifiez votre connexion et recommencez",
     "action-error-title": "Une erreur s'est produite",
     "action-error-subtitle": "Si le problème persiste contactez votre administrateur",
+    "action-conflict": "L'opération demandée est en conflit avec un autre événement de ce calendrier",
     "refresh-page": "Rafraîchir la page",
     "device-disconnected-title": "Appareil déconnecté",
     "device-disconnected-message": "Cet appareil a été déconnecté dans le panneau d'administration. Souhaitez-vous le reconnecter ?",

@@ -99,8 +99,16 @@ router.post("/device/meeting", async function(req, res) {
 
   const calendarId = req.body.calendarId || req.context.device.calendarId;
 
+  logger.info(`Creating new meeting from device ${req.context.session.deviceId} in calendar ${calendarId}`);
+
   const calendar = await req.context.calendarProvider.getCalendar(calendarId);
   const events = await req.context.calendarProvider.getEvents(calendarId, { invalidateCache: true });
+
+  const currentEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) < Date.now() && getTimestamp(event.end) > Date.now());
+  if (currentEvent) {
+    return res.sendStatus(409);
+  }
+
   const nextEvent = events.find(event => !event.isAllDayEvent && getTimestamp(event.start) > Date.now());
 
   const desiredStartTime = Date.now() + (req.body.timeInMinutes || 15) * 60 * 1000;
@@ -117,6 +125,8 @@ router.post("/device/meeting", async function(req, res) {
 });
 
 router.put("/device/meeting/:meetingId", async function(req, res) {
+  logger.info(`Altering meeting ${req.params.meetingId} from device ${req.context.session.deviceId}`);
+
   const events = await req.context.calendarProvider.getEvents(req.context.device.calendarId, { invalidateCache: true });
   const event = events.find(event => event.id === req.params.meetingId);
 
@@ -152,6 +162,8 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
 });
 
 router.delete("/device/meeting/:meetingId", async function(req, res) {
+  logger.info(`Removing meeting ${req.params.meetingId} from device ${req.context.session.deviceId}`);
+
   await req.context.calendarProvider.deleteEvent(req.context.device.calendarId, req.params.meetingId);
 
   res.sendStatus(204);

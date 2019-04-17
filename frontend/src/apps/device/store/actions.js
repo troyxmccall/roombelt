@@ -201,7 +201,7 @@ export const deviceActions = {
 export const meetingActions = {
   $startAction: action((currentAction) => ({ currentAction })),
   endAction: action(),
-  $setActionError: action(),
+  $setActionError: action(errorStatusCode => ({ errorStatusCode })),
   $setActionSource: action(source => ({ source })),
   $setActionIsRetrying: action(),
   $setActionSuccess: action(),
@@ -268,7 +268,9 @@ export const meetingActions = {
       dispatch(meetingActions.endAction());
     } catch (error) {
       console.error(error);
-      dispatch(meetingActions.$setActionError());
+
+      dispatch(deviceActions.$updateDeviceData(await getDeviceDetails()));
+      dispatch(meetingActions.$setActionError(error && error.response && error.response.status));
     }
   },
 

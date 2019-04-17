@@ -43,6 +43,7 @@
     "check-internet-and-try-again": "Kolla internetuppkoppling och försök igen",
     "action-error-title": "Ett fel uppstod",
     "action-error-subtitle": "Om problemet kvarstår ska du kontakta din IT-administratör",
+    "action-conflict": "Begärd operation konflikter med en annan händelse i den här kalendern",
     "refresh-page": "Uppdatera sida",
     "device-disconnected-title": "Enheten kopplad från",
     "device-disconnected-message": "Den här enheten har kopplats bort i administratörspanelen. Vill du ansluta den igen?"

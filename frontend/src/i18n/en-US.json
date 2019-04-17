@@ -43,6 +43,7 @@
     "check-internet-and-try-again": "Check internet connection and try again",
     "action-error-title": "An error occurred",
     "action-error-subtitle": "If this problem continues to occur contact your IT administrator",
+    "action-conflict": "Requested operation conflicts with another event in this calendar",
     "refresh-page": "Refresh page",
     "device-disconnected-title": "Device disconnected",
     "device-disconnected-message": "This device has been disconnected in admin panel. Do you want to connect it again?",

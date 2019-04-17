@@ -13,6 +13,7 @@ export const connectionCodeSelector = state => state.device && state.device.conn
 export const currentActionSelector = state => state.currentMeetingActions.currentAction;
 export const currentActionSourceSelector = state => state.currentMeetingActions.source;
 export const isActionErrorSelector = state => state.currentMeetingActions.isError;
+export const actionErrorStatusCodeSelector = state => state.currentMeetingActions.errorStatusCode;
 export const isActionSuccessSelector = state => state.currentMeetingActions.isSuccess;
 export const isRetryingActionSelector = state => state.currentMeetingActions.isRetrying;
 
