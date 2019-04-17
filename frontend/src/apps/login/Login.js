@@ -49,7 +49,6 @@ export default () => {
   return (
     <CardAndFooterLayout footer={<Footer/>}>
       <PageLoaded/>
-      <DriftWidget />
       <PageLogo withName size={30}/>
       {showOffice365LoginError && (
         <Alert error style={{ maxWidth: 300 }}>
