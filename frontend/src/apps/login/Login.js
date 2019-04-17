@@ -11,7 +11,6 @@ import { getAuth } from "services/api";
 
 import buttonGoogle from "./logo-google.svg";
 import buttonMicrosoft from "./logo-microsoft.svg";
-import DriftWidget from "../DriftWidget";
 
 const PageLogo = styled(Logo)`
   margin-bottom: 40px;

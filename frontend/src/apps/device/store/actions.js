@@ -2,6 +2,7 @@ import { action } from "utils/redux";
 import cancellationToken from "utils/cancellation-token";
 import screenfull from "screenfull";
 import axios from "axios";
+import ms from "ms";
 
 import * as api from "services/api";
 import { createDevice, getDeviceDetails, removeAuth } from "services/api";
@@ -12,8 +13,10 @@ import {
   currentMeetingSelector,
   isCalendarSelectedSelector,
   isDashboardDeviceSelector,
+  isDeviceRemovedSelector,
   isInitializedSelector,
   isInOfflineModeSelector,
+  isSubscriptionCancelledSelector,
   lastActivityOnShowCalendarsViewSelector,
   minutesLeftForCheckInSelector,
   showAllCalendarsViewSelector
@@ -73,7 +76,15 @@ export const deviceActions = {
       }
     }
 
-    const timeout = (isDashboardDeviceSelector(getState()) || isCalendarSelectedSelector(getState())) ? 30000 : 5000;
+    const timeout = function() {
+      const state = getState();
+
+      if (isDashboardDeviceSelector(state) || isCalendarSelectedSelector(state)) return ms("30s");
+      if (isSubscriptionCancelledSelector(state)) return ms("10 min");
+      if (isDeviceRemovedSelector(state)) return ms("1 year");
+
+      return ms("5s");
+    }();
 
     await wait(timeout);
 
