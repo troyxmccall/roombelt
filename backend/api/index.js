@@ -7,4 +7,9 @@ router.use(require("./admin"));
 router.use(require("./device"));
 router.use(require("./paddle"));
 
+router.use((err, req, res, next) => {
+  console.error(err);
+  res.sendStatus(500);
+});
+
 module.exports = router;

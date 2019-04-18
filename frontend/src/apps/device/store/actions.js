@@ -79,9 +79,9 @@ export const deviceActions = {
     const timeout = function() {
       const state = getState();
 
-      if (isDashboardDeviceSelector(state) || isCalendarSelectedSelector(state)) return ms("30s");
-      if (isSubscriptionCancelledSelector(state)) return ms("10 min");
       if (isDeviceRemovedSelector(state)) return ms("1 year");
+      if (isSubscriptionCancelledSelector(state)) return ms("10 min");
+      if (isDashboardDeviceSelector(state) || isCalendarSelectedSelector(state)) return ms("30s");
 
       return ms("5s");
     }();

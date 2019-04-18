@@ -171,7 +171,7 @@ module.exports = class {
 
     let result = await cache.get(cacheKey);
     if (!result) {
-      const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).get();
+      const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).top(100).get();
       result = value.map(calendar => ({
         id: calendar.address,
         summary: calendar.name,
@@ -217,6 +217,7 @@ module.exports = class {
           $expand: `extensions($filter=id eq '${isCheckedInExtension}')`
         })
         .header("Prefer", `outlook.timezone="UTC"`)
+        .top(100)
         .get();
 
       result = value.map(event => ({
