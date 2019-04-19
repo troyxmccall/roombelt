@@ -6,6 +6,7 @@ import { translations } from "i18n";
 import { connectDeviceWizardActions } from "apps/admin/store/actions";
 import { connect } from "react-redux";
 import { useWizard } from "apps/admin/wizard/Wizard";
+import { isGoogleAccountSelector } from "../store/selectors";
 
 const LocaleWrapper = styled.div`
   display: flex;
@@ -22,7 +23,7 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
+const Content = ({ isDashboard, isGoogleAccount, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
   const { isCurrentStep, isTransitioning } = useWizard();
 
   const calendarSelector = (
@@ -43,9 +44,11 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
         autofocus={isCurrentStep && !isTransitioning}
         tabIndex={isCurrentStep ? 0 : -1}
       />
-      <Text muted small>
-        Pick a calendar that will be shown on this device.
-      </Text>
+      {isGoogleAccount && (
+        <Button href="https://go.roombelt.com/scMpEB" target="_blank" link style={{ padding: "5px 3px" }}>
+          Why is my calendar read-only or absent?
+        </Button>
+      )}
     </>
   );
 
@@ -117,7 +120,8 @@ const mapStateToProps = state => ({
   calendarId: state.connectDeviceWizard.calendarId,
   language: state.connectDeviceWizard.language,
   clockType: state.connectDeviceWizard.clockType,
-  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
+  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms,
+  isGoogleAccount: isGoogleAccountSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -126,7 +130,7 @@ const mapDispatchToProps = dispatch => ({
   onSetCalendar: calendarId => dispatch(connectDeviceWizardActions.thirdStep.setCalendarId(calendarId)),
   onSetLanguage: language => dispatch(connectDeviceWizardActions.thirdStep.setLanguage(language)),
   onSetClockType: clockType => dispatch(connectDeviceWizardActions.thirdStep.setClockType(clockType)),
-  onSetShowAvailableRooms: value => dispatch(connectDeviceWizardActions.thirdStep.setShowAvailableRooms(value)),
+  onSetShowAvailableRooms: value => dispatch(connectDeviceWizardActions.thirdStep.setShowAvailableRooms(value))
 });
 
 export default {

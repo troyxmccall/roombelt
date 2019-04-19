@@ -19,10 +19,11 @@ const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType,
   msSinceLastActivity: Date.now() - lastActivityAt
 });
 
-const userRepresentation = ({ createdAt, subscriptionPassthrough, subscriptionUpdateUrl, isSubscriptionCancelled }, { displayName, photoUrl }, properties, { subscriptionPlanId, subscriptionTrialEndTimestamp }) => ({
+const userRepresentation = ({ createdAt, provider, subscriptionPassthrough, subscriptionUpdateUrl, isSubscriptionCancelled }, { displayName, photoUrl }, properties, { subscriptionPlanId, subscriptionTrialEndTimestamp }) => ({
   displayName,
   avatarUrl: photoUrl,
   createdAt: new Date(createdAt).getTime(),
+  provider,
   subscriptionPassthrough,
   subscriptionPlanId,
   subscriptionTrialEndTimestamp,

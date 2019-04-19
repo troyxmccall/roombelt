@@ -20,6 +20,7 @@ const user = (state = defaultUserState, action) => {
     case adminActions.$setUserDetails:
       return {
         isLoaded: true,
+        provider: action.user.provider,
         createdAt: action.user.createdAt,
         displayName: action.user.displayName,
         avatarUrl: action.user.avatarUrl,

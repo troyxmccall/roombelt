@@ -23,6 +23,8 @@ export const editDeviceDataSelector = state => ({
   showAvailableRooms: state.editedDevice.data.showAvailableRooms
 });
 
+export const isGoogleAccountSelector = state => state.user && state.user.provider === "google";
+
 export const removedDeviceIdSelector = state => state.removedDevice;
 
 export const isCheckoutOverlayOpenSelector = state => state.monetization.isCheckoutOverlayOpen;
