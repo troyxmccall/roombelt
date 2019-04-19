@@ -102,6 +102,7 @@ const UnderlyingComponent = props =>
       target={props.target}
       onClick={props.onClick}
       style={props.style}
+      tabIndex={props.tabIndex}
     />
   ) : (
     <button
@@ -110,6 +111,7 @@ const UnderlyingComponent = props =>
       disabled={props.disabled}
       children={props.children}
       onClick={props.onClick}
+      tabIndex={props.tabIndex}
     />
   );
 

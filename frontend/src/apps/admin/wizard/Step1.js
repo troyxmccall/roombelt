@@ -43,7 +43,11 @@ const Content = ({ connectionCode, connectionError, onChangeConnectionCode, onSu
         ref={input}
         style={{ marginTop: 15, marginBottom: 10 }}
       />
-      <Button href="https://go.roombelt.com/UgIpHu" target="_blank" link style={{ padding: "5px 3px" }}>
+      <Button link
+              tabIndex={isCurrentStep ? 0 : -1}
+              href="https://go.roombelt.com/UgIpHu"
+              target="_blank"
+              style={{ padding: "5px 3px" }}>
         How to get this code?
       </Button>
       <ErrorMessage>{connectionError}</ErrorMessage>

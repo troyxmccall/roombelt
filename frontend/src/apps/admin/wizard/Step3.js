@@ -45,7 +45,11 @@ const Content = ({ isDashboard, isGoogleAccount, calendars, calendarId, onSetCal
         tabIndex={isCurrentStep ? 0 : -1}
       />
       {isGoogleAccount && (
-        <Button href="https://go.roombelt.com/scMpEB" target="_blank" link style={{ padding: "5px 3px" }}>
+        <Button link
+                href="https://go.roombelt.com/scMpEB"
+                target="_blank"
+                tabIndex={isCurrentStep ? 0 : -1}
+                style={{ padding: "5px 3px" }}>
           Why is my calendar read-only or absent?
         </Button>
       )}
