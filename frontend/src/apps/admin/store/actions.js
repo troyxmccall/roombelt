@@ -41,9 +41,11 @@ export const adminActions = {
       });
     }
 
-    const LogRocket = require("logrocket");
-    LogRocket.init("wlxpp3/roombelt");
-    LogRocket.identify(user.subscriptionPassthrough, { name: user.displayName });
+    if (process.env.REACT_APP_LOGROCKET_ID) {
+      const LogRocket = require("logrocket");
+      LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
+      LogRocket.identify(user.subscriptionPassthrough, { name: user.displayName });
+    }
 
     dispatch(adminActions.$setCalendars(calendars));
     dispatch(adminActions.$setUserDetails(user));
