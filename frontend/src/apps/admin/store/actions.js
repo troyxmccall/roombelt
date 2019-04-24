@@ -41,6 +41,10 @@ export const adminActions = {
       });
     }
 
+    const LogRocket = require("logrocket");
+    LogRocket.init("wlxpp3/roombelt");
+    LogRocket.identify(user.subscriptionPassthrough, { name: user.displayName });
+
     dispatch(adminActions.$setCalendars(calendars));
     dispatch(adminActions.$setUserDetails(user));
     dispatch(adminActions.$setDevices(devices));

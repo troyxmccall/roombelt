@@ -49,6 +49,7 @@
     "http-proxy-middleware": "^0.19.1",
     "i18next": "^11.10.2",
     "jest-dom": "^2.1.1",
+    "logrocket": "^0.6.20",
     "moment": "^2.22.0",
     "nodemon": "^1.18.7",
     "prettier": "1.11.1",
