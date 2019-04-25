@@ -108,6 +108,7 @@ const defaultConnectDeviceWizardState = {
   calendarId: null,
   language: "en-US",
   clockType: 12,
+  showAvailableRooms: true,
   errorMessage: null,
   submitButton: null
 };
