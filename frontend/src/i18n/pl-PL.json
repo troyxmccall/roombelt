@@ -54,6 +54,7 @@
   },
   "dashboard": {
     "page-title": "Sale konferencyjne",
+    "no-meetings": "Brak spotkań dzisiaj",
     "calendar": "Sala",
     "meeting": "Spotkanie",
     "status": "Status",

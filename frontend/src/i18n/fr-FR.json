@@ -51,6 +51,7 @@
   },
   "dashboard": {
     "page-title": "Salles de réunion",
+    "no-meetings": "Pas de réunion aujourd'hui",
     "calendar": "Salle",
     "meeting": "Réunion",
     "status": "Status",

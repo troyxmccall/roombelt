@@ -35,24 +35,40 @@ const DashboardWrapper = styled.div`
   overflow: hidden;
 `;
 
-const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms }) => <Layout>
-    <PageLoaded/>
-    <Header>
-      <span>{i18next.t("dashboard.page-title")}</span>
-      <span><Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/></span>
-    </Header>
+const NoMeetingsInfo = styled.div`
+  color: white;
+  font-size: 1.8em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-    <RowView style={{ fontSize: "0.6rem", paddingBottom: 0 }}
-             header
-             meetingSummary={i18next.t("dashboard.meeting")}
-             meetingStatus={i18next.t("dashboard.status")}
-             meetingRoom={i18next.t("dashboard.calendar")}/>
+const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms }) => {
+    const hasAnyRows = events.length > 0 || (showAvailableRooms && calendars.length > 0);
 
-    <DashboardWrapper>
-      {showAvailableRooms && calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
-      {events.map(event => <EventRow key={event.id} meeting={event} timestamp={timestamp}/>)}
-    </DashboardWrapper>
-  </Layout>
+    return (
+      <Layout>
+        <PageLoaded/>
+        <Header>
+          <span>{i18next.t("dashboard.page-title")}</span>
+          <span><Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/></span>
+        </Header>
+
+        {hasAnyRows && <RowView style={{ fontSize: "0.6rem", paddingBottom: 0 }}
+                                header
+                                meetingSummary={i18next.t("dashboard.meeting")}
+                                meetingStatus={i18next.t("dashboard.status")}
+                                meetingRoom={i18next.t("dashboard.calendar")}/>}
+
+        <DashboardWrapper>
+          {showAvailableRooms && calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
+          {events.map(event => <EventRow key={event.id} meeting={event} timestamp={timestamp}/>)}
+          {!hasAnyRows && <NoMeetingsInfo>{i18next.t("dashboard.no-meetings")}</NoMeetingsInfo>}
+        </DashboardWrapper>
+      </Layout>
+    );
+  }
 ;
 
 const mapStateToProps = state => ({

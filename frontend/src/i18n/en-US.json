@@ -51,6 +51,7 @@
   },
   "dashboard": {
     "page-title": "Conference rooms",
+    "no-meetings": "No meetings today",
     "calendar": "Room",
     "meeting": "Meeting",
     "status": "Status",

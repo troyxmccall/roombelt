@@ -51,6 +51,7 @@
   },
   "dashboard": {
     "page-title": "Meetingräume",
+    "no-meetings": "Heute keine Besprechungen",
     "calendar": "Raum",
     "meeting": "Meeting",
     "status": "Status",

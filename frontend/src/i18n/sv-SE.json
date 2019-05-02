@@ -50,6 +50,7 @@
   },
   "dashboard": {
     "page-title": "Konferans rum",
+    "no-meetings": "Inga möten idag",
     "calendar": "Rum",
     "meeting": "Möte",
     "status": "Status",
