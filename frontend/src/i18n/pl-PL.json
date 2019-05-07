@@ -58,6 +58,7 @@
     "calendar": "Sala",
     "meeting": "Spotkanie",
     "status": "Status",
+    "starts-at": "Zaczyna się o",
     "starts-in": "Zaczyna się za {{ time }}",
     "starts-now": "Zaczyna się teraz",
     "started-ago": "Zaczęło się {{ time }} temu",

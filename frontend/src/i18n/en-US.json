@@ -55,6 +55,7 @@
     "calendar": "Room",
     "meeting": "Meeting",
     "status": "Status",
+    "starts-at": "Starts at",
     "starts-in": "Starts in {{ time }}",
     "starts-now": "Starts now",
     "started-ago": "Started {{ time }} ago",
