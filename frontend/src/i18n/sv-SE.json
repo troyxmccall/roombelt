@@ -54,6 +54,7 @@
     "calendar": "Rum",
     "meeting": "Möte",
     "status": "Status",
+    "hosted-by": "Organiserad av",
     "starts-at": "Börjar kl",
     "starts-in": "Startar om {{ time }}",
     "starts-now": "Börjar nu",

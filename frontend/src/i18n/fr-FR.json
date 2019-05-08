@@ -55,6 +55,7 @@
     "calendar": "Salle",
     "meeting": "Réunion",
     "status": "Status",
+    "hosted-by": "Organisé par",
     "starts-at": "Commence à",
     "starts-in": "Commence dans {{ time }}",
     "starts-now": "Commence maintenant",
