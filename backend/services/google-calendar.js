@@ -34,10 +34,10 @@ const getStatus = (status, attendees) => {
   return "declined";
 };
 
-const mapEvent = ({ id, summary, start, end, organizer, status, attendees, extendedProperties, visibility }) => ({
+const mapEvent = ({ id, summary, start, end, creator, status, attendees, extendedProperties, visibility }) => ({
   id,
   summary,
-  organizer: organizer && { displayName: organizer.displayName || organizer.email },
+  organizer: creator && { displayName: creator.displayName || creator.email },
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),
   end: getTime(end),
@@ -186,6 +186,7 @@ module.exports = class {
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
 
+      console.log(items)
       result = items.map(mapEvent);
       await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
     }
