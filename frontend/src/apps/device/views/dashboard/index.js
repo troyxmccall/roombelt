@@ -26,6 +26,7 @@ const Header = styled(Section).attrs({ header: true })`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 `;
 
 const DashboardWrapper = styled.div`
