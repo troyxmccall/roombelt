@@ -62,7 +62,7 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
 
   return calendar && {
     id: calendarId,
-    name: calendar && calendar.summary.replace(/\[.*?]/g, "").replace(/\(.*?\)/g, "").trim(),
+    name: calendar && calendar.summary,
     canModifyEvents: calendar && calendar.canModifyEvents,
     events
   };
