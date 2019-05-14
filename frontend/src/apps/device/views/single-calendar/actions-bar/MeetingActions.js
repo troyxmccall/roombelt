@@ -64,8 +64,6 @@ class MeetingStarted extends React.PureComponent {
   renderCheckInToMeeting() {
     const { currentMeeting, currentActionSource, checkInToMeeting, minutesLeftForCheckIn } = this.props;
 
-    console.log(minutesLeftForCheckIn);
-
     return (
       <>
         <LoaderButton success

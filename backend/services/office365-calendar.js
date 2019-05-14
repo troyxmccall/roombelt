@@ -10,6 +10,8 @@ const qs = require("qs");
 const logger = require("../logger");
 
 const isCheckedInExtension = "Com.Roombelt.IsCheckedIn";
+const isCreatedFromDeviceExtension = "Com.Roombelt.isCreatedFromDevice";
+
 const cache = Cache("office-365");
 const CACHE_TTL = 30;
 
@@ -221,7 +223,7 @@ module.exports = class {
         .query({
           StartDateTime: new Date(Date.now() - ms("1 day")).toISOString(),
           EndDateTime: new Date(Date.now() + ms("1 day")).toISOString(),
-          $expand: `extensions($filter=id eq '${isCheckedInExtension}')`
+          $expand: `extensions($filter=id eq '${isCheckedInExtension}' or id eq '${isCreatedFromDeviceExtension}')`
         })
         .header("Prefer", `outlook.timezone="UTC"`)
         .top(100)
@@ -237,6 +239,7 @@ module.exports = class {
           end: getTime(event.end, event.isAllDay),
           attendees: event.attendees.map(attendee => ({ displayName: attendee.emailAddress && attendee.emailAddress.name })),      // TODO
           isCheckedIn: event.extensions ? event.extensions.some(el => el.isCheckedIn) : false,
+          isCreatedFromDevice: event.extensions ? event.extensions.some(el => el.isCreatedFromDevice) : false,
           isPrivate: event.sensitivity === "private",
           status: getStatus(event.responseStatus)
         }));
@@ -247,7 +250,7 @@ module.exports = class {
     return result.filter(event => event.status === "accepted" || (options.showTentativeMeetings && event.status === "tentative"));
   }
 
-  async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
+  async createEvent(calendarId, { startDateTime, endDateTime, summary }) {
     await this.assertCalendar(calendarId);
 
     await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`).post({
@@ -257,7 +260,11 @@ module.exports = class {
       extensions: [{
         "@odata.type": "microsoft.graph.openTypeExtension",
         extensionName: isCheckedInExtension,
-        isCheckedIn
+        isCheckedIn: true
+      }, {
+        "@odata.type": "microsoft.graph.openTypeExtension",
+        extensionName: isCreatedFromDeviceExtension,
+        isCreatedFromDevice: true
       }]
     });
 

@@ -58,6 +58,11 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
       summary: null,
       organizer: {},
       attendees: []
+    })
+    .map(event => !event.isCreatedFromDevice ? event : {
+      ...event,
+      organizer: { displayName: "Roombelt" },
+      attendees: []
     });
 
   return calendar && {
@@ -144,7 +149,6 @@ router.post("/device/meeting", async function(req, res) {
   await req.context.calendarProvider.createEvent(calendarId, {
     startDateTime: Date.now(),
     endDateTime: Math.min(desiredStartTime, nextEventStartTime),
-    isCheckedIn: true,
     summary: req.body.summary || `Meeting in ${calendar.summary}`
   });
 

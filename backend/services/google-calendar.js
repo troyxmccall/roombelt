@@ -42,7 +42,8 @@ const mapEvent = ({ id, summary, start, end, creator, status, attendees, extende
   start: getTime(start),
   end: getTime(end),
   attendees: (attendees && attendees.map(attendee => ({ displayName: attendee.displayName || attendee.email }))) || [],
-  isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
+  isCheckedIn: !!(extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn),
+  isCreatedFromDevice: !!(extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCreatedFromDevice),
   isPrivate: visibility === "private" || visibility === "confidential",
   status: getStatus(status, attendees)
 });
@@ -186,7 +187,6 @@ module.exports = class {
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
 
-      console.log(items)
       result = items.map(mapEvent);
       await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
     }
@@ -201,7 +201,7 @@ module.exports = class {
         summary,
         start: { dateTime: new Date(startDateTime).toISOString() },
         end: { dateTime: new Date(endDateTime).toISOString() },
-        extendedProperties: { private: { roombeltIsCheckedIn: isCheckedIn ? "true" : "false" } }
+        extendedProperties: { private: { roombeltIsCheckedIn: "true", roombeltIsCreatedFromDevice: "true" } }
       }
     };
 

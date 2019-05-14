@@ -53,7 +53,8 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     );
   };
 
-  const guests = currentMeeting && !currentMeeting.isPrivate && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
+  const showAttendees = currentMeeting && !currentMeeting.isPrivate && !currentMeeting.isCreatedFromDevice;
+  const guests = showAttendees && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
   return (
     <Wrapper>
@@ -61,7 +62,7 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
         <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>{getTitle()}</span>
       </Indent>
-      {currentMeeting && !currentMeeting.isPrivate && <Indent>
+      {showAttendees && <Indent>
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
           {currentMeeting.organizer.displayName}
