@@ -16,6 +16,8 @@ For instruction on installing Roombelt On-Premises visit
 Feel free to request new feature on [Github](https://github.com/ziolko/roombelt/issues)
 or contact me using the chat widget on [roombelt.com](https://roombelt.com).
 
+Development progress is tracked [here](https://github.com/roombelt/roombelt/projects/1?fullscreen=true).
+
 ## License
 [Apache 2.0 with Commons Clause](https://raw.githubusercontent.com/roombelt/roombelt/master/LICENSE.txt). 
 
