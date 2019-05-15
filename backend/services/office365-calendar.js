@@ -232,6 +232,7 @@ module.exports = class {
       result = value
         .map(event => ({
           id: event.id,
+          recurringMasterId: event.seriesMasterId,
           summary: event.subject,
           organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
           isAllDayEvent: event.isAllDay,

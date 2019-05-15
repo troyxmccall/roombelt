@@ -92,6 +92,6 @@ export function updateMeeting(meetingId, { startNow, endNow, extensionTime, chec
   });
 }
 
-export function deleteMeeting(meetingId) {
-  return axios.delete(`/api/device/meeting/${encodeURIComponent(meetingId)}`);
+export function deleteMeeting(meetingId, isRemovedAutomatically = false) {
+  return axios.delete(`/api/device/meeting/${encodeURIComponent(meetingId)}`, { data: { isRemovedAutomatically } });
 }

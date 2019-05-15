@@ -146,11 +146,21 @@ router.post("/device/meeting", async function(req, res) {
   const desiredStartTime = Date.now() + (req.body.timeInMinutes || 15) * 60 * 1000;
   const nextEventStartTime = nextEvent ? getTimestamp(nextEvent.start) : Number.POSITIVE_INFINITY;
 
+  const summary = req.body.summary || `Meeting in ${calendar.summary}`;
   await req.context.calendarProvider.createEvent(calendarId, {
     startDateTime: Date.now(),
     endDateTime: Math.min(desiredStartTime, nextEventStartTime),
-    summary: req.body.summary || `Meeting in ${calendar.summary}`
+    summary
   });
+
+  await req.context.storage.events.logEvent(
+    req.context.device.userId,
+    req.context.device.deviceId,
+    null,
+    null,
+    summary,
+    req.context.storage.events.EventTypes.CREATE
+  );
 
   res.sendStatus(201);
 });
@@ -179,7 +189,23 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
     isCheckedIn
   });
 
+  await req.context.storage.events.logEvent(
+    req.context.device.userId,
+    req.context.device.deviceId,
+    event.id,
+    event.recurringMasterId,
+    event.summary,
+    getLogEventType()
+  );
+
   res.sendStatus(204);
+
+  function getLogEventType() {
+    if (req.body.startNow) return req.context.storage.events.EventTypes.START_EARLY;
+    if (req.body.endNow) return req.context.storage.events.EventTypes.END;
+    if (req.body.checkIn) return req.context.storage.events.EventTypes.CHECK_IN;
+    if (req.body.extensionTime) return req.context.storage.events.EventTypes.EXTEND;
+  }
 
   function getExtensionTime() {
     if (!req.body.extensionTime) return;
@@ -198,7 +224,33 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
 router.delete("/device/meeting/:meetingId", async function(req, res) {
   logger.info(`Removing meeting ${req.params.meetingId} from device ${req.context.session.deviceId}`);
 
-  await req.context.calendarProvider.deleteEvent(req.context.device.calendarId, req.params.meetingId);
+  const device = req.context.device;
+
+  const events = await req.context.calendarProvider.getEvents(device.calendarId, {
+    invalidateCache: true,
+    showTentativeMeetings: device.showTentativeMeetings
+  });
+
+  const event = events.find(event => event.id === req.params.meetingId);
+
+  if (event === -1) {
+    return res.sendStatus(204);
+  }
+
+  await req.context.calendarProvider.deleteEvent(device.calendarId, req.params.meetingId);
+
+  const eventType = req.body.isRemovedAutomatically
+    ? req.context.storage.events.EventTypes.CANCEL
+    : req.context.storage.events.EventTypes.AUTO_CANCEL;
+
+  await req.context.storage.events.logEvent(
+    device.userId,
+    device.deviceId,
+    event.id,
+    event.recurringMasterId,
+    event.summary,
+    eventType
+  );
 
   res.sendStatus(204);
 });

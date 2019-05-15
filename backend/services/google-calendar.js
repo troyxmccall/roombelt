@@ -34,9 +34,10 @@ const getStatus = (status, attendees) => {
   return "declined";
 };
 
-const mapEvent = ({ id, summary, start, end, creator, status, attendees, extendedProperties, visibility }) => ({
+const mapEvent = ({ id, recurringEventId, summary, start, end, creator, status, attendees, extendedProperties, visibility }) => ({
   id,
   summary,
+  recurringMasterId: recurringEventId,
   organizer: creator && { displayName: creator.displayName || creator.email },
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),

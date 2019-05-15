@@ -20,6 +20,7 @@ const glassVisibleStyles = css`
   transition: background 0.3s;
   background: rgba(0, 0, 0, 0.5);
   visibility: visible;
+  overflow-y: auto;
 
   & > * {
     transition: opacity 0.3s, transform 0.3s;
@@ -51,6 +52,7 @@ const Glass = styled.div`
   justify-content: center;
   align-items: flex-start;
   padding-top: 50px;
+  padding-bottom: 10px;
 
   ${props => (props.visible ? glassVisibleStyles : glassInvisibleStyles)};
 `;

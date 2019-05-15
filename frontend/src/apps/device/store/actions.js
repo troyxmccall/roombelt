@@ -99,7 +99,7 @@ export const deviceActions = {
     const meeting = currentMeetingSelector(getState());
 
     if (minutesLeftForCheckIn !== null && minutesLeftForCheckIn < 0) {
-      await api.deleteMeeting(meeting.id);
+      await api.deleteMeeting(meeting.id, true);
       dispatch(deviceActions.$fetchDeviceData());
     }
   },
@@ -224,7 +224,7 @@ export const meetingActions = {
     dispatch(meetingActions.$startAction(meetingActions.cancelMeeting()));
 
     const currentMeetingId = currentMeetingSelector(getState()).id;
-    const deleteMeetingPromise = api.deleteMeeting(currentMeetingId);
+    const deleteMeetingPromise = api.deleteMeeting(currentMeetingId, false);
 
     dispatch(meetingActions.$handleMeetingActionPromise(deleteMeetingPromise));
   },
