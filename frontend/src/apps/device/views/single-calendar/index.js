@@ -57,7 +57,7 @@ const Spacer = styled.div`
 `;
 
 const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock }) => (
-  <Layout>
+  <Layout flexbox>
     <PageLoaded/>
     <Header>
       <CalendarName>

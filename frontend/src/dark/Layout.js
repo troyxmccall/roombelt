@@ -44,7 +44,7 @@ export default styled(props => (<>
     <div {...props}/>
   </>
 ))`
-  display: flex;
+  display: ${props => props.flexbox ? 'flex' : 'block'};
   flex-direction: column;
   height: 100%;
   width: 100%;

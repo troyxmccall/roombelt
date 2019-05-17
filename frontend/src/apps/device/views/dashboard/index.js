@@ -29,12 +29,6 @@ const Header = styled(Section).attrs({ header: true })`
   flex-shrink: 0;
 `;
 
-const DashboardWrapper = styled.div`
-  flex-grow: 1;
-  font-size: 0.8rem;
-  overflow: hidden;
-`;
-
 const NoMeetingsInfo = styled.div`
   color: white;
   font-size: 1.8em;
@@ -42,18 +36,19 @@ const NoMeetingsInfo = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 35vh;
 `;
 
 const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms }) => {
   const hasAnyRows = events.length > 0 || (showAvailableRooms && calendars.length > 0);
 
   return (
-    <Layout>
-      <PageLoaded />
+    <Layout style={{ overflow: "hidden" }}>
+      <PageLoaded/>
       <Header>
         <span>{i18next.t("dashboard.page-title")}</span>
         <span>
-          <Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking />
+          <Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/>
         </span>
       </Header>
 
@@ -67,11 +62,11 @@ const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRoo
         />
       )}
 
-      <DashboardWrapper>
-        {showAvailableRooms && calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id} />)}
-        {events.map(event => <EventRow key={event.id} meeting={event} />)}
+      <div>
+        {showAvailableRooms && calendars.map((calendar, index) => <CalendarRow key={index} calendarId={calendar.id}/>)}
+        {events.map((event, index) => <EventRow key={index} meeting={event}/>)}
         {!hasAnyRows && <NoMeetingsInfo>{i18next.t("dashboard.no-meetings")}</NoMeetingsInfo>}
-      </DashboardWrapper>
+      </div>
     </Layout>
   );
 };

@@ -58,7 +58,7 @@ const LoaderWrapper = styled.div`
 
 const AllCalendarsView = ({ closeAllCalendarsView, calendars, areAllCalendarsLoaded, markUserActivity, timestamp, isAmPmClock }) => {
   return (
-    <Layout style={{ minHeight: "100%", height: "auto" }}>
+    <Layout style={{ minHeight: "100%", height: "auto" }} flexbox>
       <Header>
         <BackButton onClick={closeAllCalendarsView}>{i18next.t("actions.back")}</BackButton>
         <PageTitle>{i18next.t("actions.find-room")}</PageTitle>
