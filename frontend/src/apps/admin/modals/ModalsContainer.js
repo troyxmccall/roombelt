@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 
 import EditDeviceModal from "./EditDeviceModal";
 import RemoveDeviceModal from "./RemoveDeviceModal";
+import AuditLogModal from "./AuditLogModal";
 import { removeDeviceDialogActions } from "apps/admin/store/actions";
 
 const name = (device, calendars) => {
@@ -18,6 +19,7 @@ const Modals = props => (
       onConfirm={props.onConfirmRemoveDevice}
       deviceName={name(props.removedDevice, props.calendars)}
     />
+    <AuditLogModal/>
   </React.Fragment>
 );
 

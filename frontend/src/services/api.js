@@ -75,6 +75,10 @@ export function cancelSubscription() {
   return axios.delete("/api/admin/subscription");
 }
 
+export function getAuditLog() {
+  return axios.get("/api/admin/audit");
+}
+
 export function getDeviceDetails(getAllCalendars) {
   return axios.get("/api/device", { params: { "all-calendars": getAllCalendars } });
 }

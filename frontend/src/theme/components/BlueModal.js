@@ -16,7 +16,7 @@ const Content = styled.div`
 `;
 
 const BlueModal = props => (
-  <Modal visible={props.visible} compact={true} wide={props.wide} footer={props.footer} header={null}>
+  <Modal visible={props.visible} compact={true} wide={props.wide} fullWidth={props.fullWidth} footer={props.footer} header={null}>
     <Header>{props.title}</Header>
     <Content>{props.children}</Content>
   </Modal>
@@ -26,7 +26,8 @@ BlueModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   title: PropTypes.string,
   footer: PropTypes.node,
-  wide: PropTypes.bool
+  wide: PropTypes.bool,
+  fullWidth: PropTypes.bool
 };
 
 export default BlueModal;

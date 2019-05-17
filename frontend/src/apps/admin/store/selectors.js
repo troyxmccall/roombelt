@@ -24,6 +24,10 @@ export const editDeviceDataSelector = state => ({
   isReadOnlyDevice: state.editedDevice.data.isReadOnlyDevice
 });
 
+export const isAuditLogVisibleSelector = state => state.auditLog.isVisible;
+export const isAuditLogLoadingSelector = state => state.auditLog.isLoading;
+export const auditLogEntriesSelector = state => state.auditLog.entries;
+
 export const isGoogleAccountSelector = state => state.user && state.user.provider === "google";
 
 export const removedDeviceIdSelector = state => state.removedDevice;

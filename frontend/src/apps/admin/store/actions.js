@@ -7,6 +7,7 @@ import {
   getCalendars,
   getConnectedDevices,
   getUserDetails,
+  getAuditLog,
   setOptionsForDevice,
   setSubscriptionPlan
 } from "services/api";
@@ -248,5 +249,18 @@ export const monetizationActions = {
     }
 
     dispatch(monetizationActions.$toggleIsUpdatingSubscription(false));
+  }
+};
+
+export const auditLogActions = {
+  $entriesLoadingStarted: action(),
+  $setEntries: action(entries => ({ entries })),
+  $show: action(),
+
+  hide: action(),
+  show: () => async (dispatch) => {
+    dispatch(auditLogActions.$entriesLoadingStarted());
+    dispatch(auditLogActions.$show());
+    dispatch(auditLogActions.$setEntries(await getAuditLog()));
   }
 };

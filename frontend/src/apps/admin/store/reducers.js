@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 
 import {
   adminActions,
+  auditLogActions,
   connectDeviceWizardActions,
   editDeviceDialogActions,
   monetizationActions,
@@ -173,6 +174,21 @@ const monetization = (state = {
   }
 };
 
+const auditLog = (state = { isVisible: false, isLoading: false, entries: [] }, action) => {
+  switch (action.type) {
+    case auditLogActions.$show:
+      return { ...state, isVisible: true };
+    case auditLogActions.hide:
+      return { ...state, isVisible: false };
+    case auditLogActions.$entriesLoadingStarted:
+      return { ...state, isLoading: true, entries: [] };
+    case auditLogActions.$setEntries:
+      return { ...state, isLoading: false, entries: action.entries };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   devices,
@@ -180,5 +196,6 @@ export default combineReducers({
   editedDevice,
   removedDevice,
   connectDeviceWizard,
-  monetization
+  monetization,
+  auditLog
 });

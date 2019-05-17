@@ -3,6 +3,7 @@ const Moment = require("moment");
 
 const context = require("../context");
 const logger = require("../logger");
+const { EventTypes } = require("../storage/audit");
 
 const getTimestamp = time => time.isTimeZoneFixedToUTC && Moment.utc(time).valueOf();
 
@@ -153,13 +154,14 @@ router.post("/device/meeting", async function(req, res) {
     summary
   });
 
-  await req.context.storage.events.logEvent(
+  await req.context.storage.audit.logEvent(
     req.context.device.userId,
     req.context.device.deviceId,
+    req.context.device.calendarId,
     null,
     null,
     summary,
-    req.context.storage.events.EventTypes.CREATE
+    EventTypes.CREATE
   );
 
   res.sendStatus(201);
@@ -189,9 +191,10 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
     isCheckedIn
   });
 
-  await req.context.storage.events.logEvent(
+  await req.context.storage.audit.logEvent(
     req.context.device.userId,
     req.context.device.deviceId,
+    req.context.device.calendarId,
     event.id,
     event.recurringMasterId,
     event.summary,
@@ -201,10 +204,10 @@ router.put("/device/meeting/:meetingId", async function(req, res) {
   res.sendStatus(204);
 
   function getLogEventType() {
-    if (req.body.startNow) return req.context.storage.events.EventTypes.START_EARLY;
-    if (req.body.endNow) return req.context.storage.events.EventTypes.END;
-    if (req.body.checkIn) return req.context.storage.events.EventTypes.CHECK_IN;
-    if (req.body.extensionTime) return req.context.storage.events.EventTypes.EXTEND;
+    if (req.body.startNow) return EventTypes.START_EARLY;
+    if (req.body.endNow) return EventTypes.END;
+    if (req.body.checkIn) return EventTypes.CHECK_IN;
+    if (req.body.extensionTime) return EventTypes.EXTEND;
   }
 
   function getExtensionTime() {
@@ -239,13 +242,12 @@ router.delete("/device/meeting/:meetingId", async function(req, res) {
 
   await req.context.calendarProvider.deleteEvent(device.calendarId, req.params.meetingId);
 
-  const eventType = req.body.isRemovedAutomatically
-    ? req.context.storage.events.EventTypes.CANCEL
-    : req.context.storage.events.EventTypes.AUTO_CANCEL;
+  const eventType = req.body.isRemovedAutomatically ? EventTypes.AUTO_CANCEL : EventTypes.CANCEL;
 
-  await req.context.storage.events.logEvent(
+  await req.context.storage.audit.logEvent(
     device.userId,
     device.deviceId,
+    device.calendarId,
     event.id,
     event.recurringMasterId,
     event.summary,

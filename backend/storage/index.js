@@ -2,7 +2,7 @@ const Devices = require("./devices");
 const Session = require("./session");
 const OAuth = require("./oauth");
 const UserProperties = require("./user-properties");
-const Events = require("./events");
+const Audit = require("./audit");
 const config = require("../config");
 
 module.exports = class {
@@ -11,7 +11,7 @@ module.exports = class {
     this.oauth = new OAuth(sequelize);
     this.devices = new Devices(sequelize);
     this.userProperties = new UserProperties(sequelize);
-    this.events = new Events(sequelize);
+    this.audit = new Audit(sequelize);
 
     if (config.updateDatabaseSchema) {
       sequelize.sync({ alter: true }).catch(error => {
