@@ -25,8 +25,7 @@ module.exports = class {
         recurringMasterId: Sequelize.STRING,
         eventType: Sequelize.STRING,
         createdAt: Sequelize.DATE
-      },
-      { indexes: [{ fields: ["userId", "deviceId", "calendarId", "meetingId", "recurringMasterId", "eventType"] }] }
+      }
     );
   }
 
