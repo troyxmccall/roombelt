@@ -57,7 +57,6 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
     .map(event => !event.isPrivate ? event : {
       ...event,
       summary: null,
-      organizer: {},
       attendees: []
     })
     .map(event => !event.isCreatedFromDevice ? event : {

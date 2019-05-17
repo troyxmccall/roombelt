@@ -35,7 +35,7 @@ const EventRow = ({ meeting, timestamp, isAmPmClock }) => {
   const meetingSummary = (
     <>
       {getMeetingSummary(meeting)}
-      {meeting && !meeting.isPrivate && !meeting.isCreatedFromDevice && <Text muted xsmall block>
+      {meeting && !meeting.isCreatedFromDevice && <Text muted xsmall block>
         {i18next.t("dashboard.hosted-by")} {meeting.organizer.displayName}
       </Text>}
     </>

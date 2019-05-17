@@ -53,8 +53,10 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
     );
   };
 
-  const showAttendees = currentMeeting && !currentMeeting.isPrivate && !currentMeeting.isCreatedFromDevice;
-  const guests = showAttendees && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
+  const showHost = currentMeeting && !currentMeeting.isCreatedFromDevice;
+  const showGuests = currentMeeting && !currentMeeting.isPrivate && !currentMeeting.isCreatedFromDevice;
+
+  const guests = currentMeeting && currentMeeting.attendees.filter(u => u.displayName !== currentMeeting.organizer.displayName);
 
   return (
     <Wrapper>
@@ -62,12 +64,12 @@ const CurrentMeeting = ({ currentMeeting, nextMeeting, minutesToNextMeeting, isA
         <EventAvailable style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>{getTitle()}</span>
       </Indent>
-      {showAttendees && <Indent>
+      {showHost && <Indent>
         <AccountBox style={{ color: colors.foreground.white, verticalAlign: "middle", width: "1.5rem" }}/>
         <span style={{ verticalAlign: "middle" }}>
           {currentMeeting.organizer.displayName}
-          {guests.length > 0 && guests.length <= 5 && (", " + guests.map(u => u.displayName).join(", "))}
-          {guests.length > 0 && guests.length > 5 && (" " + i18next.t("meeting.guests", { count: guests.length }))}
+          {showGuests && guests.length > 0 && guests.length <= 5 && (", " + guests.map(u => u.displayName).join(", "))}
+          {showGuests && guests.length > 0 && guests.length > 5 && (" " + i18next.t("meeting.guests", { count: guests.length }))}
         </span>
       </Indent>}
     </Wrapper>
