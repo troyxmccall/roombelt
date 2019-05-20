@@ -1,13 +1,14 @@
 import { action } from "utils/redux";
+import ms from "ms";
 
 import {
   cancelSubscription,
   connectDevice,
   disconnectDevice,
+  getAuditLog,
   getCalendars,
   getConnectedDevices,
   getUserDetails,
-  getAuditLog,
   setOptionsForDevice,
   setSubscriptionPlan
 } from "services/api";
@@ -22,6 +23,7 @@ import {
 } from "./selectors";
 import { isCheckoutOverlayOpenSelector, subscriptionPassthroughSelector } from "apps/admin/store/selectors";
 import { wait } from "utils/time";
+import { setUserProperty } from "services/api";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
@@ -249,6 +251,31 @@ export const monetizationActions = {
     }
 
     dispatch(monetizationActions.$toggleIsUpdatingSubscription(false));
+  },
+
+  extendOnPremisesEvaluation: () => async dispatch => {
+    await setUserProperty("lastAcceptanceOfEvaluation", Date.now());
+    dispatch(adminActions.$setUserDetails(await getUserDetails()));
+    dispatch(monetizationActions.closePlanDialog());
+  },
+
+  buyOnPremises: () => async dispatch => {
+    dispatch(monetizationActions.$toggleOverlay(true));
+
+    window.Paddle.Checkout.open({
+      product: 561003,
+      locale: "en",
+      passthrough: null,
+      closeCallback: async () => {
+        dispatch(monetizationActions.$toggleOverlay(false))
+      },
+      successCallback: async () => {
+        await setUserProperty("lastAcceptanceOfEvaluation", Date.now() + ms("100 years"));
+        dispatch(adminActions.$setUserDetails(await getUserDetails()));
+        dispatch(monetizationActions.$toggleOverlay(false));
+        dispatch(monetizationActions.closePlanDialog());
+      }
+    });
   }
 };
 

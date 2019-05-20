@@ -50,8 +50,6 @@ const Header = props => {
     </User>
   );
 
-  const isOnPremises = props.currentSubscriptionPlan === premiumPlans.ON_PREMISES;
-
   return (
     <Wrapper>
       <a href="https://roombelt.com" style={{ textDecoration: "none" }}>
@@ -59,9 +57,9 @@ const Header = props => {
       </a>
 
       <DropdownMenu trigger={user} arrowPosition="left: 10px">
-        {!isOnPremises && <DropdownMenuItem onClick={props.openChoosePlanDialog}>
+        <DropdownMenuItem onClick={props.openChoosePlanDialog}>
           Subscription settings
-        </DropdownMenuItem>}
+        </DropdownMenuItem>
         <DropdownMenuItem as="a" href="https://docs.roombelt.com">Help</DropdownMenuItem>
         <DropdownMenuItem as="a" href="/api/admin/logout">Log out</DropdownMenuItem>
       </DropdownMenu>

@@ -23,9 +23,8 @@ async function getSubscriptionStatus(oauth) {
 
   const now = Moment();
   const endOfTrial = Moment(oauth.createdAt).add(30, "days");
-  const firstOfApril = Moment([2019, 3, 1]);
-  const isTrialExpired = !oauth.subscriptionPlanId && now.isAfter(endOfTrial) && now.isAfter(firstOfApril);
-  const isTrialLongExpired = isTrialExpired && now.isAfter(endOfTrial.add(3, "days")) && now.isAfter(firstOfApril.add(3, "days"));
+  const isTrialExpired = !oauth.subscriptionPlanId && now.isAfter(endOfTrial);
+  const isTrialLongExpired = isTrialExpired && now.isAfter(endOfTrial.add(3, "days"));
 
   const currentPlan = premiumPlans[oauth.subscriptionPlanId];
   const connectedDevicesCount = storage.devices.countDevicesForUser(oauth.userId);

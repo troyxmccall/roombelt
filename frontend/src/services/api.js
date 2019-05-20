@@ -33,7 +33,7 @@ export function getUserDetails() {
 }
 
 export function setUserProperty(propertyId, value) {
-  return axios.put(`/api/admin/user/property/${encodeURIComponent(propertyId)}`, value);
+  return axios.put(`/api/admin/user/property/${encodeURIComponent(propertyId)}`, { value });
 }
 
 export function getConnectedDevices() {

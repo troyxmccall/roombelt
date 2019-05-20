@@ -73,10 +73,6 @@ router.get("/admin/user", async function(req, res) {
       return null;
     }
 
-    if (Moment(userOAuth.createdAt).isBefore(Moment([2019, 2, 1]))) {
-      return Moment([2019, 3, 1]).valueOf();
-    }
-
     return Moment(userOAuth.createdAt).add(30, "days").valueOf();
   };
 
@@ -93,7 +89,7 @@ router.get("/admin/user", async function(req, res) {
 });
 
 router.put("/admin/user/property/:propertyId", async function(req, res) {
-  await req.context.storage.userProperties.setProperty(req.context.session.adminUserId, req.params.propertyId, req.body);
+  await req.context.storage.userProperties.setProperty(req.context.session.adminUserId, req.params.propertyId, req.body.value);
   res.sendStatus(204);
 });
 
