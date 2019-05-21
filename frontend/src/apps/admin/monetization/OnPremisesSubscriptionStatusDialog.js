@@ -22,6 +22,24 @@ const ChoosePlanDialog = ({ isOpen, isOnPaidPlan, daysSinceEvaluationStarted, cl
     );
   }
 
+  if (daysSinceEvaluationStarted === 0) {
+    const footer = (
+      <>
+        <Button onClick={buyLicense} link>Buy license</Button>
+        <Button onClick={continueEvaluation} success>Start evaluation</Button>
+      </>
+    );
+
+    return (
+      <BlueModal visible={isOpen} footer={footer} title="Roombelt license">
+        <p>
+          Thanks for giving Roombelt a try! Keep in mind that Roombelt may be
+          evaluated for free as long as necessary, however a license must be purchased for continued use.
+        </p>
+      </BlueModal>
+    );
+  }
+
   const footer = (
     <>
       <Button onClick={continueEvaluation} link>Continue evaluation</Button>
@@ -33,8 +51,8 @@ const ChoosePlanDialog = ({ isOpen, isOnPaidPlan, daysSinceEvaluationStarted, cl
     <BlueModal footer={footer} visible={isOpen} title={"Roombelt license"}>
       <p>
         You are evaluating Roombelt for {daysSinceEvaluationStarted} days now.
-        Roombelt can be evaluated for free as long as necessary to try the product,
-        however, a license must be purchased for continued use.
+        Roombelt may be evaluated for free as long as necessary, however
+        a license must be purchased for continued use.
       </p>
     </BlueModal>
   );

@@ -90,9 +90,11 @@ export const isOnPremisesEvaluationExpiredDialogOpenSelector = state => {
     return false;
   }
 
-  const lastTimeEvaluationWasAccepted = state.user.properties.lastAcceptanceOfEvaluation || state.user.createdAt;
+  if(!state.user.properties.lastAcceptanceOfEvaluation) {
+    return true;
+  }
 
-  return (lastTimeEvaluationWasAccepted < Date.now() - ms("2 weeks"));
+  return (state.user.properties.lastAcceptanceOfEvaluation < Date.now() - ms("2 weeks"));
 };
 
 export const daysSinceJoinedSelector = state => {
