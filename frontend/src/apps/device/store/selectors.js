@@ -16,6 +16,7 @@ export const isActionErrorSelector = state => state.currentMeetingActions.isErro
 export const actionErrorStatusCodeSelector = state => state.currentMeetingActions.errorStatusCode;
 export const isActionSuccessSelector = state => state.currentMeetingActions.isSuccess;
 export const isRetryingActionSelector = state => state.currentMeetingActions.isRetrying;
+export const fontSizeSelector = state => state.displayOptions.fontSize;
 
 export const calendarSelector = (state, props) => {
   if (!props || !props.calendarId) {

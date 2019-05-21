@@ -18,6 +18,7 @@ import colors from "dark/colors";
 import Time from "theme/components/Time";
 import RowView from "./RowView";
 import CalendarRow from "./CalendarRow";
+import { fontSizeSelector } from "../../store/selectors";
 
 const Header = styled(Section).attrs({ header: true })`
   padding: 0.4rem 0.85rem 0.2rem 0.85rem;
@@ -39,11 +40,11 @@ const NoMeetingsInfo = styled.div`
   margin-top: 35vh;
 `;
 
-const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms }) => {
+const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms, fontSize }) => {
   const hasAnyRows = events.length > 0 || (showAvailableRooms && calendars.length > 0);
 
   return (
-    <Layout style={{ overflow: "hidden" }}>
+    <Layout style={{ overflow: "hidden" }} fontSize={fontSize}>
       <PageLoaded/>
       <Header>
         <span>{i18next.t("dashboard.page-title")}</span>
@@ -76,7 +77,8 @@ const mapStateToProps = state => ({
   calendars: allCalendarsSelector(state),
   events: dashboardMeetingsSelector(state),
   isAmPmClock: isAmPmClockSelector(state),
-  showAvailableRooms: showAvailableRoomsSelector(state)
+  showAvailableRooms: showAvailableRoomsSelector(state),
+  fontSize: fontSizeSelector(state)
 });
 
 export default connect(mapStateToProps)(Dashboard);

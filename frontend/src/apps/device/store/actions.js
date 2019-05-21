@@ -123,11 +123,13 @@ export const deviceActions = {
       screenfull.onchange(updateStatus);
     }
   },
-  requestFullScreen: () => () => {
+  toggleFullScreen: () => () => {
     if (screenfull.enabled) {
-      screenfull.request();
+      screenfull.toggle();
     }
   },
+
+  changeFontSize: action(fontSizeDelta => ({ fontSizeDelta })),
 
   $updateOfflineStatus: action(isOffline => ({ isOffline })),
   $initializeOfflineObserver: () => (dispatch, getState) => {

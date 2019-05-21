@@ -6,7 +6,6 @@ import Logo from "../Logo";
 import { DropdownMenu, DropdownMenuItem, Text } from "theme";
 import { monetizationActions } from "apps/admin/store/actions";
 import { currentSubscriptionPlanSelector, daysOfTrialLeftSelector } from "apps/admin/store/selectors";
-import premiumPlans from "services/premium-plans";
 
 const User = styled.a`
   display: inline-flex;
