@@ -5,7 +5,7 @@ const context = require("../context");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) => ({
   id: deviceId,
   createdAt: new Date(createdAt).getTime(),
   deviceType,
@@ -16,6 +16,7 @@ const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType,
   showAvailableRooms,
   showTentativeMeetings,
   isReadOnlyDevice,
+  recurringMeetingsCheckInTolerance,
   language: language || "en",
   clockType: clockType,
   isOnline: lastActivityAt > Date.now() - 70 * 1000,

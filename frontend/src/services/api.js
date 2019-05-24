@@ -52,7 +52,7 @@ export function getCalendars() {
   return axios.get("/api/admin/calendar");
 }
 
-export function setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType) {
+export function setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance) {
   return axios.put(`/api/admin/device/${encodeURIComponent(deviceId)}`, {
     deviceType,
     calendarId,
@@ -63,7 +63,8 @@ export function setOptionsForDevice(deviceId, deviceType, calendarId, location, 
     showAvailableRooms,
     showTentativeMeetings,
     isReadOnlyDevice,
-    clockType
+    clockType,
+    recurringMeetingsCheckInTolerance
   });
 }
 

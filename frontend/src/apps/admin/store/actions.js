@@ -73,7 +73,7 @@ export const connectDeviceWizardActions = {
 
     const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelector(getState());
 
-    await setOptionsForDevice(deviceId, deviceType, calendarId, "", language, 0, 5, true, true, false, clockType);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, "", language, 0, 5, true, true, false, clockType, 0);
 
     const allDevices = await getConnectedDevices();
     dispatch(adminActions.$setDevices(allDevices));
@@ -135,12 +135,13 @@ export const editDeviceDialogActions = {
   setShowAvailableRooms: action(showAvailableRooms => ({ showAvailableRooms })),
   setShowTentativeMeetings: action(showTentativeMeetings => ({ showTentativeMeetings })),
   setReadOnlyDevice: action(isReadOnlyDevice => ({ isReadOnlyDevice })),
+  setRecurringMeetingsCheckInTolerance: action(recurringMeetingsCheckInTolerance => ({ recurringMeetingsCheckInTolerance })),
   $startSubmitting: action(),
   submit: () => async (dispatch, getState) => {
-    const { deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType } = editDeviceDataSelector(getState());
+    const { deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance } = editDeviceDataSelector(getState());
 
     dispatch(editDeviceDialogActions.$startSubmitting());
-    await setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance);
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(editDeviceDialogActions.hide());

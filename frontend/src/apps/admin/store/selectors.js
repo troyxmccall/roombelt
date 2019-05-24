@@ -22,7 +22,8 @@ export const editDeviceDataSelector = state => ({
   minutesForStartEarly: state.editedDevice.data.minutesForStartEarly,
   showAvailableRooms: state.editedDevice.data.showAvailableRooms,
   showTentativeMeetings: state.editedDevice.data.showTentativeMeetings,
-  isReadOnlyDevice: state.editedDevice.data.isReadOnlyDevice
+  isReadOnlyDevice: state.editedDevice.data.isReadOnlyDevice,
+  recurringMeetingsCheckInTolerance: state.editedDevice.data.recurringMeetingsCheckInTolerance
 });
 
 export const isAuditLogVisibleSelector = state => state.auditLog.isVisible;

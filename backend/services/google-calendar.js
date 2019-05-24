@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const Moment = require("moment");
+const { RRule } = require("rrule");
 const logger = require("../logger");
 const Cache = require("./cache");
 
@@ -243,6 +244,26 @@ module.exports = class {
     );
 
     await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+  }
+
+  async deleteRecurringEvent(calendarId, recurringMasterId) {
+    const query = {
+      calendarId: encodeURIComponent(calendarId),
+      eventId: encodeURIComponent(recurringMasterId)
+    };
+
+    const event = await new Promise((res, rej) =>
+      this.calendarClient.events.get(query, (err, data) => (err ? rej(err) : res(data.data)))
+    );
+
+    const rrule = new RRule({ ...RRule.parseString(event.recurrence.join("\n")), count: undefined, until: new Date() });
+    const updatedRecurrence = rrule.toString().split("\n");
+
+    const patchQuery = { ...query, resource: { recurrence: updatedRecurrence } };
+
+    await new Promise((res, rej) =>
+      this.calendarClient.events.patch(patchQuery, (err, data) => (err ? rej(err) : res(data.data)))
+    );
   }
 
   $watchCalendars(key, channelId, ttl) {

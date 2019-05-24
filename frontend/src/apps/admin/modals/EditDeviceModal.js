@@ -54,7 +54,7 @@ const InlineCheckbox = styled(Checkbox)`
   margin-top: 10px;
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType, onChangeShowTentativeMeetings, onChangeReadOnlyDevice }) => {
+const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType, onChangeShowTentativeMeetings, onChangeReadOnlyDevice, onChangeRecurringMeetingsCheckInTolerance }) => {
   const select = useRef();
   useEffect(() => {
     if (isVisible) select.current.focus();
@@ -205,6 +205,18 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
             onChange={option => onChangeMinutesForCheckIn(option.value)}
           />
         </CheckInWrapper>
+        {device.minutesForCheckIn > 0 && <Select
+          styles={{ container: base => ({ ...base, marginTop: 15 }) }}
+          instanceId="edit-device-settings-remove-ghost-meetings"
+          isDisabled={isReadOnly}
+          value={device && isReadOnly ? 0 : (device.recurringMeetingsCheckInTolerance || 0)}
+          options={[
+            { label: "Don't remove recurring meetings automatically", value: 0 },
+            { label: "Remove recurring meetings if nobody checks-in 2 times in a row", value: 2 },
+            { label: "Remove recurring meetings if nobody checks-in 3 times in a row", value: 3 },
+          ]}
+          onChange={option => onChangeRecurringMeetingsCheckInTolerance(option.value)}
+        />}
       </FormField>}
     </BlueModal>
   );
@@ -230,7 +242,8 @@ const mapDispatchToProps = dispatch => ({
   onChangeMinutesForStartEarly: minutes => dispatch(editDeviceDialogActions.setMinutesForStartEarly(minutes)),
   onChangeShowAvailableRooms: value => dispatch(editDeviceDialogActions.setShowAvailableRooms(value)),
   onChangeShowTentativeMeetings: value => dispatch(editDeviceDialogActions.setShowTentativeMeetings(value)),
-  onChangeReadOnlyDevice: value => dispatch(editDeviceDialogActions.setReadOnlyDevice(value))
+  onChangeReadOnlyDevice: value => dispatch(editDeviceDialogActions.setReadOnlyDevice(value)),
+  onChangeRecurringMeetingsCheckInTolerance: value => dispatch(editDeviceDialogActions.setRecurringMeetingsCheckInTolerance(value))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDeviceModal);

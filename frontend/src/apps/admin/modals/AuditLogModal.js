@@ -31,13 +31,14 @@ const Footer = styled.div`
 `;
 
 const eventTypes = {
-  "create": "Create meeting",
+  "create": "New meeting",
   "end": "End meeting",
   "start-early": "Start early",
   "check-in": "Check in",
-  "extend": "Extend meeting",
-  "cancel": "Cancel manually",
-  "auto-cancel": "Cancel automatically"
+  "extend": "Extend",
+  "cancel": "Cancel",
+  "auto-cancel": "Auto cancel",
+  "auto-cancel-recurring": "Remove recurring"
 };
 
 const AuditLogModal = ({ onClose, isVisible, devices, calendars, entries }) => {
@@ -66,7 +67,7 @@ const AuditLogModal = ({ onClose, isVisible, devices, calendars, entries }) => {
     {
       Header: "Event",
       accessor: "eventType",
-      width: 140,
+      width: 180,
       Cell: ({ value }) => (eventTypes[value]),
       Filter: ({ filter, onChange }) =>
         <select

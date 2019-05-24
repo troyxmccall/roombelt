@@ -85,6 +85,8 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, showTentativeMeetings: action.showTentativeMeetings } };
     case editDeviceDialogActions.setReadOnlyDevice:
       return { data: { ...state.data, isReadOnlyDevice: action.isReadOnlyDevice } };
+    case editDeviceDialogActions.setRecurringMeetingsCheckInTolerance:
+      return { data: { ...state.data, recurringMeetingsCheckInTolerance: action.recurringMeetingsCheckInTolerance } };
     default:
       return state;
   }

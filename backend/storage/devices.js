@@ -18,7 +18,8 @@ module.exports = class {
       minutesForStartEarly: { type: Sequelize.INTEGER, defaultValue: 5 },
       showAvailableRooms: { type: Sequelize.BOOLEAN, defaultValue: false },
       showTentativeMeetings: { type: Sequelize.BOOLEAN, defaultValue: true },
-      isReadOnlyDevice: { type: Sequelize.BOOLEAN, defaultValue: false }
+      isReadOnlyDevice: { type: Sequelize.BOOLEAN, defaultValue: false },
+      recurringMeetingsCheckInTolerance: { type: Sequelize.INTEGER, defaultValue: 0 }
     });
   }
 
@@ -56,7 +57,7 @@ module.exports = class {
     await this.Model.update({ lastActivityAt: new Date() }, { where: { deviceId } });
   }
 
-  async setDeviceOptions(deviceId, { deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice }) {
+  async setDeviceOptions(deviceId, { deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) {
     await this.Model.update({
       deviceType,
       calendarId,
@@ -67,7 +68,8 @@ module.exports = class {
       minutesForStartEarly,
       showAvailableRooms,
       showTentativeMeetings,
-      isReadOnlyDevice
+      isReadOnlyDevice,
+      recurringMeetingsCheckInTolerance
     }, { where: { deviceId } });
   }
 };

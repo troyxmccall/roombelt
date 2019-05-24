@@ -235,25 +235,52 @@ router.delete("/device/meeting/:meetingId", async function(req, res) {
 
   const event = events.find(event => event.id === req.params.meetingId);
 
-  if (event === -1) {
-    return res.sendStatus(204);
+  if (event) {
+    await removeMeeting();
+    await removeRecurringMeetingIfNeeded();
   }
 
-  await req.context.calendarProvider.deleteEvent(device.calendarId, req.params.meetingId);
-
-  const eventType = req.body.isRemovedAutomatically ? EventTypes.AUTO_CANCEL : EventTypes.CANCEL;
-
-  await req.context.storage.audit.logEvent(
-    device.userId,
-    device.deviceId,
-    device.calendarId,
-    event.id,
-    event.recurringMasterId,
-    event.summary,
-    eventType
-  );
-
   res.sendStatus(204);
+
+  async function removeMeeting() {
+    await req.context.calendarProvider.deleteEvent(device.calendarId, req.params.meetingId);
+
+    const eventType = req.body.isRemovedAutomatically ? EventTypes.AUTO_CANCEL : EventTypes.CANCEL;
+
+    await req.context.storage.audit.logEvent(
+      device.userId,
+      device.deviceId,
+      device.calendarId,
+      event.id,
+      event.recurringMasterId,
+      event.summary,
+      eventType
+    );
+  }
+
+  async function removeRecurringMeetingIfNeeded() {
+    if (!req.body.isRemovedAutomatically || !event.recurringMasterId || !device.minutesForCheckIn || !device.recurringMeetingsCheckInTolerance) {
+      return;
+    }
+
+    const lastAuditEntries = await req.context.storage.audit.findLastRecurringMeetingEvents(device.deviceId, event.recurringMasterId, device.recurringMeetingsCheckInTolerance);
+
+    if (lastAuditEntries.length < device.recurringMeetingsCheckInTolerance || lastAuditEntries.some(event => event.eventType !== EventTypes.AUTO_CANCEL)) {
+      return;
+    }
+
+    await req.context.calendarProvider.deleteRecurringEvent(device.calendarId, event.recurringMasterId);
+
+    await req.context.storage.audit.logEvent(
+      device.userId,
+      device.deviceId,
+      device.calendarId,
+      event.id,
+      event.recurringMasterId,
+      event.summary,
+      EventTypes.AUTO_CANCEL_RECURRING
+    );
+  }
 });
 
 module.exports = router;

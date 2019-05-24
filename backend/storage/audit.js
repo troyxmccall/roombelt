@@ -48,11 +48,11 @@ module.exports = class {
     return await this.Model.findAll({ where, order: [["createdAt", "DESC"]], limit: 5000 });
   }
 
-  async findLastRecurringMeetingEvents(deviceId, recurringMasterId) {
+  async findLastRecurringMeetingEvents(deviceId, recurringMasterId, count) {
     return await this.Model.findAll({
       where: { deviceId, recurringMasterId },
       order: [["createdAt", "DESC"]],
-      limit: 2
+      limit: count
     });
   }
 };
