@@ -243,7 +243,7 @@ router.delete("/device/meeting/:meetingId", async function(req, res) {
   res.sendStatus(204);
 
   async function removeMeeting() {
-    await req.context.calendarProvider.deleteEvent(device.calendarId, req.params.meetingId);
+    await req.context.calendarProvider.declineEvent(device.calendarId, req.params.meetingId);
 
     const eventType = req.body.isRemovedAutomatically ? EventTypes.AUTO_CANCEL : EventTypes.CANCEL;
 
@@ -269,7 +269,7 @@ router.delete("/device/meeting/:meetingId", async function(req, res) {
       return;
     }
 
-    await req.context.calendarProvider.deleteRecurringEvent(device.calendarId, event.recurringMasterId);
+    await req.context.calendarProvider.declineEvent(device.calendarId, event.recurringMasterId);
 
     await req.context.storage.audit.logEvent(
       device.userId,

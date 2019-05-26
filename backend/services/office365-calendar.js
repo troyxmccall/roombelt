@@ -295,29 +295,12 @@ module.exports = class {
     await this.invalidateCalendarCache(calendarId);
   }
 
-  async deleteEvent(calendarId, eventId) {
+  async declineEvent(calendarId, eventId) {
     await this.assertCalendar(calendarId);
-    await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`).delete();
+    await this.serviceClient
+      .api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}/decline`)
+      .responseType(graph.ResponseType.RAW)
+      .post({ sendResponse: "true" });
     await this.invalidateCalendarCache(calendarId);
-  }
-
-  async deleteRecurringEvent(calendarId, recurringMasterId) {
-    await this.assertCalendar(calendarId);
-
-    const path = `/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(recurringMasterId)}`;
-
-    const event = await this.serviceClient.api(path).get();
-    const recurrence = {
-      pattern: event.recurrence.pattern,
-      range: {
-        startDate: event.recurrence.range.startDate,
-        recurrenceTimeZone: event.recurrence.range.recurrenceTimeZone,
-        numberOfOccurrences: 0,
-        type: "endDate",
-        endDate: Moment().subtract(1, "day").format("YYYY-MM-DD")
-      }
-    };
-
-    await this.serviceClient.api(path).patch({ recurrence });
   }
 };

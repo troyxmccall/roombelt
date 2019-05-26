@@ -2,7 +2,6 @@ const crypto = require("crypto");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const Moment = require("moment");
-const { RRule } = require("rrule");
 const logger = require("../logger");
 const Cache = require("./cache");
 
@@ -233,37 +232,29 @@ module.exports = class {
     await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
-  async deleteEvent(calendarId, eventId) {
+  async declineEvent(calendarId, eventId) {
     const query = {
       calendarId: encodeURIComponent(calendarId),
-      eventId: encodeURIComponent(eventId)
-    };
-
-    await new Promise((res, rej) =>
-      this.calendarClient.events.delete(query, (err, data) => (err ? rej(err) : res(data)))
-    );
-
-    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
-  }
-
-  async deleteRecurringEvent(calendarId, recurringMasterId) {
-    const query = {
-      calendarId: encodeURIComponent(calendarId),
-      eventId: encodeURIComponent(recurringMasterId)
+      eventId: encodeURIComponent(eventId),
+      sendUpdates: "all"
     };
 
     const event = await new Promise((res, rej) =>
       this.calendarClient.events.get(query, (err, data) => (err ? rej(err) : res(data.data)))
     );
 
-    const rrule = new RRule({ ...RRule.parseString(event.recurrence.join("\n")), count: undefined, until: new Date() });
-    const updatedRecurrence = rrule.toString().split("\n");
+    const attendees = event.attendees && event.attendees.map(attendee => ({
+      ...attendee,
+      responseStatus: attendee.self ? "declined" : attendee.responseStatus
+    }));
 
-    const patchQuery = { ...query, resource: { recurrence: updatedRecurrence } };
+    const patchQuery = { ...query, resource: { status: "cancelled", attendees } };
 
     await new Promise((res, rej) =>
       this.calendarClient.events.patch(patchQuery, (err, data) => (err ? rej(err) : res(data.data)))
     );
+
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   $watchCalendars(key, channelId, ttl) {
