@@ -1,6 +1,6 @@
 ## Roombelt
 
-[Roombelt](https://roombelt.com) is a free meeting room manager
+[Roombelt](https://roombelt.com) is a meeting room manager
 focused on simplicity. Works both in Cloud and On-Premises.
 
 ![Tablet with roombelt installed](https://roombelt.com/img/tablet.png)
