@@ -25,16 +25,16 @@ const ChoosePlanDialog = ({ isOpen, isOnPaidPlan, daysSinceEvaluationStarted, cl
   if (daysSinceEvaluationStarted === 0) {
     const footer = (
       <>
-        <Button onClick={buyLicense} link>Buy license</Button>
-        <Button onClick={continueEvaluation} success>Start evaluation</Button>
+        <Button onClick={buyLicense} link>Start subscription</Button>
+        <Button onClick={continueEvaluation} success>Close</Button>
       </>
     );
 
     return (
       <BlueModal visible={isOpen} footer={footer} title="Roombelt license">
         <p>
-          Thanks for giving Roombelt a try! Keep in mind that Roombelt may be
-          evaluated for free as long as necessary, however a license must be purchased for continued use.
+          Thanks for giving Roombelt a try! It's a free software but keep
+          in mind that you can support further development by starting a paid subscription.
         </p>
       </BlueModal>
     );
@@ -42,17 +42,17 @@ const ChoosePlanDialog = ({ isOpen, isOnPaidPlan, daysSinceEvaluationStarted, cl
 
   const footer = (
     <>
-      <Button onClick={continueEvaluation} link>Continue evaluation</Button>
-      <Button onClick={buyLicense} success>Buy license</Button>
+      <Button onClick={continueEvaluation} link>Close</Button>
+      <Button onClick={buyLicense} success>Start subscription</Button>
     </>
   );
 
   return (
     <BlueModal footer={footer} visible={isOpen} title={"Roombelt license"}>
       <p>
-        You are evaluating Roombelt for {daysSinceEvaluationStarted} days now.
-        Roombelt may be evaluated for free as long as necessary, however
-        a license must be purchased for continued use.
+        You are using Roombelt for {daysSinceEvaluationStarted} days now.
+        It's a free software but keep in mind that you can support further
+        development by starting a paid subscription.
       </p>
     </BlueModal>
   );
