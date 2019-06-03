@@ -5,7 +5,9 @@ import WizardStepLayout from "./WizardStepLayout";
 import { translations } from "i18n";
 import { connectDeviceWizardActions } from "apps/admin/store/actions";
 import { connect } from "react-redux";
-import { useWizard } from "apps/admin/wizard/Wizard";
+import { useWizard } from "apps/admin/modals/wizard/Wizard";
+import { isGoogleAccountSelector } from "../../store/selectors";
+import CalendarSelector from "../CalendarSelector";
 
 const LocaleWrapper = styled.div`
   display: flex;
@@ -22,30 +24,39 @@ const LocaleWrapper = styled.div`
   }
 `;
 
-const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
+const Content = ({ isDashboard, isGoogleAccount, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
   const { isCurrentStep, isTransitioning } = useWizard();
+  const calendarOptions = Object.values(calendars).map(calendar => ({
+    label: calendar.summary,
+    isReadOnly: !calendar.canModifyEvents,
+    deviceType: "calendar",
+    calendarId: calendar.id
+  }));
 
   const calendarSelector = (
     <>
       <Text large block>
         Calendar
       </Text>
-      <Select
+      <CalendarSelector
         instanceId="edit-device-choose-calendar"
-        value={calendarId}
-        options={Object.values(calendars)}
-        getOptionLabel={calendar => calendar.summary + (calendar.canModifyEvents ? "" : " (read only)")}
-        getOptionValue={calendar => calendar.id}
-        isOptionDisabled={calendar => !calendar.canModifyEvents}
-        onChange={calendar => onSetCalendar(calendar && calendar.id)}
+        value={calendarOptions.find(x => x.calendarId === calendarId)}
+        options={calendarOptions}
+        onChange={calendar => onSetCalendar(calendar && calendar.calendarId)}
         styles={{ container: base => ({ ...base, marginTop: 15, marginBottom: 10 }) }}
         menuPortalTarget={document.body}
         autofocus={isCurrentStep && !isTransitioning}
         tabIndex={isCurrentStep ? 0 : -1}
       />
-      <Text muted small>
-        Pick a calendar that will be shown on this device.
-      </Text>
+      {isGoogleAccount && (
+        <Button link
+                href="https://go.roombelt.com/scMpEB"
+                target="_blank"
+                tabIndex={isCurrentStep ? 0 : -1}
+                style={{ padding: "5px 3px" }}>
+          Why is my calendar read-only or absent?
+        </Button>
+      )}
     </>
   );
 
@@ -66,7 +77,6 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
       />
     </>
   );
-
 
   const languageSelector = (
     <>
@@ -103,30 +113,39 @@ const Content = ({ isDashboard, calendars, calendarId, onSetCalendar, language, 
   );
 };
 
-const Buttons = ({ onSubmit, onBack, isSubmitting }) => (
+const Buttons = ({ onSubmit, onBack, onShowAdvancedConfiguration, submitButton }) => (
   <div>
-    <Button disabled={isSubmitting} onClick={onBack}>Back</Button>
-    <LoaderButton primary onClick={onSubmit} isLoading={isSubmitting}>Voila</LoaderButton>
+    <LoaderButton link
+                  onClick={onShowAdvancedConfiguration}
+                  isLoading={submitButton === "show-advanced"}
+                  disabled={!!submitButton}>
+      Advanced configuration
+    </LoaderButton>
+    <Button disabled={!!submitButton} onClick={onBack}>Back</Button>
+    <LoaderButton primary onClick={onSubmit} disabled={!!submitButton}
+                  isLoading={submitButton === "voila"}>Voila</LoaderButton>
   </div>
 );
 
 const mapStateToProps = state => ({
   calendars: state.calendars,
   isDashboard: state.connectDeviceWizard.deviceType === "dashboard",
-  isSubmitting: state.connectDeviceWizard.isSubmitting,
+  submitButton: state.connectDeviceWizard.submitButton,
   calendarId: state.connectDeviceWizard.calendarId,
   language: state.connectDeviceWizard.language,
   clockType: state.connectDeviceWizard.clockType,
-  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
+  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms,
+  isGoogleAccount: isGoogleAccountSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({
   onBack: () => dispatch(connectDeviceWizardActions.thirdStep.previousStep()),
-  onSubmit: () => dispatch(connectDeviceWizardActions.thirdStep.submit()),
+  onSubmit: () => dispatch(connectDeviceWizardActions.submit("voila")),
   onSetCalendar: calendarId => dispatch(connectDeviceWizardActions.thirdStep.setCalendarId(calendarId)),
   onSetLanguage: language => dispatch(connectDeviceWizardActions.thirdStep.setLanguage(language)),
   onSetClockType: clockType => dispatch(connectDeviceWizardActions.thirdStep.setClockType(clockType)),
   onSetShowAvailableRooms: value => dispatch(connectDeviceWizardActions.thirdStep.setShowAvailableRooms(value)),
+  onShowAdvancedConfiguration: () => dispatch(connectDeviceWizardActions.submit("show-advanced", true))
 });
 
 export default {

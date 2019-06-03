@@ -6,6 +6,7 @@ import { deviceActions } from "apps/device/store/actions";
 import {
   allCalendarsSelector,
   areAllCalendarsLoadedSelector,
+  fontSizeSelector,
   isAmPmClockSelector,
   timestampSelector
 } from "apps/device/store/selectors";
@@ -56,9 +57,9 @@ const LoaderWrapper = styled.div`
   transform: translateX(-50%);
 `;
 
-const AllCalendarsView = ({ closeAllCalendarsView, calendars, areAllCalendarsLoaded, markUserActivity, timestamp, isAmPmClock }) => {
+const AllCalendarsView = ({ closeAllCalendarsView, calendars, areAllCalendarsLoaded, markUserActivity, timestamp, isAmPmClock, fontSize }) => {
   return (
-    <Layout style={{ minHeight: "100%", height: "auto" }}>
+    <Layout style={{ minHeight: "100%", height: "auto" }} flexbox fontSize={fontSize}>
       <Header>
         <BackButton onClick={closeAllCalendarsView}>{i18next.t("actions.back")}</BackButton>
         <PageTitle>{i18next.t("actions.find-room")}</PageTitle>
@@ -77,7 +78,8 @@ const mapStateToProps = state => ({
   areAllCalendarsLoaded: areAllCalendarsLoadedSelector(state),
   calendars: allCalendarsSelector(state),
   timestamp: timestampSelector(state),
-  isAmPmClock: isAmPmClockSelector(state)
+  isAmPmClock: isAmPmClockSelector(state),
+  fontSize: fontSizeSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({

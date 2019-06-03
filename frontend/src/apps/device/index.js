@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 
 import store from "./store";
 import { deviceActions } from "./store/actions";
-import FullScreenToggle from "./components/FullScreenToggle";
+import DisplayOptionsBar from "./components/DisplayOptionsBar";
 
 export default class Device extends React.Component {
   componentDidMount() {
@@ -21,7 +21,7 @@ export default class Device extends React.Component {
       <Provider store={store}>
         <>
           <Router/>
-          <FullScreenToggle/>
+          <DisplayOptionsBar/>
         </>
       </Provider>
     );

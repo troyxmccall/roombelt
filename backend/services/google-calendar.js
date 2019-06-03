@@ -21,26 +21,33 @@ const getTime = time => {
   return { year, month, day, hour, minute, second, isTimeZoneFixedToUTC: !!time.dateTime };
 };
 
-const mapEvent = ({ id, summary, start, end, organizer, attendees, extendedProperties, visibility }) => ({
+const getStatus = (status, attendees) => {
+  if (status.toLowerCase() === "cancelled") return "declined";
+
+  const room = attendees && attendees.find(attendee => attendee.self);
+
+  if (!room) return "accepted";
+
+  if (room.responseStatus.toLowerCase() === "accepted") return "accepted";
+  if (room.responseStatus.toLowerCase() !== "declined") return "tentative";
+
+  return "declined";
+};
+
+const mapEvent = ({ id, recurringEventId, summary, start, end, creator, status, attendees, extendedProperties, visibility }) => ({
   id,
   summary,
-  organizer: organizer && { displayName: organizer.displayName || organizer.email },
+  recurringMasterId: recurringEventId,
+  organizer: creator && { displayName: creator.displayName || creator.email },
   isAllDayEvent: !!(start && start.date) || !!(end && end.date),
   start: getTime(start),
   end: getTime(end),
   attendees: (attendees && attendees.map(attendee => ({ displayName: attendee.displayName || attendee.email }))) || [],
-  isCheckedIn: extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn === "true",
-  isPrivate: visibility === "private" || visibility === "confidential"
+  isCheckedIn: !!(extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCheckedIn),
+  isCreatedFromDevice: !!(extendedProperties && extendedProperties.private && extendedProperties.private.roombeltIsCreatedFromDevice),
+  isPrivate: visibility === "private" || visibility === "confidential",
+  status: getStatus(status, attendees)
 });
-
-const isEventAccepted = event => {
-  if (event.status === "cancelled") {
-    return false;
-  }
-
-  const currentAttendee = event.attendees && event.attendees.find(attendee => attendee.self);
-  return !currentAttendee || currentAttendee.responseStatus !== "declined";
-};
 
 module.exports = class {
   constructor(config, credentials) {
@@ -114,34 +121,35 @@ module.exports = class {
   async getCalendars(options = { invalidateCache: false }) {
     const cacheKey = `calendars-${this.cacheKey}`;
 
-    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+    if (!await watchersCache.get(cacheKey) && this.webHookUrl) {
       logger.debug(`Set calendars watcher`);
 
       const channelId = crypto.randomBytes(64).toString("hex");
-      watchersCache.set(cacheKey, channelId, 5);
+      await watchersCache.set(cacheKey, channelId, 5);
 
       this.$watchCalendars(cacheKey, channelId, CHANNEL_TTL_CALENDARS)
         .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_CALENDARS - 10));
     }
 
     if (options.invalidateCache) {
-      valuesCache.delete(cacheKey);
+      await valuesCache.delete(cacheKey);
     }
 
-    if (!valuesCache.get(cacheKey)) {
+    let result = await valuesCache.get(cacheKey);
+    if (!result) {
       logger.debug(`Fetch calendars`);
 
       const { items } = await new Promise((res, rej) => this.calendarClient.calendarList.list((err, data) => (err ? rej(err) : res(data.data))));
-      const calendars = items.map(calendar => ({
+      result = items.map(calendar => ({
         id: calendar.id,
         summary: calendar.summary,
         canModifyEvents: calendar.accessRole === "writer" || calendar.accessRole === "owner"
       }));
 
-      valuesCache.set(cacheKey, calendars, this.webHookUrl ? CHANNEL_TTL_CALENDARS : 30);
+      await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_CALENDARS : 30);
     }
 
-    return valuesCache.get(cacheKey);
+    return result;
   }
 
   async getCalendar(calendarId) {
@@ -149,18 +157,18 @@ module.exports = class {
     return calendars.find(calendar => calendar.id === calendarId);
   }
 
-  async getEvents(calendarId, options = { invalidateCache: false }) {
+  async getEvents(calendarId, options = { invalidateCache: false, showTentativeMeetings: false }) {
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (options.invalidateCache) {
-      valuesCache.delete(cacheKey);
+      await valuesCache.delete(cacheKey);
     }
 
-    if (!watchersCache.get(cacheKey) && this.webHookUrl) {
+    if (!await watchersCache.get(cacheKey) && this.webHookUrl) {
       logger.debug(`Set events watcher for calendar ${calendarId}`);
 
       const channelId = crypto.randomBytes(64).toString("hex");
-      watchersCache.set(cacheKey, channelId, 5);
+      await watchersCache.set(cacheKey, channelId, 5);
 
       this.$watchEvents(calendarId, cacheKey, channelId, CHANNEL_TTL_EVENTS)
         .then(() => watchersCache.set(cacheKey, channelId, CHANNEL_TTL_EVENTS - 10));
@@ -174,15 +182,17 @@ module.exports = class {
       orderBy: "startTime"
     };
 
-    if (!valuesCache.get(cacheKey)) {
+    let result = await valuesCache.get(cacheKey);
+    if (!result) {
       logger.debug(`Fetch events for ${calendarId}`);
 
       const { items } = await new Promise((res, rej) => this.calendarClient.events.list(query, (err, data) => (err ? rej(err) : res(data.data))));
 
-      valuesCache.set(cacheKey, items.filter(isEventAccepted).map(mapEvent), this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
+      result = items.map(mapEvent);
+      await valuesCache.set(cacheKey, result, this.webHookUrl ? CHANNEL_TTL_EVENTS : 30);
     }
 
-    return valuesCache.get(cacheKey);
+    return result.filter(event => event.status === "accepted" || (options.showTentativeMeetings && event.status === "tentative"));
   }
 
   async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
@@ -192,7 +202,7 @@ module.exports = class {
         summary,
         start: { dateTime: new Date(startDateTime).toISOString() },
         end: { dateTime: new Date(endDateTime).toISOString() },
-        extendedProperties: { private: { roombeltIsCheckedIn: isCheckedIn ? "true" : "false" } }
+        extendedProperties: { private: { roombeltIsCheckedIn: "true", roombeltIsCreatedFromDevice: "true" } }
       }
     };
 
@@ -200,7 +210,7 @@ module.exports = class {
       this.calendarClient.events.insert(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async patchEvent(calendarId, eventId, { startDateTime, endDateTime, isCheckedIn }) {
@@ -219,20 +229,32 @@ module.exports = class {
       this.calendarClient.events.patch(query, (err, data) => (err ? rej(err) : res(data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
-  async deleteEvent(calendarId, eventId) {
+  async declineEvent(calendarId, eventId) {
     const query = {
       calendarId: encodeURIComponent(calendarId),
-      eventId: encodeURIComponent(eventId)
+      eventId: encodeURIComponent(eventId),
+      sendUpdates: "all"
     };
 
-    await new Promise((res, rej) =>
-      this.calendarClient.events.delete(query, (err, data) => (err ? rej(err) : res(data)))
+    const event = await new Promise((res, rej) =>
+      this.calendarClient.events.get(query, (err, data) => (err ? rej(err) : res(data.data)))
     );
 
-    valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
+    const attendees = event.attendees && event.attendees.map(attendee => ({
+      ...attendee,
+      responseStatus: attendee.self ? "declined" : attendee.responseStatus
+    }));
+
+    const patchQuery = { ...query, resource: { status: "cancelled", attendees } };
+
+    await new Promise((res, rej) =>
+      this.calendarClient.events.patch(patchQuery, (err, data) => (err ? rej(err) : res(data.data)))
+    );
+
+    await valuesCache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   $watchCalendars(key, channelId, ttl) {

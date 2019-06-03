@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { createGlobalStyle, css } from "styled-components/macro";
-import styled from "styled-components/macro";
+import styled, { createGlobalStyle, css } from "styled-components/macro";
 
 import Card from "./Card";
 import Button from "./Button";
@@ -20,6 +19,7 @@ const glassVisibleStyles = css`
   transition: background 0.3s;
   background: rgba(0, 0, 0, 0.5);
   visibility: visible;
+  overflow-y: auto;
 
   & > * {
     transition: opacity 0.3s, transform 0.3s;
@@ -51,6 +51,7 @@ const Glass = styled.div`
   justify-content: center;
   align-items: flex-start;
   padding-top: 50px;
+  padding-bottom: 10px;
 
   ${props => (props.visible ? glassVisibleStyles : glassInvisibleStyles)};
 `;
@@ -139,13 +140,19 @@ class Modal extends React.Component {
       <FooterWrapper children={this.props.footer || <DefaultFooter {...this.props} />}/>
     );
 
+    const getMaxWidth = () => {
+      if (this.props.fullWidth) return "100%";
+      if (this.props.wide) return 800;
+      return 600;
+    };
+
     return (
       <Glass visible={this.props.visible}>
         <GlobalStyle/>
         <Card
           block
           compact={this.props.compact}
-          style={{ width: "80%", maxWidth: this.props.wide ? 800 : 600 }}
+          style={{ width: "80%", maxWidth: getMaxWidth() }}
           header={header}
           footer={footer}
           children={this.props.children}
@@ -167,7 +174,8 @@ Modal.propTypes = {
   header: PropTypes.node,
   footer: PropTypes.node,
   compact: PropTypes.bool,
-  wide: PropTypes.bool
+  wide: PropTypes.bool,
+  fullWidth: PropTypes.bool
 };
 
 Modal.defaultProps = {

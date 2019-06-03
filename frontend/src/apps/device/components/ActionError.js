@@ -3,7 +3,11 @@ import i18next from "i18next";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 
-import { isActionErrorSelector, isRetryingActionSelector } from "apps/device/store/selectors";
+import {
+  actionErrorStatusCodeSelector,
+  isActionErrorSelector,
+  isRetryingActionSelector
+} from "apps/device/store/selectors";
 
 import { meetingActions } from "apps/device/store/actions";
 import LoaderButton from "dark/LoaderButton";
@@ -24,7 +28,7 @@ const ErrorSubtitle = styled.div`
   color: ${colors.foreground.gray}
 `;
 
-const ActionError = ({ isActionError, isRetryingAction, cancelAction, retryAction, style }) => (
+const ActionError = ({ isActionError, actionErrorStatusCode, isRetryingAction, cancelAction, retryAction, style }) => (
   <Wrapper style={style}>
     <ErrorTitle>{i18next.t("errors.action-error-title")}</ErrorTitle>
     <LoaderButton primary onClick={retryAction} isLoading={isRetryingAction}>
@@ -33,12 +37,15 @@ const ActionError = ({ isActionError, isRetryingAction, cancelAction, retryActio
     <Button disabled={isRetryingAction} onClick={cancelAction}>
       {i18next.t("actions.cancel")}
     </Button>
-    <ErrorSubtitle>{i18next.t("errors.action-error-subtitle")}</ErrorSubtitle>
+    <ErrorSubtitle>
+      {i18next.t(actionErrorStatusCode === 409 ? "errors.action-conflict" : "errors.action-error-subtitle")}
+    </ErrorSubtitle>
   </Wrapper>
 );
 
 const mapStateToProps = state => ({
   isActionError: isActionErrorSelector(state),
+  actionErrorStatusCode: actionErrorStatusCodeSelector(state),
   isRetryingAction: isRetryingActionSelector(state)
 });
 

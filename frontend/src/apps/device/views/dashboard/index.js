@@ -18,6 +18,7 @@ import colors from "dark/colors";
 import Time from "theme/components/Time";
 import RowView from "./RowView";
 import CalendarRow from "./CalendarRow";
+import { fontSizeSelector } from "../../store/selectors";
 
 const Header = styled(Section).attrs({ header: true })`
   padding: 0.4rem 0.85rem 0.2rem 0.85rem;
@@ -26,41 +27,58 @@ const Header = styled(Section).attrs({ header: true })`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 `;
 
-
-const DashboardWrapper = styled.div`
-  flex-grow: 1;
-  font-size: 0.8rem;
-  overflow: hidden;
+const NoMeetingsInfo = styled.div`
+  color: white;
+  font-size: 1.8em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 35vh;
 `;
 
-const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms }) => <Layout>
-    <PageLoaded/>
-    <Header>
-      <span>{i18next.t("dashboard.page-title")}</span>
-      <span><Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/></span>
-    </Header>
+const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms, fontSize }) => {
+  const hasAnyRows = events.length > 0 || (showAvailableRooms && calendars.length > 0);
 
-    <RowView style={{ fontSize: "0.6rem", paddingBottom: 0 }}
-             header
-             meetingSummary={i18next.t("dashboard.meeting")}
-             meetingStatus={i18next.t("dashboard.status")}
-             meetingRoom={i18next.t("dashboard.calendar")}/>
+  return (
+    <Layout style={{ overflow: "hidden" }} fontSize={fontSize}>
+      <PageLoaded/>
+      <Header>
+        <span>{i18next.t("dashboard.page-title")}</span>
+        <span>
+          <Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/>
+        </span>
+      </Header>
 
-    <DashboardWrapper>
-      {showAvailableRooms && calendars.map(calendar => <CalendarRow key={calendar.id} calendarId={calendar.id}/>)}
-      {events.map(event => <EventRow key={event.id} meeting={event} timestamp={timestamp}/>)}
-    </DashboardWrapper>
-  </Layout>
-;
+      {hasAnyRows && (
+        <RowView
+          style={{ fontSize: "0.6rem", paddingBottom: 0 }}
+          header
+          meetingSummary={i18next.t("dashboard.meeting")}
+          meetingStatus={i18next.t("dashboard.status")}
+          meetingRoom={i18next.t("dashboard.calendar")}
+        />
+      )}
+
+      <div>
+        {showAvailableRooms && calendars.map((calendar, index) => <CalendarRow key={index} calendarId={calendar.id}/>)}
+        {events.map((event, index) => <EventRow key={index} meeting={event}/>)}
+        {!hasAnyRows && <NoMeetingsInfo>{i18next.t("dashboard.no-meetings")}</NoMeetingsInfo>}
+      </div>
+    </Layout>
+  );
+};
 
 const mapStateToProps = state => ({
   timestamp: timestampSelector(state),
   calendars: allCalendarsSelector(state),
   events: dashboardMeetingsSelector(state),
   isAmPmClock: isAmPmClockSelector(state),
-  showAvailableRooms: showAvailableRoomsSelector(state)
+  showAvailableRooms: showAvailableRoomsSelector(state),
+  fontSize: fontSizeSelector(state)
 });
 
 export default connect(mapStateToProps)(Dashboard);

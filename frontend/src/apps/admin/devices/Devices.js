@@ -2,11 +2,14 @@ import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components/macro";
 import moment from "moment";
+import ms from "ms";
 
 import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
-import { translations } from "../../../i18n";
+import { translations } from "i18n";
 
 import {
+  Alert,
+  Badge,
   Card,
   DropdownMenu,
   DropdownMenuItem,
@@ -19,7 +22,7 @@ import {
   TableRow,
   TableRowColumn,
   Text
-} from "../../../theme/index";
+} from "theme";
 
 import EmptyState from "./EmptyState";
 import { editDeviceDialogActions, removeDeviceDialogActions } from "apps/admin/store/actions";
@@ -34,9 +37,17 @@ const SingleDeviceRow = props => (
   <CalendarRowWrapper>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
-        {props.device.deviceType === "dashboard" && (props.device.location ? props.device.location : <em>Dashboard</em>)}
-        {props.device.deviceType === "calendar" && (props.calendar ? props.calendar.summary :
-          <em>No calendar connected</em>)}
+        {props.device.deviceType === "dashboard" && props.device.location}
+        {props.device.deviceType === "dashboard" && !props.device.location && <em>Dashboard</em>}
+
+        {props.device.deviceType === "calendar" && !props.calendar && <em>No calendar connected</em>}
+        {props.device.deviceType === "calendar" && props.calendar && <>
+          {props.calendar.summary}
+          {" "}
+          {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
+            <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+          )}
+        </>}
       </Text>
       <Text muted small>
         Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
@@ -51,28 +62,12 @@ const SingleDeviceRow = props => (
       </Text>
     </TableRowColumn>
     <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text>
-        {props.device.deviceType === "dashboard" && <>
-          <Text muted small>Highlight available rooms:</Text>
-          <Text block>{props.device.showAvailableRooms ? "Yes" : "No"}</Text>
-        </>
-        }
-        {props.device.deviceType === "calendar" && <>
-          <Text muted small>Check-in:</Text>
-          <Text block>
-            {props.device.minutesForStartEarly} min / {props.device.minutesForCheckIn ? "Required" : "Not required"}
-          </Text>
-        </>
-        }
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
       <Text block>
         <StatusIcon success={props.device.isOnline} danger={!props.device.isOnline}/>
         {props.device.isOnline ? "Online" : "Offline"}
       </Text>
       <Text muted small>
-        Seen {moment(Date.now() - props.device.msSinceLastActivity).fromNow()}
+        {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
       </Text>
     </TableRowColumn>
     <TableRowColumn style={{ textAlign: "right" }}>
@@ -84,6 +79,15 @@ const SingleDeviceRow = props => (
   </CalendarRowWrapper>
 );
 
+const EmptyDashboardWarning = () => (
+  <Alert warning>
+    <strong>Warning: </strong>
+    Dashboard shows a summary of all connected devices.
+    You didn't connect any other devices so the dashboard will be empty.
+    <br/><br/>
+    Please connect another device with calendar selected.
+  </Alert>
+);
 
 const Devices = props => {
   if (!props.isLoaded) {
@@ -98,6 +102,8 @@ const Devices = props => {
     return <EmptyState/>;
   }
 
+  props.devices.sort((a, b) => b.createdAt - a.createdAt);
+
   const rows = props.devices.map(device => (
     <SingleDeviceRow
       key={device.id}
@@ -109,21 +115,25 @@ const Devices = props => {
     />
   ));
 
-  return (
-    <Card block compact>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHeaderColumn>Device</TableHeaderColumn>
-            <TableHeaderColumn>Locale</TableHeaderColumn>
-            <TableHeaderColumn>Settings</TableHeaderColumn>
-            <TableHeaderColumn>Status</TableHeaderColumn>
-            <TableHeaderColumn style={{ width: 50 }}/>
-          </TableRow>
-        </TableHeader>
-        <TableBody children={rows}/>
-      </Table>
-    </Card>
+  const hasDashboardDevices = props.devices.some(device => device.deviceType === "dashboard");
+  const hasSingleCalendarDevices = props.devices.some(device => device.deviceType === "calendar" && props.calendars[device.calendarId]);
+
+  return (<>
+      {hasDashboardDevices && !hasSingleCalendarDevices && <EmptyDashboardWarning/>}
+      <Card block compact>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHeaderColumn>Device</TableHeaderColumn>
+              <TableHeaderColumn>Locale</TableHeaderColumn>
+              <TableHeaderColumn>Status</TableHeaderColumn>
+              <TableHeaderColumn style={{ width: 50 }}/>
+            </TableRow>
+          </TableHeader>
+          <TableBody children={rows}/>
+        </Table>
+      </Card>
+    </>
   );
 };
 

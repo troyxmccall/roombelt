@@ -6,6 +6,7 @@ import MdLayers from "react-icons/lib/md/layers";
 import {
   calendarNameSelector,
   currentMeetingSelector,
+  fontSizeSelector,
   isAmPmClockSelector,
   nextMeetingSelector
 } from "../../store/selectors";
@@ -56,8 +57,8 @@ const Spacer = styled.div`
   flex-grow: 1;
 `;
 
-const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock }) => (
-  <Layout>
+const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock, fontSize }) => (
+  <Layout flexbox fontSize={fontSize}>
     <PageLoaded/>
     <Header>
       <CalendarName>
@@ -92,7 +93,8 @@ const mapStateToProps = state => ({
   currentMeeting: currentMeetingSelector(state),
   nextMeeting: nextMeetingSelector(state),
   currentTimestamp: state.timestamp,
-  isAmPmClock: isAmPmClockSelector(state)
+  isAmPmClock: isAmPmClockSelector(state),
+  fontSize: fontSizeSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({

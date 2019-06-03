@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { connect } from "react-redux";
-import { Text, Input, LoaderButton, Button } from "theme";
+import { Button, Input, LoaderButton, Text } from "theme";
 import styled from "styled-components/macro";
 import WizardStepLayout from "./WizardStepLayout";
 import { useWizard } from "./Wizard";
@@ -43,9 +43,13 @@ const Content = ({ connectionCode, connectionError, onChangeConnectionCode, onSu
         ref={input}
         style={{ marginTop: 15, marginBottom: 10 }}
       />
-      <Text muted small>
-        To get connection code open Roombelt website using browser on your tablet and click "Register device".
-      </Text>
+      <Button link
+              tabIndex={isCurrentStep ? 0 : -1}
+              href="https://go.roombelt.com/UgIpHu"
+              target="_blank"
+              style={{ padding: "5px 3px", fontSize: 20 }}>
+        How to get this code?
+      </Button>
       <ErrorMessage>{connectionError}</ErrorMessage>
     </WizardStepLayout>
   );
@@ -61,7 +65,7 @@ const Buttons = ({ onSubmit, onCancel, isSubmitting }) => (
 const mapStateToProps = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   connectionError: state.connectDeviceWizard.errorMessage,
-  isSubmitting: state.connectDeviceWizard.isSubmitting
+  isSubmitting: !!state.connectDeviceWizard.submitButton
 });
 
 const mapDispatchToProps = dispatch => ({

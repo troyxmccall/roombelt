@@ -5,19 +5,15 @@ axios.interceptors.response.use(response => response.data);
 
 export async function isOnline() {
   try {
-    await getAuth();
+    await getApiVersion();
     return true;
   } catch (err) {
     return false;
   }
 }
 
-export function removeAuth() {
-  return axios.delete("/api/auth");
-}
-
-export function getAuth() {
-  return axios.get("/api/auth");
+export function getAuthUrls() {
+  return axios.get("/api/admin/auth_urls");
 }
 
 export function getApiVersion() {
@@ -25,7 +21,11 @@ export function getApiVersion() {
 }
 
 export function createDevice() {
-  return axios.put("/api/auth/device");
+  return axios.post("/api/device");
+}
+
+export function removeDevice() {
+  return axios.delete("/api/device");
 }
 
 export function getUserDetails() {
@@ -33,7 +33,7 @@ export function getUserDetails() {
 }
 
 export function setUserProperty(propertyId, value) {
-  return axios.put(`/api/admin/user/property/${encodeURIComponent(propertyId)}`, value);
+  return axios.put(`/api/admin/user/property/${encodeURIComponent(propertyId)}`, { value });
 }
 
 export function getConnectedDevices() {
@@ -52,7 +52,7 @@ export function getCalendars() {
   return axios.get("/api/admin/calendar");
 }
 
-export function setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, clockType) {
+export function setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance) {
   return axios.put(`/api/admin/device/${encodeURIComponent(deviceId)}`, {
     deviceType,
     calendarId,
@@ -61,7 +61,10 @@ export function setOptionsForDevice(deviceId, deviceType, calendarId, location, 
     minutesForCheckIn,
     minutesForStartEarly,
     showAvailableRooms,
-    clockType
+    showTentativeMeetings,
+    isReadOnlyDevice,
+    clockType,
+    recurringMeetingsCheckInTolerance
   });
 }
 
@@ -71,6 +74,10 @@ export function setSubscriptionPlan(subscriptionPlanId) {
 
 export function cancelSubscription() {
   return axios.delete("/api/admin/subscription");
+}
+
+export function getAuditLog() {
+  return axios.get("/api/admin/audit");
 }
 
 export function getDeviceDetails(getAllCalendars) {
@@ -90,6 +97,6 @@ export function updateMeeting(meetingId, { startNow, endNow, extensionTime, chec
   });
 }
 
-export function deleteMeeting(meetingId) {
-  return axios.delete(`/api/device/meeting/${encodeURIComponent(meetingId)}`);
+export function deleteMeeting(meetingId, isRemovedAutomatically = false) {
+  return axios.delete(`/api/device/meeting/${encodeURIComponent(meetingId)}`, { data: { isRemovedAutomatically } });
 }

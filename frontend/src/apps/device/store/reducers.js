@@ -2,6 +2,7 @@ import { deviceActions, meetingActions } from "apps/device/store/actions";
 
 import { combineReducers } from "redux";
 import Moment from "moment";
+import { getFontSize, setFontSize } from "services/persistent-store";
 
 const timestamp = (state = 0, action) => (action.type === deviceActions.$updateClock ? action.timestamp : state);
 
@@ -31,6 +32,7 @@ const defaultCurrentMeetingActionsState = {
   currentAction: null,
   isRetrying: false,
   isError: false,
+  errorStatusCode: null,
   isSuccess: false
 };
 
@@ -43,7 +45,7 @@ const currentMeetingActions = (state = defaultCurrentMeetingActionsState, action
     case meetingActions.$setActionIsRetrying:
       return { ...state, isRetrying: true };
     case meetingActions.$setActionError:
-      return { ...state, isError: true, isRetrying: false };
+      return { ...state, isError: true, errorStatusCode: action.errorStatusCode, isRetrying: false };
     case meetingActions.$setActionSuccess:
       return { ...state, isSuccess: true, isRetrying: false };
     case meetingActions.endAction:
@@ -79,17 +81,21 @@ const appState = (state = {
   }
 };
 
-const fullScreen = (state = { isFullScreen: null, isSupported: null }, action) => {
+const displayOptions = (state = { isFullScreen: null, isSupported: null, fontSize: getFontSize() }, action) => {
   switch (action.type) {
     case deviceActions.$updateFullScreenState:
-      return { isFullScreen: action.isFullScreen, isSupported: action.isSupported };
+      return { ...state, isFullScreen: action.isFullScreen, isSupported: action.isSupported };
+    case deviceActions.changeFontSize:
+      const fontSize = Math.max(state.fontSize + action.fontSizeDelta, 0.1);
+      setFontSize(fontSize);
+      return { ...state, fontSize };
     default:
       return state;
   }
 };
 
 export default combineReducers({
-  fullScreen,
+  displayOptions,
   appState,
   timestamp,
   device,

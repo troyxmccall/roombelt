@@ -10,6 +10,8 @@ const qs = require("qs");
 const logger = require("../logger");
 
 const isCheckedInExtension = "Com.Roombelt.IsCheckedIn";
+const isCreatedFromDeviceExtension = "Com.Roombelt.isCreatedFromDevice";
+
 const cache = Cache("office-365");
 const CACHE_TTL = 30;
 
@@ -29,7 +31,8 @@ const serviceAuthProvider = (config, credentials) => async cb => {
 
   const cacheKey = `service-auth-${credentials.userId}`;
 
-  if (!cache.get(cacheKey)) {
+  let result = await cache.get(cacheKey);
+  if (!result) {
     const { data: { access_token, expires_in } } = await axios.post(`https://login.microsoftonline.com/${credentials.tenantId}/oauth2/v2.0/token`, qs.stringify({
       grant_type: "client_credentials",
       client_id: config.clientId,
@@ -37,10 +40,18 @@ const serviceAuthProvider = (config, credentials) => async cb => {
       scope: "https://graph.microsoft.com/.default"
     }));
 
-    cache.set(cacheKey, access_token, expires_in - 60 * 5);
+    result = access_token;
+    await cache.set(cacheKey, access_token, expires_in - 60 * 5);
   }
 
-  cb(null, cache.get(cacheKey));
+  cb(null, result);
+};
+
+const getStatus = (responseStatus) => {
+  const response = responseStatus && responseStatus.response && responseStatus.response.toLowerCase();
+  if (response === "declined") return "declined";
+  if (response === "accepted" || response === "organizer") return "accepted";
+  return "tentative";
 };
 
 const consumeStream = (stream) => new Promise(resolve => {
@@ -71,7 +82,7 @@ module.exports = class {
     this.clientId = config.clientId;
     this.redirectUrl = config.redirectUrl;
     this.redirectUrlAdmin = config.redirectUrlAdmin;
-    this.authScope = "openid profile offline_access";
+    this.authScope = "openid profile email offline_access";
     this.cacheKey = credentials && crypto.createHash("md5").update(credentials.refreshToken).digest("hex");
     this.credentials = credentials;
   }
@@ -164,21 +175,22 @@ module.exports = class {
     const cacheKey = `calendars-${this.cacheKey}`;
 
     if (options.invalidateCache) {
-      cache.delete(cacheKey);
+      await cache.delete(cacheKey);
     }
 
-    if (!cache.get(cacheKey)) {
-      const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).get();
-      const calendars = value.map(calendar => ({
+    let result = await cache.get(cacheKey);
+    if (!result) {
+      const { value } = await this.serviceClient.api(`/users/${this.credentials.userId}/findRooms`).top(100).get();
+      result = value.map(calendar => ({
         id: calendar.address,
         summary: calendar.name,
         canModifyEvents: true
       }));
 
-      cache.set(cacheKey, calendars, CACHE_TTL);
+      await cache.set(cacheKey, result, CACHE_TTL);
     }
 
-    return cache.get(cacheKey);
+    return result;
   }
 
   async getCalendar(calendarId) {
@@ -187,7 +199,7 @@ module.exports = class {
   }
 
   async invalidateCalendarCache(calendarId) {
-    cache.delete(`events-${this.cacheKey}-${calendarId}`);
+    await cache.delete(`events-${this.cacheKey}-${calendarId}`);
   }
 
   async assertCalendar(calendarId) {
@@ -196,44 +208,50 @@ module.exports = class {
     }
   }
 
-  async getEvents(calendarId, options = { invalidateCache: false }) {
+  async getEvents(calendarId, options = { invalidateCache: false, showTentativeMeetings: false }) {
     await this.assertCalendar(calendarId);
 
     const cacheKey = `events-${this.cacheKey}-${calendarId}`;
 
     if (options.invalidateCache) {
-      cache.delete(cacheKey);
+      await cache.delete(cacheKey);
     }
 
-    if (!cache.get(cacheKey)) {
+    let result = await cache.get(cacheKey);
+    if (!result) {
       const { value } = await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/calendarView`)
         .query({
           StartDateTime: new Date(Date.now() - ms("1 day")).toISOString(),
           EndDateTime: new Date(Date.now() + ms("1 day")).toISOString(),
-          $expand: `extensions($filter=id eq '${isCheckedInExtension}')`
+          $expand: `extensions($filter=id eq '${isCheckedInExtension}' or id eq '${isCreatedFromDeviceExtension}')`
         })
         .header("Prefer", `outlook.timezone="UTC"`)
+        .top(100)
         .get();
 
-      const events = value.map(event => ({
-        id: event.id,
-        summary: event.subject,
-        organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
-        isAllDayEvent: event.isAllDay,
-        start: getTime(event.start, event.isAllDay),
-        end: getTime(event.end, event.isAllDay),
-        attendees: event.attendees.map(attendee => ({ displayName: attendee.emailAddress && attendee.emailAddress.name })),      // TODO
-        isCheckedIn: event.extensions ? event.extensions.some(el => el.isCheckedIn) : false,
-        isPrivate: event.sensitivity === "private"
-      }));
+      result = value
+        .map(event => ({
+          id: event.id,
+          recurringMasterId: event.seriesMasterId,
+          summary: event.subject,
+          organizer: { displayName: event.organizer && event.organizer.emailAddress && event.organizer.emailAddress.name },
+          isAllDayEvent: event.isAllDay,
+          start: getTime(event.start, event.isAllDay),
+          end: getTime(event.end, event.isAllDay),
+          attendees: event.attendees.map(attendee => ({ displayName: attendee.emailAddress && attendee.emailAddress.name })),      // TODO
+          isCheckedIn: event.extensions ? event.extensions.some(el => el.isCheckedIn) : false,
+          isCreatedFromDevice: event.extensions ? event.extensions.some(el => el.isCreatedFromDevice) : false,
+          isPrivate: event.sensitivity === "private",
+          status: getStatus(event.responseStatus)
+        }));
 
-      cache.set(cacheKey, events, CACHE_TTL);
+      await cache.set(cacheKey, result, CACHE_TTL);
     }
 
-    return cache.get(cacheKey);
+    return result.filter(event => event.status === "accepted" || (options.showTentativeMeetings && event.status === "tentative"));
   }
 
-  async createEvent(calendarId, { startDateTime, endDateTime, isCheckedIn, summary }) {
+  async createEvent(calendarId, { startDateTime, endDateTime, summary }) {
     await this.assertCalendar(calendarId);
 
     await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events`).post({
@@ -243,7 +261,11 @@ module.exports = class {
       extensions: [{
         "@odata.type": "microsoft.graph.openTypeExtension",
         extensionName: isCheckedInExtension,
-        isCheckedIn
+        isCheckedIn: true
+      }, {
+        "@odata.type": "microsoft.graph.openTypeExtension",
+        extensionName: isCreatedFromDeviceExtension,
+        isCreatedFromDevice: true
       }]
     });
 
@@ -273,9 +295,12 @@ module.exports = class {
     await this.invalidateCalendarCache(calendarId);
   }
 
-  async deleteEvent(calendarId, eventId) {
+  async declineEvent(calendarId, eventId) {
     await this.assertCalendar(calendarId);
-    await this.serviceClient.api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`).delete();
+    await this.serviceClient
+      .api(`/users/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}/decline`)
+      .responseType(graph.ResponseType.RAW)
+      .post({ sendResponse: "true" });
     await this.invalidateCalendarCache(calendarId);
   }
 };

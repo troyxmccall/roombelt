@@ -2,9 +2,11 @@ import { combineReducers } from "redux";
 
 import {
   adminActions,
-  editDeviceDialogActions,
+  auditLogActions,
   connectDeviceWizardActions,
-  removeDeviceDialogActions, monetizationActions
+  editDeviceDialogActions,
+  monetizationActions,
+  removeDeviceDialogActions
 } from "apps/admin/store/actions";
 
 const defaultUserState = {
@@ -20,6 +22,7 @@ const user = (state = defaultUserState, action) => {
     case adminActions.$setUserDetails:
       return {
         isLoaded: true,
+        provider: action.user.provider,
         createdAt: action.user.createdAt,
         displayName: action.user.displayName,
         avatarUrl: action.user.avatarUrl,
@@ -78,6 +81,12 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, minutesForStartEarly: action.minutesForStartEarly } };
     case editDeviceDialogActions.setShowAvailableRooms:
       return { data: { ...state.data, showAvailableRooms: action.showAvailableRooms } };
+    case editDeviceDialogActions.setShowTentativeMeetings:
+      return { data: { ...state.data, showTentativeMeetings: action.showTentativeMeetings } };
+    case editDeviceDialogActions.setReadOnlyDevice:
+      return { data: { ...state.data, isReadOnlyDevice: action.isReadOnlyDevice } };
+    case editDeviceDialogActions.setRecurringMeetingsCheckInTolerance:
+      return { data: { ...state.data, recurringMeetingsCheckInTolerance: action.recurringMeetingsCheckInTolerance } };
     default:
       return state;
   }
@@ -102,11 +111,9 @@ const defaultConnectDeviceWizardState = {
   calendarId: null,
   language: "en-US",
   clockType: 12,
-  minutesForCheckIn: 0,
-  minutesForStartEarly: 5,
   showAvailableRooms: true,
   errorMessage: null,
-  isSubmitting: false
+  submitButton: null
 };
 
 const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) => {
@@ -115,14 +122,16 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...defaultConnectDeviceWizardState, currentStep: "connection-code" };
     case connectDeviceWizardActions.hide:
       return defaultConnectDeviceWizardState;
+    case connectDeviceWizardActions.$setSubmitButton:
+      return { ...state, submitButton: action.submitButton };
     case connectDeviceWizardActions.firstStep.setConnectionCode:
       return { ...state, connectionCode: action.connectionCode.replace(/\D/g, "") };
     case connectDeviceWizardActions.firstStep.$startSubmitting:
-      return { ...state, errorMessage: null, isSubmitting: true };
+      return { ...state, errorMessage: null, submitButton: "first-step-submit" };
     case connectDeviceWizardActions.firstStep.$submitSuccess:
-      return { ...state, currentStep: "device-type", isSubmitting: false, deviceId: action.deviceId };
+      return { ...state, currentStep: "device-type", submitButton: null, deviceId: action.deviceId };
     case connectDeviceWizardActions.firstStep.$submitError:
-      return { ...state, errorMessage: action.errorMessage, isSubmitting: false };
+      return { ...state, errorMessage: action.errorMessage, submitButton: null };
     case connectDeviceWizardActions.secondStep.setDeviceType:
       return { ...state, deviceType: action.deviceType };
     case connectDeviceWizardActions.secondStep.nextStep:
@@ -137,8 +146,6 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...state, clockType: action.clockType };
     case connectDeviceWizardActions.thirdStep.setShowAvailableRooms:
       return { ...state, showAvailableRooms: action.showAvailableRooms };
-    case connectDeviceWizardActions.thirdStep.$startSubmitting:
-      return { ...state, errorMessage: null, isSubmitting: true };
     default:
       return state;
   }
@@ -169,6 +176,21 @@ const monetization = (state = {
   }
 };
 
+const auditLog = (state = { isVisible: false, isLoading: false, entries: [] }, action) => {
+  switch (action.type) {
+    case auditLogActions.$show:
+      return { ...state, isVisible: true };
+    case auditLogActions.hide:
+      return { ...state, isVisible: false };
+    case auditLogActions.$entriesLoadingStarted:
+      return { ...state, isLoading: true, entries: [] };
+    case auditLogActions.$setEntries:
+      return { ...state, isLoading: false, entries: action.entries };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   devices,
@@ -176,5 +198,6 @@ export default combineReducers({
   editedDevice,
   removedDevice,
   connectDeviceWizard,
-  monetization
+  monetization,
+  auditLog
 });

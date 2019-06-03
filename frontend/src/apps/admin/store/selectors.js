@@ -1,14 +1,14 @@
 import Moment from "moment";
+import ms from "ms";
 import premiumPlans from "services/premium-plans";
 
 export const newDeviceDataSelector = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
   deviceId: state.connectDeviceWizard.deviceId,
-  calendarId: state.connectDeviceWizard.calendarId,
   deviceType: state.connectDeviceWizard.deviceType,
+  calendarId: state.connectDeviceWizard.calendarId,
   language: state.connectDeviceWizard.language,
-  clockType: state.connectDeviceWizard.clockType,
-  showAvailableRooms: state.connectDeviceWizard.showAvailableRooms
+  clockType: state.connectDeviceWizard.clockType
 });
 
 export const editDeviceDataSelector = state => ({
@@ -20,8 +20,17 @@ export const editDeviceDataSelector = state => ({
   clockType: state.editedDevice.data.clockType,
   minutesForCheckIn: state.editedDevice.data.minutesForCheckIn,
   minutesForStartEarly: state.editedDevice.data.minutesForStartEarly,
-  showAvailableRooms: state.editedDevice.data.showAvailableRooms
+  showAvailableRooms: state.editedDevice.data.showAvailableRooms,
+  showTentativeMeetings: state.editedDevice.data.showTentativeMeetings,
+  isReadOnlyDevice: state.editedDevice.data.isReadOnlyDevice,
+  recurringMeetingsCheckInTolerance: state.editedDevice.data.recurringMeetingsCheckInTolerance
 });
+
+export const isAuditLogVisibleSelector = state => state.auditLog.isVisible;
+export const isAuditLogLoadingSelector = state => state.auditLog.isLoading;
+export const auditLogEntriesSelector = state => state.auditLog.entries;
+
+export const isGoogleAccountSelector = state => state.user && state.user.provider === "google";
 
 export const removedDeviceIdSelector = state => state.removedDevice;
 
@@ -32,6 +41,10 @@ export const isCancelSubscriptionDialogOpenSelector = state => state.monetizatio
 export const isUpdatingSubscriptionDialogOpen = state => state.monetization.isUpdatingSubscription;
 
 export const isChoosePlanDialogOpenSelector = state => {
+  if (isOnPremisesSelector(state)) {
+    return false;
+  }
+
   if (state.monetization.isCheckoutOverlayOpen || state.monetization.isCancelSubscriptionDialogOpen || state.monetization.isUpdatingSubscription) {
     return false;
   }
@@ -50,6 +63,47 @@ export const isChoosePlanDialogOpenSelector = state => {
   }
 
   return false;
+};
+
+export const isOnPremisesSelector = state => currentSubscriptionPlanSelector(state) === premiumPlans.ON_PREMISES;
+
+export const isOnPremisesPaidPlan = state => {
+  if (!isOnPremisesSelector(state)) {
+    return false;
+  }
+  return state.user && state.user.properties && state.user.properties.lastAcceptanceOfEvaluation > Date.now();
+};
+
+export const isOnPremisesEvaluationExpiredDialogOpenSelector = state => {
+  if (!isOnPremisesSelector(state)) {
+    return false;
+  }
+
+  if (state.monetization.isCheckoutOverlayOpen) {
+    return false;
+  }
+
+  if (state.monetization.isChoosePlanDialogOpenByUser) {
+    return true;
+  }
+
+  if (!state.user || !state.user.properties) {
+    return false;
+  }
+
+  if(!state.user.properties.lastAcceptanceOfEvaluation) {
+    return true;
+  }
+
+  return (state.user.properties.lastAcceptanceOfEvaluation < Date.now() - ms("2 weeks"));
+};
+
+export const daysSinceJoinedSelector = state => {
+  if (!state.user || !state.user.createdAt) {
+    return 0;
+  }
+
+  return Math.floor((Date.now() - state.user.createdAt) / ms("1 day"));
 };
 
 export const subscriptionPassthroughSelector = state => state.user.subscriptionPassthrough;

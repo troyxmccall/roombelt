@@ -2,9 +2,10 @@ import { action } from "utils/redux";
 import cancellationToken from "utils/cancellation-token";
 import screenfull from "screenfull";
 import axios from "axios";
+import ms from "ms";
 
 import * as api from "services/api";
-import { createDevice, getDeviceDetails, removeAuth } from "services/api";
+import { createDevice, getDeviceDetails, removeDevice } from "services/api";
 
 import {
   calendarNameSelector,
@@ -12,8 +13,10 @@ import {
   currentMeetingSelector,
   isCalendarSelectedSelector,
   isDashboardDeviceSelector,
+  isDeviceRemovedSelector,
   isInitializedSelector,
   isInOfflineModeSelector,
+  isSubscriptionCancelledSelector,
   lastActivityOnShowCalendarsViewSelector,
   minutesLeftForCheckInSelector,
   showAllCalendarsViewSelector
@@ -73,7 +76,15 @@ export const deviceActions = {
       }
     }
 
-    const timeout = (isDashboardDeviceSelector(getState()) || isCalendarSelectedSelector(getState())) ? 30000 : 5000;
+    const timeout = function() {
+      const state = getState();
+
+      if (isDeviceRemovedSelector(state)) return ms("1 year");
+      if (isSubscriptionCancelledSelector(state)) return ms("10 min");
+      if (isDashboardDeviceSelector(state) || isCalendarSelectedSelector(state)) return ms("30s");
+
+      return ms("5s");
+    }();
 
     await wait(timeout);
 
@@ -88,7 +99,7 @@ export const deviceActions = {
     const meeting = currentMeetingSelector(getState());
 
     if (minutesLeftForCheckIn !== null && minutesLeftForCheckIn < 0) {
-      await api.deleteMeeting(meeting.id);
+      await api.deleteMeeting(meeting.id, true);
       dispatch(deviceActions.$fetchDeviceData());
     }
   },
@@ -112,11 +123,13 @@ export const deviceActions = {
       screenfull.onchange(updateStatus);
     }
   },
-  requestFullScreen: () => () => {
+  toggleFullScreen: () => () => {
     if (screenfull.enabled) {
-      screenfull.request();
+      screenfull.toggle();
     }
   },
+
+  changeFontSize: action(fontSizeDelta => ({ fontSizeDelta })),
 
   $updateOfflineStatus: action(isOffline => ({ isOffline })),
   $initializeOfflineObserver: () => (dispatch, getState) => {
@@ -162,7 +175,7 @@ export const deviceActions = {
   $setIsSubscriptionCancelled: action(isSubscriptionCancelled => ({ isSubscriptionCancelled })),
   $markRemoved: action(),
   disconnectDevice: () => async () => {
-    await removeAuth();
+    await removeDevice();
     window.location.reload();
   },
 
@@ -190,7 +203,7 @@ export const deviceActions = {
 export const meetingActions = {
   $startAction: action((currentAction) => ({ currentAction })),
   endAction: action(),
-  $setActionError: action(),
+  $setActionError: action(errorStatusCode => ({ errorStatusCode })),
   $setActionSource: action(source => ({ source })),
   $setActionIsRetrying: action(),
   $setActionSuccess: action(),
@@ -213,7 +226,7 @@ export const meetingActions = {
     dispatch(meetingActions.$startAction(meetingActions.cancelMeeting()));
 
     const currentMeetingId = currentMeetingSelector(getState()).id;
-    const deleteMeetingPromise = api.deleteMeeting(currentMeetingId);
+    const deleteMeetingPromise = api.deleteMeeting(currentMeetingId, false);
 
     dispatch(meetingActions.$handleMeetingActionPromise(deleteMeetingPromise));
   },
@@ -257,7 +270,9 @@ export const meetingActions = {
       dispatch(meetingActions.endAction());
     } catch (error) {
       console.error(error);
-      dispatch(meetingActions.$setActionError());
+
+      dispatch(deviceActions.$updateDeviceData(await getDeviceDetails()));
+      dispatch(meetingActions.$setActionError(error && error.response && error.response.status));
     }
   },
 

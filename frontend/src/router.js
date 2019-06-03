@@ -2,13 +2,13 @@ import React from "react";
 import i18next from "i18next";
 import { withRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
-import { getAuth } from "./services/api";
+import { getUserDetails } from "./services/api";
 
 import FatalError from "./theme/layouts/FatalError";
 import LoginApp from "./apps/login/Login";
 import AdminApp from "./apps/admin";
 import DeviceApp from "./apps/device";
-import { createDevice, isOnline } from "services/api";
+import { isOnline } from "services/api";
 
 class Login extends React.PureComponent {
   render = () => <LoginApp/>;
@@ -16,9 +16,9 @@ class Login extends React.PureComponent {
 
 class Admin extends React.PureComponent {
   async componentDidMount() {
-    const { scope, isAccessTokenValid } = await getAuth();
-
-    if (scope !== "admin" || !isAccessTokenValid) {
+    try {
+      await getUserDetails();
+    } catch (error) {
       window.location = "/";
     }
   }
@@ -27,14 +27,6 @@ class Admin extends React.PureComponent {
 }
 
 class Device extends React.PureComponent {
-  async componentDidMount() {
-    const { scope } = await getAuth();
-
-    if (scope !== "device") {
-      createDevice();
-    }
-  }
-
   render = () => <DeviceApp/>;
 }
 

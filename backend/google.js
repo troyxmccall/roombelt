@@ -7,9 +7,9 @@ router.post("/web_hook", async (req, res) => {
   const channelId = req.headers["x-goog-channel-id"];
   const token = req.headers["x-goog-channel-token"];
 
-  if (state !== "sync" && GoogleCalendar.watchersCache.get(token) === channelId) {
+  if (state !== "sync" && await GoogleCalendar.watchersCache.get(token) === channelId) {
     logger.debug(`clearing cache for ${channelId} ${token}`);
-    GoogleCalendar.valuesCache.delete(token);
+    await GoogleCalendar.valuesCache.delete(token);
   }
 
   logger.debug(`${state} ${token} ${channelId}`);
@@ -17,7 +17,7 @@ router.post("/web_hook", async (req, res) => {
   res.sendStatus(204);
 });
 
-router.get("/oauth_callback", require("./context"), async (req, res) => {
+router.get("/oauth_callback", require("./context").adminContext, async (req, res) => {
   if (req.query.error === "access_denied") {
     return res.redirect("/");
   }
@@ -40,10 +40,7 @@ router.get("/oauth_callback", require("./context"), async (req, res) => {
     return res.redirect(req.context.calendarProviders.google.getAuthUrl(true));
   }
 
-  await req.context.storage.session.updateSession(req.context.session.token, {
-    userId: tokens.userId,
-    scope: "admin"
-  });
+  await req.context.storage.session.updateSession(req.context.session.token, { adminUserId: tokens.userId });
 
   res.redirect(`/admin`);
 });
