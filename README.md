@@ -11,12 +11,14 @@ Sign-on to cloud version at [app.roombelt.com](https://app.roombelt.com).
 For instruction on installing Roombelt On-Premises visit
 [documentation](https://docs.roombelt.com/installation/on-premises).
 
+## Custom themes
+I provide professional services to customize Roombelt look & feel in order to meet your company visual identity.
+Reach me at [mateusz@roombelt.com](mailto:mateusz@roombelt.com) for details.
+
 ## Feedback
 
 Feel free to request new feature on [Github](https://github.com/ziolko/roombelt/issues)
 or contact me using the chat widget on [roombelt.com](https://roombelt.com).
-
-Development progress is tracked [here](https://github.com/roombelt/roombelt/projects/1?fullscreen=true).
 
 ## License
 [Apache 2.0 with Commons Clause](https://raw.githubusercontent.com/roombelt/roombelt/master/LICENSE.txt). 
