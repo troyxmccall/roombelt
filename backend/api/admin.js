@@ -171,7 +171,7 @@ router.delete("/admin/subscription", async function(req, res) {
 });
 
 router.get("/admin/audit", async function(req, res) {
-  const audit = await req.context.storage.audit.findEvents(req.context.session.adminUserId);
+  const audit = await req.context.storage.audit.findEvents(req.context.session.adminUserId, req.query.getAll === "true");
 
   res.json(audit.map(({ calendarId, meetingSummary, eventType, createdAt }) => ({
     createdAt,
