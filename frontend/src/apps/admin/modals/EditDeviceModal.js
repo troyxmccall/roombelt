@@ -142,13 +142,12 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
       </FormField>
       {device && device.deviceType === "dashboard" && <FormField>
         <FormFieldLabel>
-          Location (optional)
-          <InlineHelp>Name of the device shown in the administration panel.</InlineHelp>
+          Description
         </FormFieldLabel>
         <Input style={{ fontSize: 16, fontFamily: "inherit" }}
                value={device && device.location}
                onChange={event => onChangeLocation(event.target.value)}
-               placeholder="e.g. reception"/>
+               placeholder="e.g. reception dashboard"/>
       </FormField>}
       <FormField>
         <FormFieldLabel>Locale</FormFieldLabel>
