@@ -21,7 +21,7 @@ const mapEventForReport = calendars => event => {
   const calendar = calendars[event.calendarId];
 
   return ({
-    "Time": Moment(event.createdAt).format("L LTS"),
+    "Time": Moment(event.createdAt).toISOString(),
     "Event": eventTypes[event.eventType],
     "Room": calendar ? calendar.summary : "Unknown",
     "Meeting": event.meetingSummary
