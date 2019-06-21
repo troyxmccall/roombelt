@@ -53,11 +53,11 @@ const DisplayOptionsBar = props => {
 
   return (
     <Wrapper>
-      <Button tabindex={0} onClick={props.decreaseFontSize}>-</Button>
-      {props.isFullScreenSupported && <Button tabindex={0} onClick={props.requestFullScreen}>
+      <Button tabIndex={0} onClick={props.decreaseFontSize}>-</Button>
+      {props.isFullScreenSupported && <Button tabIndex={0} onClick={props.requestFullScreen}>
         {props.isFullScreen ? <IoAndroidContract/> : <IoAndroidExpand/>}
       </Button>}
-      <Button tabindex={0} onClick={props.increaseFontSize}>+</Button>
+      <Button tabIndex={0} onClick={props.increaseFontSize}>+</Button>
     </Wrapper>
   );
 };

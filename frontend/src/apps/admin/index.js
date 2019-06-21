@@ -2,11 +2,14 @@ import React from "react";
 import { Provider } from "react-redux";
 
 import { adminActions, monetizationActions } from "apps/admin/store/actions";
+import { getUserDetails } from "services/api";
 
 import store from "./store";
 
 class AdminApp extends React.PureComponent {
   componentDidMount() {
+    getUserDetails().then(null, () => window.location = "/");
+
     store.dispatch(adminActions.initialFetch());
     store.dispatch(monetizationActions.init());
 

@@ -36,13 +36,13 @@ async function getSubscriptionStatus(oauth) {
   };
 }
 
-const createContext = (cookieName, cookieTTL, alternateCookieName) => async (req, res) => {
+const createContext = (cookieName, cookieTTL) => async (req, res) => {
   if (!cookieName) {
     req.context = { storage };
     return "next";
   }
 
-  const session = await storage.session.getSession(req.cookies[cookieName]) || await storage.session.createSession();
+  const session = await storage.session.getSession(req.get(cookieName) || req.cookies[cookieName]) || await storage.session.createSession();
 
   const device = session.deviceId && await storage.devices.getDeviceById(session.deviceId);
   const userId = session.adminUserId || (device && device.userId);
@@ -65,22 +65,16 @@ const createContext = (cookieName, cookieTTL, alternateCookieName) => async (req
     subscriptionStatus,
     removeSession: async () => {
       await storage.session.deleteSession(req.context.session.token);
-      res.clearCookie(cookieName, { httpOnly: true });
-
-      // TODO: Remove after 1st of September
-      if (alternateCookieName) res.clearCookie(alternateCookieName, { httpOnly: true });
+      res.clearCookie(cookieName, { httpOnly: true, sameSite: true });
     }
   };
 
-  res.cookie(cookieName, session.token, { httpOnly: true, maxAge: cookieTTL });
-
-  // TODO: Remove after 1st of September
-  if (alternateCookieName) res.cookie(alternateCookieName, session.token, { httpOnly: true, maxAge: cookieTTL });
+  res.cookie(cookieName, session.token, { httpOnly: true, maxAge: cookieTTL, sameSite: true });
 
   return "next";
 };
 
 exports.emptyContext = createContext();
-exports.deviceContext = createContext("sessionToken", ms("1 year"), "deviceSessionToken");
+exports.deviceContext = createContext("deviceSessionToken", ms("1 year"));
 exports.adminContext = createContext("adminSessionToken", ms("1 day"));
 

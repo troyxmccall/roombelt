@@ -26,7 +26,6 @@ import { changeLanguage } from "i18n";
 import i18next from "i18next";
 import { wait, waitUntilTrue } from "utils/time";
 
-
 export const deviceActions = {
   $markInitialized: action(),
   initialize: () => async (dispatch, getState) => {

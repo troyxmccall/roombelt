@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Select from "react-select";
 
 const Select2 = React.forwardRef(({ autofocus, ...props }, fwRef) => {
@@ -6,8 +6,8 @@ const Select2 = React.forwardRef(({ autofocus, ...props }, fwRef) => {
     const ref = fwRef || innerRef;
 
     useEffect(() => {
-      if(autofocus) ref.current && ref.current.focus();
-    }, [autofocus]);
+      if (autofocus) ref.current && ref.current.focus();
+    }, [autofocus, ref]);
 
     function findSelectedOption(options) {
       for (let option of options) {

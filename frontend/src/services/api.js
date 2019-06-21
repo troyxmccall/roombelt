@@ -3,6 +3,10 @@ import axios from "axios";
 axios.interceptors.request.use(config => ({ ...config, url: config.url + "?_ts=" + Date.now() }));
 axios.interceptors.response.use(response => response.data);
 
+export function setHeader(name, value) {
+  axios.interceptors.request.use(config => ({ ...config, headers: { ...config.headers, [name]: value } }));
+}
+
 export async function isOnline() {
   try {
     await getApiVersion();

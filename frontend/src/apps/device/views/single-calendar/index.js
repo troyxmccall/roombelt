@@ -43,7 +43,6 @@ const TimeWrapper = styled.div`
 
 const StatusBar = styled(Partial)`
   display: flex;
-  justify-content: space-between;
   padding: 0.6rem 1.2rem;
   color: ${colors.foreground.white};
   align-items: center;
@@ -71,6 +70,7 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
 
     <StatusBar>
       <RoomStatus/>
+      <Spacer/>
       <Button subtle style={{ padding: "0.5rem", margin: "0 -0.5rem 0 0" }} onClick={showAllCalendarsView}>
         {i18next.t("actions.find-room")} <MdLayers/>
       </Button>

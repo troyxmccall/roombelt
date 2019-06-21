@@ -44,7 +44,7 @@ export default ({ currentStepKey, steps, footer, header, getStepStyle }) => {
 
     const handle = setTimeout(() => setVisibleStepKey(currentStepKey), 500);
     return () => clearTimeout(handle);
-  }, [currentStepKey]);
+  }, [currentStepKey, visibleStepKey]);
 
   return (
     <WizardLayout>
