@@ -65,11 +65,11 @@ const createContext = (cookieName, cookieTTL) => async (req, res) => {
     subscriptionStatus,
     removeSession: async () => {
       await storage.session.deleteSession(req.context.session.token);
-      res.clearCookie(cookieName, { httpOnly: true, sameSite: true });
+      res.clearCookie(cookieName, { httpOnly: true });
     }
   };
 
-  res.cookie(cookieName, session.token, { httpOnly: true, maxAge: cookieTTL, sameSite: true });
+  res.cookie(cookieName, session.token, { httpOnly: true, maxAge: cookieTTL });
 
   return "next";
 };
