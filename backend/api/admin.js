@@ -126,10 +126,13 @@ router.put("/admin/device/:deviceId", checkSubscription, async function(req, res
 
   if (req.body.calendarId) {
     const calendarsFromProvider = await req.context.calendarProvider.getCalendars();
-    const calendar = calendarsFromProvider.find(calendar => calendar.id === req.body.calendarId);
 
-    if (!calendar) {
-      return res.status(404).send(`No calendar with id ${req.body.calendarId}`);
+    for (let calendarId of req.body.calendarId.split(";")) {
+      if (calendarId === "all-connected-devices") continue;
+
+      if (!calendarsFromProvider.find(calendar => calendar.id === calendarId)) {
+        return res.status(404).send(`No calendar with id ${calendarId}`);
+      }
     }
   }
 

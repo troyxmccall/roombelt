@@ -18,6 +18,21 @@ const FormFieldLabel = styled.label`
   color: #333;
 `;
 
+const ViewWrapper = styled.div`
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+
+  > :first-child {
+    width: 180px;
+    margin-right: 20px;
+  }
+
+  > :last-child {
+    flex: 1 1 0;
+  }
+`;
+
 const LocaleWrapper = styled.div`
   display: flex;
   justify-content: stretch;
@@ -55,11 +70,6 @@ const InlineCheckbox = styled(Checkbox)`
 `;
 
 const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType, onChangeShowTentativeMeetings, onChangeReadOnlyDevice, onChangeRecurringMeetingsCheckInTolerance }) => {
-  const select = useRef();
-  useEffect(() => {
-    if (isVisible) select.current.focus();
-  }, [isVisible]);
-
   const footer = (
     <>
       <div style={{ flexGrow: 1 }}/>
@@ -70,24 +80,7 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
     </>
   );
 
-  const viewOptions = [
-    { label: "Dashboard", deviceType: "dashboard", calendarId: null, isDisabled: false },
-    {
-      label: "Calendars",
-      options: Object.values(calendars).map(calendar => ({
-        label: calendar.summary,
-        isReadOnly: !calendar.canModifyEvents,
-        deviceType: "calendar",
-        calendarId: calendar.id
-      }))
-    }
-  ];
-
-  const onOptionSelected = option => {
-    onChangeCalendar(option && option.calendarId);
-    onChangeType(option && option.deviceType);
-  };
-
+  const deviceTypes = [{ label: "Single calendar", value: "calendar" }, { label: "Dashboard", value: "dashboard" }];
   const currentCalendar = device && calendars && calendars[device.calendarId];
   const isReadOnly = (device && device.isReadOnlyDevice) || (currentCalendar && !currentCalendar.canModifyEvents);
 
@@ -100,16 +93,26 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
     >
       <FormField>
         <FormFieldLabel>View</FormFieldLabel>
-        <CalendarSelector
-          instanceId="edit-device-choose-calendar"
-          value={device}
-          onChange={onOptionSelected}
-          options={viewOptions}
-          ref={select}
-        />
+        <ViewWrapper>
+          <Select
+            instanceId="edit-device-choose-device-type"
+            value={device && device.deviceType}
+            onChange={option => option && onChangeType(option.value)}
+            options={deviceTypes}
+            autofocus={isVisible}
+            styles={{ container: base => ({ ...base, maxWidth: 180 }) }}
+          />
+          <CalendarSelector
+            instanceId="edit-device-choose-calendar"
+            isMulti={device && device.deviceType === "dashboard"}
+            value={device && device.calendarId}
+            onChange={onChangeCalendar}
+            options={calendars}
+          />
+        </ViewWrapper>
         {isGoogleAccount && (
           <Button link href="https://go.roombelt.com/scMpEB" target="_blank"
-                  style={{ fontSize: 12, margin: "5px 0 0 0", padding: "5px 3px" }}>
+                  style={{ fontSize: 12, margin: "5px 0 0 0", padding: "5px 3px", textAlign: 'right' }}>
             Why is my calendar read-only or absent?
           </Button>
         )}
@@ -145,7 +148,7 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
           Description
         </FormFieldLabel>
         <Input style={{ fontSize: 16, fontFamily: "inherit" }}
-               value={device && device.location}
+               value={(device && device.location) || ""}
                onChange={event => onChangeLocation(event.target.value)}
                placeholder="e.g. reception dashboard"/>
       </FormField>}
@@ -212,7 +215,7 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
           options={[
             { label: "Don't remove recurring meetings automatically", value: 0 },
             { label: "Remove recurring meetings if nobody checks-in 2 times in a row", value: 2 },
-            { label: "Remove recurring meetings if nobody checks-in 3 times in a row", value: 3 },
+            { label: "Remove recurring meetings if nobody checks-in 3 times in a row", value: 3 }
           ]}
           onChange={option => onChangeRecurringMeetingsCheckInTolerance(option.value)}
         />}

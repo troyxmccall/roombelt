@@ -8,7 +8,6 @@ import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
 import { translations } from "i18n";
 
 import {
-  Alert,
   Badge,
   Card,
   DropdownMenu,
@@ -79,16 +78,6 @@ const SingleDeviceRow = props => (
   </CalendarRowWrapper>
 );
 
-const EmptyDashboardWarning = () => (
-  <Alert warning>
-    <strong>Warning: </strong>
-    Dashboard shows a summary of all connected devices.
-    You didn't connect any other devices so the dashboard will be empty.
-    <br/><br/>
-    Please connect another device with calendar selected.
-  </Alert>
-);
-
 const Devices = props => {
   if (!props.isLoaded) {
     return (
@@ -115,25 +104,20 @@ const Devices = props => {
     />
   ));
 
-  const hasDashboardDevices = props.devices.some(device => device.deviceType === "dashboard");
-  const hasSingleCalendarDevices = props.devices.some(device => device.deviceType === "calendar" && props.calendars[device.calendarId]);
-
-  return (<>
-      {hasDashboardDevices && !hasSingleCalendarDevices && <EmptyDashboardWarning/>}
-      <Card block compact>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Device</TableHeaderColumn>
-              <TableHeaderColumn>Locale</TableHeaderColumn>
-              <TableHeaderColumn>Status</TableHeaderColumn>
-              <TableHeaderColumn style={{ width: 50 }}/>
-            </TableRow>
-          </TableHeader>
-          <TableBody children={rows}/>
-        </Table>
-      </Card>
-    </>
+  return (
+    <Card block compact>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderColumn>Device</TableHeaderColumn>
+            <TableHeaderColumn>Locale</TableHeaderColumn>
+            <TableHeaderColumn>Status</TableHeaderColumn>
+            <TableHeaderColumn style={{ width: 50 }}/>
+          </TableRow>
+        </TableHeader>
+        <TableBody children={rows}/>
+      </Table>
+    </Card>
   );
 };
 

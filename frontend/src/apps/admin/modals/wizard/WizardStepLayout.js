@@ -8,15 +8,16 @@ const Wrapper = styled.div`
   margin: 0;
   overflow: hidden;
   box-sizing: border-box;
-  height: 270px;
+  min-height: 270px;
 `;
 
 const Content = styled.div`
-  flex: 300px 0 0;
+  flex: 300px 1 0;
+  padding-bottom: 30px;
 `;
 
 const Image = styled.img`
-  height: 100%;
+  height: 270px;
   margin-left: 20px;
   flex: auto 0 1;
 `;

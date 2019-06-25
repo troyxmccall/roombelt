@@ -66,7 +66,13 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
     case editDeviceDialogActions.$startSubmitting:
       return { data: state.data, isSaving: true };
     case editDeviceDialogActions.setDeviceType:
-      return { data: { ...state.data, deviceType: action.deviceType } };
+      return {
+        data: {
+          ...state.data,
+          deviceType: action.deviceType,
+          calendarId: action.deviceType === "calendar" ? "" : "all-connected-devices"
+        }
+      };
     case editDeviceDialogActions.setCalendarId:
       return { data: { ...state.data, calendarId: action.calendarId } };
     case editDeviceDialogActions.setLocation:
@@ -133,7 +139,11 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
     case connectDeviceWizardActions.firstStep.$submitError:
       return { ...state, errorMessage: action.errorMessage, submitButton: null };
     case connectDeviceWizardActions.secondStep.setDeviceType:
-      return { ...state, deviceType: action.deviceType };
+      return {
+        ...state,
+        deviceType: action.deviceType,
+        calendarId: action.deviceType === "calendar" ? "" : "all-connected-devices"
+      };
     case connectDeviceWizardActions.secondStep.nextStep:
       return { ...state, currentStep: "configuration" };
     case connectDeviceWizardActions.thirdStep.previousStep:

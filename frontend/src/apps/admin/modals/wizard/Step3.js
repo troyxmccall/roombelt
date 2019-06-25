@@ -26,23 +26,18 @@ const LocaleWrapper = styled.div`
 
 const Content = ({ isDashboard, isGoogleAccount, calendars, calendarId, onSetCalendar, language, onSetLanguage, clockType, onSetClockType, showAvailableRooms, onSetShowAvailableRooms }) => {
   const { isCurrentStep, isTransitioning } = useWizard();
-  const calendarOptions = Object.values(calendars).map(calendar => ({
-    label: calendar.summary,
-    isReadOnly: !calendar.canModifyEvents,
-    deviceType: "calendar",
-    calendarId: calendar.id
-  }));
 
   const calendarSelector = (
     <>
       <Text large block>
-        Calendar
+        {isDashboard ? 'Calendars' : 'Calendar'}
       </Text>
       <CalendarSelector
-        instanceId="edit-device-choose-calendar"
-        value={calendarOptions.find(x => x.calendarId === calendarId)}
-        options={calendarOptions}
-        onChange={calendar => onSetCalendar(calendar && calendar.calendarId)}
+        instanceId="connect-device-choose-calendar"
+        isMulti={isDashboard}
+        value={calendarId}
+        options={calendars}
+        onChange={onSetCalendar}
         styles={{ container: base => ({ ...base, marginTop: 15, marginBottom: 10 }) }}
         menuPortalTarget={document.body}
         autofocus={isCurrentStep && !isTransitioning}
@@ -106,8 +101,7 @@ const Content = ({ isDashboard, isGoogleAccount, calendars, calendarId, onSetCal
 
   return (
     <WizardStepLayout img={require("./calendar.png")}>
-      {!isDashboard && calendarSelector}
-      {isDashboard && showAllAvailableRoomsSelector}
+      {calendarSelector}
       {languageSelector}
     </WizardStepLayout>
   );

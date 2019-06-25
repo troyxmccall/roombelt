@@ -9,22 +9,19 @@ const Select2 = React.forwardRef(({ autofocus, ...props }, fwRef) => {
       if (autofocus) ref.current && ref.current.focus();
     }, [autofocus, ref]);
 
-    function findSelectedOption(options) {
-      for (let option of options) {
-        if (props.getOptionValue(option) === props.value) {
+    function findSelectedOption(value) {
+      for (let option of props.options) {
+        if (props.getOptionValue(option) === value) {
           return option;
-        }
-
-        if (option.options) {
-          const subOption = findSelectedOption(option.options);
-          if (subOption) return subOption;
         }
       }
 
       return null;
     }
 
-    return <Select {...props} ref={ref || innerRef} value={findSelectedOption(props.options)}/>;
+    const value = props.isMulti ? props.value.map(findSelectedOption) : findSelectedOption(props.value);
+
+    return <Select {...props} ref={ref} value={value}/>;
   }
 );
 

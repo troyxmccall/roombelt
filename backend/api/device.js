@@ -73,14 +73,29 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
   };
 }
 
-async function getUserCalendars(req) {
-  const devices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
-  const calendarIds = devices
-    .map(device => device.deviceType === "calendar" && device.calendarId)
-    .filter(calendarId => calendarId);
+async function getAllCalendars(req) {
+  const device = req.context.device;
 
-  const uniqueCalendarIds = [...new Set(calendarIds)];
-  const calendars = await Promise.all(uniqueCalendarIds.map(
+  if (!device.calendarId) {
+    return [];
+  }
+
+  const includeUserCalendarsForFindRoom = device.deviceType === "calendar" && req.query["all-calendars"] === "true";
+  const includeUserCalendarsForDashboard = device.deviceType === "dashboard" && device.calendarId.split(";").includes("all-connected-devices");
+  const additionalCalendarIdsForDashboard = device.deviceType === "dashboard" && device.calendarId.split(";").filter(x => x !== "all-connected-devices");
+
+  const calendarIds = additionalCalendarIdsForDashboard || [];
+
+  if (includeUserCalendarsForDashboard || includeUserCalendarsForFindRoom) {
+    const userDevices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
+    const userCalendarIds = userDevices
+      .map(device => device.deviceType === "calendar" && device.calendarId)
+      .filter(calendarId => calendarId);
+
+    calendarIds.push(...userCalendarIds);
+  }
+
+  const calendars = await Promise.all([...new Set(calendarIds)].map(
     calendarId => getCalendarInfo(calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings))
   );
 
@@ -90,12 +105,7 @@ async function getUserCalendars(req) {
 router.get("/device", async function(req, res) {
   const device = req.context.device;
 
-  const isDashboard = device.deviceType === "dashboard";
-  const isCalendarSelected = device.calendarId;
-  const getAllCalendars = isDashboard || (isCalendarSelected && req.query["all-calendars"] === "true");
-
-  const calendar = isCalendarSelected ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
-  const allCalendars = getAllCalendars ? await getUserCalendars(req) : null;
+  const calendar = (device.deviceType === "calendar" && device.calendarId) ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
   const isReadOnlyDevice = device.isReadOnlyDevice || (calendar && !calendar.canModifyEvents);
 
   res.json({
@@ -108,7 +118,7 @@ router.get("/device", async function(req, res) {
     showAvailableRooms: device.showAvailableRooms,
     isReadOnlyDevice,
     calendar,
-    allCalendars
+    allCalendars: await getAllCalendars(req)
   });
 
   await req.context.storage.devices.heartbeatDevice(req.context.session.deviceId);
