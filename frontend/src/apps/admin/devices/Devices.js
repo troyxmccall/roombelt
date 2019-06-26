@@ -32,51 +32,59 @@ const CalendarRowWrapper = styled(TableRow)`
   }
 `;
 
-const SingleDeviceRow = props => (
-  <CalendarRowWrapper>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        {props.device.deviceType === "dashboard" && props.device.location}
-        {props.device.deviceType === "dashboard" && !props.device.location && <em>Dashboard</em>}
+const SingleDeviceRow = props => {
+  const hasDisplayName = !!props.device.displayName;
+  const isDashboard = props.device.deviceType === "dashboard";
+  const hasCalendar = !!props.calendar;
 
-        {props.device.deviceType === "calendar" && !props.calendar && <em>No calendar connected</em>}
-        {props.device.deviceType === "calendar" && props.calendar && <>
-          {props.calendar.summary}
-          {" "}
-          {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
-            <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+  return (
+    <CalendarRowWrapper>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          {hasDisplayName && props.device.displayName}
+          {!hasDisplayName && isDashboard && <em>Dashboard</em>}
+          {!hasDisplayName && !isDashboard && !hasCalendar && <em>No calendar connected</em>}
+          {!hasDisplayName && !isDashboard && hasCalendar && (
+            <>
+              {props.calendar.summary}
+              {" "}
+              {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
+                <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+              )}
+            </>
           )}
-        </>}
-      </Text>
-      <Text muted small>
-        Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        {translations[props.device.language].language}
-      </Text>
-      <Text muted small>
-        {props.device.clockType}h clock
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        <StatusIcon success={props.device.isOnline} danger={!props.device.isOnline}/>
-        {props.device.isOnline ? "Online" : "Offline"}
-      </Text>
-      <Text muted small>
-        {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn style={{ textAlign: "right" }}>
-      <DropdownMenu trigger={<IoAndroidMoreVertical style={{ cursor: "pointer", color: "#555" }}/>}>
-        <DropdownMenuItem onClick={props.onConfigureClicked}>Configure</DropdownMenuItem>
-        <DropdownMenuItem onClick={props.onDeleteClicked}>Disconnect</DropdownMenuItem>
-      </DropdownMenu>
-    </TableRowColumn>
-  </CalendarRowWrapper>
-);
+          {props.device.location && <span> ({props.device.location})</span>}
+        </Text>
+        <Text muted small>
+          Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          {translations[props.device.language].language}
+        </Text>
+        <Text muted small>
+          {props.device.clockType}h clock
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          <StatusIcon success={props.device.isOnline} danger={!props.device.isOnline}/>
+          {props.device.isOnline ? "Online" : "Offline"}
+        </Text>
+        <Text muted small>
+          {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn style={{ textAlign: "right" }}>
+        <DropdownMenu trigger={<IoAndroidMoreVertical style={{ cursor: "pointer", color: "#555" }}/>}>
+          <DropdownMenuItem onClick={props.onConfigureClicked}>Configure</DropdownMenuItem>
+          <DropdownMenuItem onClick={props.onDeleteClicked}>Disconnect</DropdownMenuItem>
+        </DropdownMenu>
+      </TableRowColumn>
+    </CalendarRowWrapper>
+  );
+};
 
 const Devices = props => {
   if (!props.isLoaded) {

@@ -86,8 +86,9 @@ async function getAllCalendars(req) {
 
   const calendarIds = additionalCalendarIdsForDashboard || [];
 
+  const userDevices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
+
   if (includeUserCalendarsForDashboard || includeUserCalendarsForFindRoom) {
-    const userDevices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
     const userCalendarIds = userDevices
       .map(device => device.deviceType === "calendar" && device.calendarId)
       .filter(calendarId => calendarId);
@@ -99,7 +100,12 @@ async function getAllCalendars(req) {
     calendarId => getCalendarInfo(calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings))
   );
 
-  return calendars.filter(calendar => calendar);
+  const userDevicesWithDisplayName = userDevices.filter(x => x.displayName).sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+  return calendars.filter(calendar => calendar).map(calendar => {
+    const device = userDevicesWithDisplayName.find(x => x.calendarId === calendar.id);
+    return { ...calendar, name: device ? device.displayName : calendar.name };
+  });
 }
 
 router.get("/device", async function(req, res) {
@@ -108,9 +114,14 @@ router.get("/device", async function(req, res) {
   const calendar = (device.deviceType === "calendar" && device.calendarId) ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
   const isReadOnlyDevice = device.isReadOnlyDevice || (calendar && !calendar.canModifyEvents);
 
+  if (calendar && device && device.displayName) {
+    calendar.name = device.displayName;
+  }
+
   res.json({
     deviceType: device.deviceType,
     language: process.env["REFRESH_LANG"] || device.language,
+    displayName: device.displayName,
     clockType: device.clockType,
     connectionCode: device.connectionCode,
     minutesForCheckIn: isReadOnlyDevice ? 0 : device.minutesForCheckIn,

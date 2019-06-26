@@ -18,7 +18,7 @@ import colors from "dark/colors";
 import Time from "theme/components/Time";
 import RowView from "./RowView";
 import CalendarRow from "./CalendarRow";
-import { fontSizeSelector } from "../../store/selectors";
+import { displayNameSelector, fontSizeSelector } from "../../store/selectors";
 
 const Header = styled(Section).attrs({ header: true })`
   padding: 0.4rem 0.85rem 0.2rem 0.85rem;
@@ -40,19 +40,18 @@ const NoMeetingsInfo = styled.div`
   margin-top: 35vh;
 `;
 
-const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRooms, fontSize }) => {
+const Dashboard = ({ timestamp, isAmPmClock, displayName, events, calendars, showAvailableRooms, fontSize }) => {
   const hasAnyRows = events.length > 0 || (showAvailableRooms && calendars.length > 0);
 
   return (
     <Layout style={{ overflow: "hidden" }} fontSize={fontSize}>
       <PageLoaded/>
       <Header>
-        <span>{i18next.t("dashboard.page-title")}</span>
+        <span>{displayName || i18next.t("dashboard.page-title")}</span>
         <span>
           <Time timestamp={timestamp} ampm={isAmPmClock} smallSuffix blinking/>
         </span>
       </Header>
-
       {hasAnyRows && (
         <RowView
           style={{ fontSize: "0.6rem", paddingBottom: 0 }}
@@ -74,6 +73,7 @@ const Dashboard = ({ timestamp, isAmPmClock, events, calendars, showAvailableRoo
 
 const mapStateToProps = state => ({
   timestamp: timestampSelector(state),
+  displayName: displayNameSelector(state),
   calendars: allCalendarsSelector(state),
   events: dashboardMeetingsSelector(state),
   isAmPmClock: isAmPmClockSelector(state),

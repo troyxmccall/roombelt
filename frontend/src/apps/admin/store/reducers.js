@@ -77,6 +77,8 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
       return { data: { ...state.data, calendarId: action.calendarId } };
     case editDeviceDialogActions.setLocation:
       return { data: { ...state.data, location: action.location } };
+    case editDeviceDialogActions.setDisplayName:
+      return { data: { ...state.data, displayName: action.displayName } };
     case editDeviceDialogActions.setLanguage:
       return { data: { ...state.data, language: action.language } };
     case editDeviceDialogActions.setClockType:
@@ -117,7 +119,6 @@ const defaultConnectDeviceWizardState = {
   calendarId: null,
   language: "en-US",
   clockType: 12,
-  showAvailableRooms: true,
   errorMessage: null,
   submitButton: null
 };
@@ -154,8 +155,6 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...state, language: action.language };
     case connectDeviceWizardActions.thirdStep.setClockType:
       return { ...state, clockType: action.clockType };
-    case connectDeviceWizardActions.thirdStep.setShowAvailableRooms:
-      return { ...state, showAvailableRooms: action.showAvailableRooms };
     default:
       return state;
   }

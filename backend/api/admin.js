@@ -5,11 +5,12 @@ const context = require("../context");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, displayName, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) => ({
   id: deviceId,
   createdAt: new Date(createdAt).getTime(),
   deviceType,
   calendarId,
+  displayName,
   location,
   minutesForCheckIn,
   minutesForStartEarly,

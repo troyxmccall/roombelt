@@ -10,7 +10,8 @@ import {
   getConnectedDevices,
   getUserDetails,
   setOptionsForDevice,
-  setSubscriptionPlan
+  setSubscriptionPlan,
+  setUserProperty
 } from "services/api";
 
 import {
@@ -23,7 +24,6 @@ import {
 } from "./selectors";
 import { isCheckoutOverlayOpenSelector, subscriptionPassthroughSelector } from "apps/admin/store/selectors";
 import { wait } from "utils/time";
-import { setUserProperty } from "services/api";
 
 export const adminActions = {
   $setDevices: action(devices => ({ devices })),
@@ -73,7 +73,7 @@ export const connectDeviceWizardActions = {
 
     const { deviceId, deviceType, calendarId, language, clockType } = newDeviceDataSelector(getState());
 
-    await setOptionsForDevice(deviceId, deviceType, calendarId, "", language, 0, 5, true, true, false, clockType, 0);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, "", "", language, 0, 5, true, true, false, clockType, 0);
 
     const allDevices = await getConnectedDevices();
     dispatch(adminActions.$setDevices(allDevices));
@@ -114,7 +114,6 @@ export const connectDeviceWizardActions = {
     setCalendarId: action(calendarId => ({ calendarId })),
     setLanguage: action(language => ({ language })),
     setClockType: action(clockType => ({ clockType })),
-    setShowAvailableRooms: action(showAvailableRooms => ({ showAvailableRooms })),
     previousStep: action(),
     submit: () => async dispatch => {
       dispatch(connectDeviceWizardActions.submit(false));
@@ -127,6 +126,7 @@ export const editDeviceDialogActions = {
   hide: action(),
   setDeviceType: action(deviceType => ({ deviceType })),
   setCalendarId: action(calendarId => ({ calendarId })),
+  setDisplayName: action(displayName => ({ displayName })),
   setLocation: action(location => ({ location })),
   setLanguage: action(language => ({ language })),
   setClockType: action(clockType => ({ clockType })),
@@ -138,10 +138,10 @@ export const editDeviceDialogActions = {
   setRecurringMeetingsCheckInTolerance: action(recurringMeetingsCheckInTolerance => ({ recurringMeetingsCheckInTolerance })),
   $startSubmitting: action(),
   submit: () => async (dispatch, getState) => {
-    const { deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance } = editDeviceDataSelector(getState());
+    const { deviceId, deviceType, calendarId, displayName, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance } = editDeviceDataSelector(getState());
 
     dispatch(editDeviceDialogActions.$startSubmitting());
-    await setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance);
+    await setOptionsForDevice(deviceId, deviceType, calendarId, displayName, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance);
 
     dispatch(adminActions.$setDevices(await getConnectedDevices()));
     dispatch(editDeviceDialogActions.hide());
@@ -268,7 +268,7 @@ export const monetizationActions = {
       locale: "en",
       passthrough: null,
       closeCallback: async () => {
-        dispatch(monetizationActions.$toggleOverlay(false))
+        dispatch(monetizationActions.$toggleOverlay(false));
       },
       successCallback: async () => {
         await setUserProperty("lastAcceptanceOfEvaluation", Date.now() + ms("100 years"));
