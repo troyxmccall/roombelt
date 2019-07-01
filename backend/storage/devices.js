@@ -11,7 +11,7 @@ module.exports = class {
       language: { type: Sequelize.STRING, defaultValue: "en-US" },
       clockType: { type: Sequelize.INTEGER, defaultValue: 24 },
       deviceType: { type: Sequelize.STRING, defaultValue: "calendar" },
-      calendarId: Sequelize.STRING,
+      calendarId: Sequelize.TEXT,
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
       lastActivityAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
