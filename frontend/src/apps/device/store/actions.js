@@ -130,6 +130,8 @@ export const deviceActions = {
 
   changeFontSize: action(fontSizeDelta => ({ fontSizeDelta })),
 
+  toggleTwoColumnLayout: action(),
+
   $updateOfflineStatus: action(isOffline => ({ isOffline })),
   $initializeOfflineObserver: () => (dispatch, getState) => {
     const successCallback = result => {

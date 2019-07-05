@@ -1,15 +1,24 @@
 import React, { useRef } from "react";
 import styled, { css } from "styled-components/macro";
 import { useIsVisible } from "utils/react";
-import Section, { partialMixin } from "dark/Section";
+import Section  from "dark/Section";
 import colors from "dark/colors";
 
 
 const RowWrapper = styled(Section)`
   color: ${colors.foreground.white};
   padding: 0.3rem 0.85rem;
-  
-  :first-child { ${partialMixin} }
+  ${props => props.header && css`
+    font-size: 0.6rem;
+  `}
+
+  ${props => !props.header && css`
+    background: transparent;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem 0.85rem 0 0.85rem;
+  `}
 `;
 
 const RowContent = styled.div`

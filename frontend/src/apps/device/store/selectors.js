@@ -1,5 +1,5 @@
 import { createSelector } from "reselect";
-import { timeDifferenceInMinutes } from "../../../services/formatting";
+import { timeDifferenceInMinutes } from "services/formatting";
 
 export const isSubscriptionCancelledSelector = state => state.appState.isSubscriptionCancelled;
 export const isDeviceRemovedSelector = state => state.appState.isRemoved;
@@ -17,6 +17,7 @@ export const actionErrorStatusCodeSelector = state => state.currentMeetingAction
 export const isActionSuccessSelector = state => state.currentMeetingActions.isSuccess;
 export const isRetryingActionSelector = state => state.currentMeetingActions.isRetrying;
 export const fontSizeSelector = state => state.displayOptions.fontSize;
+export const isTwoColumnLayoutSelector = state => state.displayOptions.isTwoColumnLayout;
 
 export const calendarSelector = (state, props) => {
   if (!props || !props.calendarId) {
