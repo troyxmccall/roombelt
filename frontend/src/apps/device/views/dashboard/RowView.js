@@ -43,7 +43,7 @@ const MeetingSummary = styled.div`
 `;
 
 const CalendarName = styled.div`
-  flex: 0.6 1 0;
+  flex: 0.8 1 0;
   padding: 0 0.5rem;
   
   text-overflow: ellipsis;
