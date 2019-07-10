@@ -1,7 +1,20 @@
+import React from "react";
 import styled, { css } from "styled-components/macro";
 import colors from "./colors";
 
-export default styled.button`
+const ButtonWithTouchSupport = ({ onClick, ...props }) => (
+  <button
+    onTouchStart={() => ButtonWithTouchSupport.isTouchModeEnabled = true}
+    onTouchEnd={onClick}
+    onClick={event => {
+      if (!ButtonWithTouchSupport.isTouchModeEnabled && onClick) onClick(event);
+      ButtonWithTouchSupport.isTouchModeEnabled = false;
+    }}
+    {...props}
+  />
+);
+
+export default styled(ButtonWithTouchSupport)`
   min-width: 5em;
   padding: 0.3em;
   text-align: center;
@@ -16,6 +29,7 @@ export default styled.button`
   border: 0.1em solid #606060;
   background: transparent;
   margin-right: .5em;
+  user-select: none;
   
   ${props => !props.disabled && css`
     cursor: pointer;
