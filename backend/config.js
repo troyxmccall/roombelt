@@ -33,7 +33,7 @@ const result = {
 
 if (!result.databaseUrl) {
   console.log(chalk.red("Error: Database connection string has not been provided."));
-  console.log(chalk.red("Take a look at https://docs.roombelt.com/installing-locally for instructions."));
+  console.log(chalk.red("Take a look at https://docs.roombelt.com/installation/on-premises for instructions."));
   process.exit(1);
 }
 
