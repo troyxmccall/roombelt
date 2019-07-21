@@ -31,7 +31,7 @@ const getStatusMessage = (meeting, timestamp, isAmPmClock) => {
   return t("dashboard.ends-in", Math.ceil(minutesToEnd));
 };
 
-const EventRow = ({ meeting, timestamp, isAmPmClock }) => {
+const EventRow = ({ meeting, timestamp, isAmPmClock, fixedHeight }) => {
   const meetingSummary = (
     <>
       {getMeetingSummary(meeting)}
@@ -50,7 +50,10 @@ const EventRow = ({ meeting, timestamp, isAmPmClock }) => {
     </Status>
   );
 
-  return <RowView meetingRoom={meeting.calendar.name} meetingStatus={meetingStatus} meetingSummary={meetingSummary}/>;
+  return <RowView meetingRoom={meeting.calendar.name}
+                  meetingStatus={meetingStatus}
+                  meetingSummary={meetingSummary}
+                  fixedHeight={fixedHeight}/>;
 };
 
 const mapStateToProps = state => ({

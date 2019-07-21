@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import styled, { css } from "styled-components/macro";
 import { useIsVisible } from "utils/react";
-import Section  from "dark/Section";
+import Section from "dark/Section";
 import colors from "dark/colors";
 
 
@@ -29,7 +29,12 @@ const RowContent = styled.div`
     background: #424242;
     box-sizing: border-box;
     padding: 0.5rem 0;    
-`};
+  `};
+  
+  ${props => props.fixedHeight && css`
+    padding: 0;
+    height: 2.8em;
+  `};
 `;
 
 const MeetingSummary = styled.div`
@@ -56,13 +61,13 @@ const MeetingStatus = styled.div`
   padding: 0 0.5rem;
 `;
 
-export default ({ meetingSummary, meetingRoom, meetingStatus, header, style = {} }) => {
+export default ({ meetingSummary, meetingRoom, meetingStatus, header, fixedHeight, style = {} }) => {
   const elRef = useRef();
   const isVisible = useIsVisible(elRef);
 
   return (
     <RowWrapper header={header} style={{ visibility: isVisible ? "visible" : "hidden", ...style }}>
-      <RowContent header={header} ref={elRef}>
+      <RowContent header={header} fixedHeight={fixedHeight} ref={elRef}>
         <MeetingSummary header={header}>{meetingSummary}</MeetingSummary>
         <CalendarName>{meetingRoom}</CalendarName>
         <MeetingStatus>{meetingStatus}</MeetingStatus>

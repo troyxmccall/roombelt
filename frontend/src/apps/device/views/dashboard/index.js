@@ -99,9 +99,10 @@ const Dashboard = ({ timestamp, isAmPmClock, displayName, events, calendars, sho
       <ColumnsWrapper>
         {!hasAnyRows && <NoMeetingsInfo>{i18next.t("dashboard.no-meetings")}</NoMeetingsInfo>}
         {hasAnyRows && <Columns columnsCount={columnsCount}>
-          {showAvailableRooms && calendars.map((calendar, index) => <CalendarRow key={index}
+          {showAvailableRooms && calendars.map((calendar, index) => <CalendarRow fixedHeight={columnsCount !== 1}
+                                                                                 key={index}
                                                                                  calendarId={calendar.id}/>)}
-          {events.map((event, index) => <EventRow key={index} meeting={event}/>)}
+          {events.map((event, index) => <EventRow key={index} meeting={event} fixedHeight={columnsCount !== 1}/>)}
           {Array(1000).fill(1).map(() => <div style={{ visibility: "hidden" }}>&nbsp;</div>)}
         </Columns>}
       </ColumnsWrapper>
