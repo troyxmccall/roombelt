@@ -35,6 +35,7 @@
     "start-early": "Jetzt starten",
     "cancel-meeting": "Meeting absagen",
     "find-room": "Raum finden",
+    "calendar-view": "Kalender",
     "check-in-warning": "Sein Meeting wird automatisch in {{ count }} Minuten abgesagt."
   },
   "full-screen": "Vollbild",

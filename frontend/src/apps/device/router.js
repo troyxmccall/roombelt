@@ -8,7 +8,8 @@ import {
   isDeviceConnectedSelector,
   isDeviceRemovedSelector,
   isSubscriptionCancelledSelector,
-  showAllCalendarsViewSelector
+  showAllCalendarsViewSelector,
+  showTodayScheduleViewSelector
 } from "./store/selectors";
 
 import Dashboard from "./views/dashboard";
@@ -18,8 +19,9 @@ import ConnectionCode from "./views/connect/ConnectionCode";
 import NoCalendar from "./views/connect/NoCalendar";
 import FatalError from "theme/layouts/FatalError";
 import { deviceActions } from "apps/device/store/actions";
+import TodaySchedule from "./views/today-schedule";
 
-const Router = ({ connectionCode, isDashboardDevice, isCalendarSelected, isDeviceConnected, isDeviceRemoved, isSubscriptionCancelled, isOffline, disconnectDevice, showAllCalendarsView }) => {
+const Router = ({ connectionCode, isDashboardDevice, isCalendarSelected, isDeviceConnected, isDeviceRemoved, isSubscriptionCancelled, isOffline, disconnectDevice, showAllCalendarsView, showTodayScheduleView }) => {
   if (isOffline) return <FatalError title={i18next.t("errors.unable-to-connect-server")}/>;
   if (isDeviceRemoved) return <FatalError title={i18next.t("errors.device-disconnected-title")}
                                           subtitle={i18next.t("errors.device-disconnected-message")}
@@ -28,6 +30,7 @@ const Router = ({ connectionCode, isDashboardDevice, isCalendarSelected, isDevic
   if (isSubscriptionCancelled) return <FatalError title={i18next.t("errors.subscription-cancelled")}/>;
   if (isDashboardDevice) return <Dashboard/>;
   if (showAllCalendarsView) return <AllCalendars/>;
+  if (showTodayScheduleView) return <TodaySchedule/>;
   if (isCalendarSelected) return <SingleCalendar/>;
   if (isDeviceConnected) return <NoCalendar/>;
   if (connectionCode) return <ConnectionCode connectionCode={connectionCode}/>;
@@ -44,7 +47,8 @@ const mapStateToProps = state => ({
   isCalendarSelected: isCalendarSelectedSelector(state),
   isDeviceRemoved: isDeviceRemovedSelector(state),
   isSubscriptionCancelled: isSubscriptionCancelledSelector(state),
-  showAllCalendarsView: showAllCalendarsViewSelector(state)
+  showAllCalendarsView: showAllCalendarsViewSelector(state),
+  showTodayScheduleView: showTodayScheduleViewSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({

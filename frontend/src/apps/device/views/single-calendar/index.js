@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components/macro";
-import MdLayers from "react-icons/lib/md/layers";
+import MdLayers from "react-icons/lib/md/search";
+import MdToday from "react-icons/lib/md/today";
 
 import {
   calendarNameSelector,
@@ -56,7 +57,7 @@ const Spacer = styled.div`
   flex-grow: 1;
 `;
 
-const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, currentTimestamp, isAmPmClock, fontSize }) => (
+const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, showTodayScheduleView, currentTimestamp, isAmPmClock, fontSize }) => (
   <Layout flexbox fontSize={fontSize}>
     <PageLoaded/>
     <Header>
@@ -71,9 +72,14 @@ const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAl
     <StatusBar>
       <RoomStatus/>
       <Spacer/>
-      <Button subtle style={{ padding: "0.5rem", margin: "0 -0.5rem 0 0" }} onClick={showAllCalendarsView}>
-        {i18next.t("actions.find-room")} <MdLayers/>
-      </Button>
+      <div>
+        <Button subtle style={{ padding: "0.5rem" }} onClick={showTodayScheduleView}>
+          {i18next.t("actions.calendar-view")} <MdToday/>
+        </Button>
+        <Button subtle style={{ padding: "0.5rem", margin: "0 -0.5rem 0 0" }} onClick={showAllCalendarsView}>
+          {i18next.t("actions.find-room")} <MdLayers/>
+        </Button>
+      </div>
     </StatusBar>
 
     <CurrentMeeting/>
@@ -97,8 +103,9 @@ const mapStateToProps = state => ({
   fontSize: fontSizeSelector(state)
 });
 
-const mapDispatchToProps = dispatch => ({
-  showAllCalendarsView: () => dispatch(deviceActions.showAllCalendarsView())
-});
+const mapDispatchToProps = {
+  showAllCalendarsView: deviceActions.showAllCalendarsView,
+  showTodayScheduleView: deviceActions.showTodayScheduleView
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(CalendarView);

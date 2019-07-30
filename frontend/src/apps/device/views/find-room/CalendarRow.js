@@ -143,12 +143,12 @@ const mapStateToProps = (state, { calendarId }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   createMeeting: (calendarId, minutes, source) => {
-    dispatch(deviceActions.$allCalendarsViewActivity());
+    dispatch(deviceActions.markDeviceViewActivity());
     dispatch(meetingActions.createMeetingInAnotherRoom(calendarId, minutes));
     dispatch(meetingActions.$setActionSource(source));
   },
   acknowledgeMeetingCreated: () => {
-    dispatch(deviceActions.$allCalendarsViewActivity());
+    dispatch(deviceActions.markDeviceViewActivity());
     dispatch(meetingActions.endAction());
   }
 });

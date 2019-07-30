@@ -35,6 +35,7 @@
     "start-early": "Börja tidigare",
     "cancel-meeting": "Avbryta mötet",
     "find-room": "Hitta rum",
+    "calendar-view": "Kalender",
     "check-in-warning": "Det här mötet avbryts automatiskt om {{ count }} min."
   },
   "full-screen": "Fullskärm",

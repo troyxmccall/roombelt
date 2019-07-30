@@ -7,8 +7,9 @@ export const isInitializedSelector = state => state.appState.isInitialized;
 export const timestampSelector = state => state.timestamp;
 export const deviceSelector = state => state.device;
 export const isInOfflineModeSelector = state => state.appState.isOffline;
-export const showAllCalendarsViewSelector = state => state.appState.showAllCalendarsView;
-export const lastActivityOnShowCalendarsViewSelector = state => state.appState.lastActivityOnShowCalendarsView;
+export const showAllCalendarsViewSelector = state => state.appState.currentDeviceView === "all-calendars";
+export const showTodayScheduleViewSelector = state => state.appState.currentDeviceView === "today-schedule";
+export const lastActivityOnDeviceViewSelector = state => state.appState.lastActivityOnShowCalendarsView;
 export const connectionCodeSelector = state => state.device && state.device.connectionCode;
 export const currentActionSelector = state => state.currentMeetingActions.currentAction;
 export const currentActionSourceSelector = state => state.currentMeetingActions.source;
@@ -36,7 +37,7 @@ export const isReadOnlyDeviceSelector = createSelector(deviceSelector, device =>
 
 export const displayNameSelector = createSelector(deviceSelector, device => device && device.displayName);
 export const allCalendarsSelector = createSelector(deviceSelector, device => (device && device.allCalendars) || []);
-export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && !!device.allCalendars);
+export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && device.allCalendars && device.allCalendars.length);
 
 export const requireCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn > 0);
 export const minutesForCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn);

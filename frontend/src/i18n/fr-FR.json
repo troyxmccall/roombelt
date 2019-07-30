@@ -35,6 +35,7 @@
     "start-early": "Commencer plus tôt",
     "cancel-meeting": "Annuler la réunion",
     "find-room": "Trouver une salle",
+    "calendar-view": "Calendrier",
     "check-in-warning": "Cette réunion sera annulée dans {{ count }} min."
   },
   "full-screen": "Pein écran",

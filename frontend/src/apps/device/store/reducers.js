@@ -60,7 +60,7 @@ const appState = (state = {
   isRemoved: false,
   isInitialized: false,
   isOffline: false,
-  showAllCalendarsView: false,
+  currentDeviceView: null,
   lastActivityOnShowCalendarsView: null
 }, action) => {
   switch (action.type) {
@@ -72,9 +72,9 @@ const appState = (state = {
       return { ...state, isSubscriptionCancelled: action.isSubscriptionCancelled };
     case deviceActions.$updateOfflineStatus:
       return { ...state, isOffline: action.isOffline };
-    case deviceActions.$updateShowAllCalendarsView:
-      return { ...state, showAllCalendarsView: action.showAllCalendarsView };
-    case deviceActions.$allCalendarsViewActivity:
+    case deviceActions.$setCurrentDeviceView:
+      return { ...state, currentDeviceView: action.currentDeviceView };
+    case deviceActions.markDeviceViewActivity:
       return { ...state, lastActivityOnShowCalendarsView: action.timestamp };
     default:
       return state;

@@ -52,8 +52,6 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
   const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId, { showTentativeMeetings });
 
   const events = calendarId && calendarEvents
-    .filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now())
-    .slice(0, 10)
     .map(event => !event.isPrivate ? event : {
       ...event,
       summary: null,
