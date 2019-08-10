@@ -5,12 +5,6 @@ focused on simplicity. Works both in Cloud and On-Premises.
 
 ![Tablet with roombelt installed](https://roombelt.com/img/tablet.png)
 
-## Installation
-
-Sign-on to cloud version at [app.roombelt.com](https://app.roombelt.com).
-For instruction on installing Roombelt On-Premises visit
-[documentation](https://docs.roombelt.com/installation/on-premises).
-
 ## Custom themes
 I provide professional services to customize Roombelt look & feel in order to meet your company visual identity.
 Reach me at [mateusz@roombelt.com](mailto:mateusz@roombelt.com) for details.
