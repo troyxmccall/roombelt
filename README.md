@@ -3,7 +3,7 @@
 [Roombelt](https://roombelt.com) is a meeting room manager
 focused on simplicity. Works both in Cloud and On-Premises.
 
-![Tablet with roombelt installed](https://roombelt.com/img/tablet.png)
+![Tablet with roombelt installed](https://roombelt.com/assets/img/tablet.png)
 
 ## Custom themes
 I provide professional services to customize Roombelt look & feel in order to meet your company visual identity.
@@ -15,9 +15,9 @@ Feel free to request new feature on [Github](https://github.com/ziolko/roombelt/
 or contact me using the chat widget on [roombelt.com](https://roombelt.com).
 
 ## License
-[Apache 2.0 with Commons Clause](https://raw.githubusercontent.com/roombelt/roombelt/master/LICENSE.txt). 
+[Apache 2.0 with Commons Clause](https://raw.githubusercontent.com/ziolko/roombelt/master/LICENSE.txt). 
 
 ---
 
 Cross-browser testing provided by: <br><br>
-<a href="http://browserstack.com"><img height="50" src="https://roombelt.com/img/browserstack-logo.svg" alt="BrowserStack"></a>
+<a href="http://browserstack.com"><img height="50" src="https://i1.wp.com/www.diogonunes.com/blog/wp-content/uploads/2016/07/browserstack-logo.png?resize=840%2C276" alt="BrowserStack"></a>
