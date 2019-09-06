@@ -68,45 +68,6 @@ export const isChoosePlanDialogOpenSelector = state => {
 
 export const isOnPremisesSelector = state => currentSubscriptionPlanSelector(state) === premiumPlans.ON_PREMISES;
 
-export const isOnPremisesPaidPlan = state => {
-  if (!isOnPremisesSelector(state)) {
-    return false;
-  }
-  return state.user && state.user.properties && state.user.properties.lastAcceptanceOfEvaluation > Date.now();
-};
-
-export const isOnPremisesEvaluationExpiredDialogOpenSelector = state => {
-  if (!isOnPremisesSelector(state)) {
-    return false;
-  }
-
-  if (state.monetization.isCheckoutOverlayOpen) {
-    return false;
-  }
-
-  if (state.monetization.isChoosePlanDialogOpenByUser) {
-    return true;
-  }
-
-  if (!state.user || !state.user.properties) {
-    return false;
-  }
-
-  if(!state.user.properties.lastAcceptanceOfEvaluation) {
-    return true;
-  }
-
-  return (state.user.properties.lastAcceptanceOfEvaluation < Date.now() - ms("2 weeks"));
-};
-
-export const daysSinceJoinedSelector = state => {
-  if (!state.user || !state.user.createdAt) {
-    return 0;
-  }
-
-  return Math.floor((Date.now() - state.user.createdAt) / ms("1 day"));
-};
-
 export const subscriptionPassthroughSelector = state => state.user.subscriptionPassthrough;
 export const subscriptionUpdateUrlSelector = state => state.user.subscriptionUpdateUrl;
 export const currentSubscriptionPlanSelector = state => premiumPlans[state.user.subscriptionPlanId];

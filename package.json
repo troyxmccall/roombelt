@@ -1,20 +1,22 @@
 {
   "name": "roombelt",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "private": true,
   "engines": {
     "node": "10.15.1",
     "npm": "6.4.1"
   },
   "scripts": {
+    "start": "node index.js",
     "dev:frontend": "cd frontend && cross-env PORT=3001 REACT_APP_VERSION=$npm_package_version BROWSER=none react-scripts start",
     "dev:backend": "cross-env PORT=3000 NODE_ENV=development nodemon --watch backend index.js",
-    "test:frontend": "cd frontend && cross-env NODE_PATH=./src react-scripts test",
     "build:frontend": "cd frontend && cross-env REACT_APP_VERSION=$npm_package_version react-scripts build",
     "heroku-postbuild": "npm run build:frontend",
-    "start": "node index.js",
-    "docker:build": "cross-env-shell docker build -t ziolko/roombelt:$npm_package_version -t ziolko/roombelt:latest .",
-    "docker:publish": "cross-env-shell docker push ziolko/roombelt:$npm_package_version && docker push ziolko/roombelt:latest"
+    "build:binaries": "pkg . --out-path=dist --targets=node10-linux-x64,node10-win-x64"
+  },
+  "bin": "index.js",
+  "pkg": {
+    "assets": "frontend/build/**/*"
   },
   "dependencies": {
     "@microsoft/microsoft-graph-client": "^1.5.2",

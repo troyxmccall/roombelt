@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import Logo from "../Logo";
 import { DropdownMenu, DropdownMenuItem, Text } from "theme";
 import { monetizationActions } from "apps/admin/store/actions";
-import { currentSubscriptionPlanSelector, daysOfTrialLeftSelector } from "apps/admin/store/selectors";
+import { isOnPremisesSelector, currentSubscriptionPlanSelector, daysOfTrialLeftSelector } from "apps/admin/store/selectors";
 
 const User = styled.a`
   display: inline-flex;
@@ -43,7 +43,8 @@ const Header = props => {
         </Text>
         <Text block xsmall muted>
           {props.currentSubscriptionPlan && `Roombelt ${props.currentSubscriptionPlan.name}`}
-          {!props.currentSubscriptionPlan && `Free trial - ${props.daysOfTrialLeft} days left`}
+          {!props.currentSubscriptionPlan && "Free trial"}
+          {!props.currentSubscriptionPlan && props.daysOfTrialLeft >= 0 && ` - ${props.daysOfTrialLeft} days left`}
         </Text>
       </div>
     </User>
@@ -56,11 +57,15 @@ const Header = props => {
       </a>
 
       <DropdownMenu trigger={user} arrowPosition="left: 10px">
-        <DropdownMenuItem onClick={props.openChoosePlanDialog}>
-          Subscription settings
+        {!props.isOnPremises && (
+          <DropdownMenuItem onClick={props.openChoosePlanDialog}>Subscription settings</DropdownMenuItem>
+        )}
+        <DropdownMenuItem as="a" href="https://docs.roombelt.com">
+          Help
         </DropdownMenuItem>
-        <DropdownMenuItem as="a" href="https://docs.roombelt.com">Help</DropdownMenuItem>
-        <DropdownMenuItem as="a" href="/api/admin/logout">Log out</DropdownMenuItem>
+        <DropdownMenuItem as="a" href="/api/admin/logout">
+          Log out
+        </DropdownMenuItem>
       </DropdownMenu>
     </Wrapper>
   );
@@ -70,7 +75,8 @@ const mapStateToProps = state => ({
   avatarUrl: state.user.avatarUrl,
   userName: state.user.displayName,
   daysOfTrialLeft: daysOfTrialLeftSelector(state),
-  currentSubscriptionPlan: currentSubscriptionPlanSelector(state)
+  currentSubscriptionPlan: currentSubscriptionPlanSelector(state),
+  isOnPremises: isOnPremisesSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({

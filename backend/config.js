@@ -4,6 +4,8 @@ const chalk = require("chalk");
 require("dotenv").config({ path: path.resolve(process.cwd(), "roombelt.env") });
 
 const result = {
+  licenseKey: (process.env["LICENSE_KEY"] || "").trim(),
+
   google: {
     clientId: process.env["GOOGLE_CLIENT_ID"],
     clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
@@ -28,12 +30,19 @@ const result = {
   logLevel: (process.env["LOG_LEVEL"] || "debug").toLowerCase(),
   paddleVendorId: process.env["PADDLE_VENDOR_ID"] || "",
   paddlePublicKey: process.env["PADDLE_PUBLIC_KEY"] || "",
-  paddleApiKey: process.env["PADDLE_API_KEY"] || ""
+  paddleApiKey: process.env["PADDLE_API_KEY"] || "",
+  licenseGeneratorPrivateKey: process.env["LICENSE_GENERATOR_PRIVATE_KEY"]
 };
+
+if (!result.google.clientId && !result.office365.clientId) {
+  console.log(chalk.red("Error: Neither Google nor Office365 authentication is configured."));
+  console.log(chalk.red("Take a look at https://docs.roombelt.com/installation/on-premises for installation instructions."));
+  process.exit(1);
+}
 
 if (!result.databaseUrl) {
   console.log(chalk.red("Error: Database connection string has not been provided."));
-  console.log(chalk.red("Take a look at https://docs.roombelt.com/installation/on-premises for instructions."));
+  console.log(chalk.red("Take a look at https://docs.roombelt.com/installation/on-premises for installation instructions."));
   process.exit(1);
 }
 

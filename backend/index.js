@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const logger = require("./logger");
 const config = require("./config");
+require("./license");
 
 const app = express();
 

@@ -13,7 +13,6 @@ import Footer from "../Footer";
 import ChoosePlanDialog from "./monetization/ChoosePlanDialog";
 import CancelSubscriptionDialog from "./monetization/CancelSubscriptionDialog";
 import UpdatingSubscriptionDialog from "./monetization/UpdatingSubscriptionDialog";
-import OnPremisesSubscriptionStatusDialog from "./monetization/OnPremisesSubscriptionStatusDialog";
 
 const Dashboard = () => (
   <HeaderAndFooterLayout header={<Header/>} footer={<Footer/>}>
@@ -24,7 +23,6 @@ const Dashboard = () => (
     <ConnectDeviceWizard/>
     <DriftWidget/>
     <ChoosePlanDialog/>
-    <OnPremisesSubscriptionStatusDialog/>
     <CancelSubscriptionDialog/>
     <UpdatingSubscriptionDialog/>
   </HeaderAndFooterLayout>
