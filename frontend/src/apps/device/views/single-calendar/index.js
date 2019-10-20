@@ -28,7 +28,7 @@ import i18next from "i18next";
 const Header = styled.div`
   background: ${colors.background.black};
   color: ${colors.foreground.white};
-  padding: .9rem 1.2rem .4rem 1.2rem;
+  padding: 0.9rem 1.2rem 0.4rem 1.2rem;
   display: flex;
   justify-content: space-between;
 `;
@@ -42,55 +42,81 @@ const TimeWrapper = styled.div`
   margin-top: -0.1rem;
 `;
 
-const StatusBar = styled(Partial)`
+const StatusBar = styled(Partial).attrs({ split: "2.5rem" })`
   display: flex;
   padding: 0.6rem 1.2rem;
   color: ${colors.foreground.white};
   align-items: center;
+
+  @media screen and (orientation: portrait) {
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 0.2rem;
+  }
+`;
+
+const ButtonsWrapper = styled.div`
+  @media screen and (orientation: portrait) {
+    padding-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    margin-left: -0.3rem;
+  }
 `;
 
 const ActionsWrapper = styled.div`
-  padding: 0.6rem 1.2rem;
+  padding: 0.6rem 1.2rem 0 1.2rem;
+  button {
+    margin-bottom: 0.6rem;
+  }
 `;
 
 const Spacer = styled.div`
   flex-grow: 1;
 `;
 
-const CalendarView = ({ calendarName, style, nextMeeting, currentMeeting, showAllCalendarsView, showTodayScheduleView, currentTimestamp, isAmPmClock, fontSize }) => (
+const CalendarView = ({
+  calendarName,
+  style,
+  nextMeeting,
+  currentMeeting,
+  showAllCalendarsView,
+  showTodayScheduleView,
+  currentTimestamp,
+  isAmPmClock,
+  fontSize
+}) => (
   <Layout flexbox fontSize={fontSize}>
-    <PageLoaded/>
+    <PageLoaded />
     <Header>
-      <CalendarName>
-        {calendarName}
-      </CalendarName>
+      <CalendarName>{calendarName}</CalendarName>
       <TimeWrapper>
-        <Time timestamp={currentTimestamp} ampm={isAmPmClock} blinking smallSuffix/>
+        <Time timestamp={currentTimestamp} ampm={isAmPmClock} blinking smallSuffix />
       </TimeWrapper>
     </Header>
 
     <StatusBar>
-      <RoomStatus/>
-      <Spacer/>
-      <div>
+      <RoomStatus />
+      <Spacer />
+      <ButtonsWrapper>
         <Button subtle style={{ padding: "0.5rem" }} onClick={showTodayScheduleView}>
-          {i18next.t("actions.calendar-view")} <MdToday/>
+          {i18next.t("actions.calendar-view")} <MdToday />
         </Button>
         <Button subtle style={{ padding: "0.5rem", margin: "0 -0.5rem 0 0" }} onClick={showAllCalendarsView}>
-          {i18next.t("actions.find-room")} <MdLayers/>
+          {i18next.t("actions.find-room")} <MdLayers />
         </Button>
-      </div>
+      </ButtonsWrapper>
     </StatusBar>
 
-    <CurrentMeeting/>
+    <CurrentMeeting />
 
     <ActionsWrapper>
-      <ActionsBar/>
+      <ActionsBar />
     </ActionsWrapper>
 
-    <Spacer/>
+    <Spacer />
 
-    {nextMeeting && <NextMeeting/>}
+    {nextMeeting && <NextMeeting />}
   </Layout>
 );
 

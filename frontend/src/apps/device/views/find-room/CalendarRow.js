@@ -45,9 +45,12 @@ const RowCard = styled.div`
 
 const Content = styled.div`
  font-size: 0.8rem; 
- margin-top: 0.5rem;
  line-height: 1.2rem;
  overflow: hidden;
+ 
+ button {
+  margin-top: 0.5rem;
+ }
 `;
 
 const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
