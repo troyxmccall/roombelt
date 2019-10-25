@@ -108,7 +108,6 @@ const TodaySchedule = ({ currentCalendar, currentTimestamp, isAmPmClock }) => {
   eventsWithOffsets.forEach((event, i) => {
     for (let j = 0; j < i; j++) {
       const earlierEvent = eventsWithOffsets[j];
-      console.log(earlierEvent.visualEndTimestamp > event.visualStartTimestamp, endOfDay);
 
       if (
         earlierEvent.visualStartTimestamp < event.visualStartTimestamp &&

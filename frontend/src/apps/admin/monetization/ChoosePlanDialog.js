@@ -3,17 +3,17 @@ import { connect } from "react-redux";
 import { Card, BlueModal } from "theme/index";
 import styled from "styled-components/macro";
 import { Button } from "theme";
-import premiumPlans from "services/premium-plans";
+import getPricingPlan from "services/premium-plans";
 
 import {
   connectedDevicesSelector,
   daysOfTrialLeftSelector,
   isChoosePlanDialogOpenSelector,
-  currentSubscriptionPlanSelector
+  currentSubscriptionPlanSelector,
+  userCreatedAtSelector
 } from "apps/admin/store/selectors";
 
 import { monetizationActions } from "apps/admin/store/actions";
-
 
 const Pricing = styled.div`
   display: flex;
@@ -90,31 +90,64 @@ const ChoosePlan = styled(Button)`
   margin-top: 10px;
 `;
 
-const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscriptionPlan, close, selectPlan, updateSubscription, cancelSubscription }) => {
+const ChoosePlanDialog = ({
+  isOpen,
+  connectedDevices,
+  userCreatedAt,
+  daysOfTrialLeft,
+  subscriptionPlan,
+  close,
+  selectPlan,
+  updateSubscription,
+  cancelSubscription
+}) => {
+  const premiumPlans = getPricingPlan(userCreatedAt);
+
   const isStarterCurrent = subscriptionPlan === premiumPlans.STARTER;
   const isGrowingCurrent = subscriptionPlan === premiumPlans.GROWING;
   const isBusinessCurrent = subscriptionPlan === premiumPlans.BUSINESS;
 
-  const isStarterHighlighted = connectedDevices <= 5 && !isGrowingCurrent && !isBusinessCurrent;
-  const isGrowingHighlighted = connectedDevices > 5 && connectedDevices <= 10 && !isBusinessCurrent;
-  const isBusinessHighlighted = connectedDevices > 10;
+  const isStarterHighlighted =
+    connectedDevices <= premiumPlans.STARTER.maxDevices && !isGrowingCurrent && !isBusinessCurrent;
+
+  const isGrowingHighlighted =
+    connectedDevices > premiumPlans.STARTER.maxDevices &&
+    connectedDevices <= premiumPlans.GROWING.maxDevices &&
+    !isBusinessCurrent;
+  const isBusinessHighlighted = connectedDevices > premiumPlans.GROWING.maxDevices;
 
   const isTrialActive = daysOfTrialLeft > 0;
-  const isCurrentPlanSufficient = isTrialActive || (subscriptionPlan && subscriptionPlan.maxDevices >= connectedDevices);
+  const isCurrentPlanSufficient =
+    isTrialActive || (subscriptionPlan && subscriptionPlan.maxDevices >= connectedDevices);
   const showFooter = subscriptionPlan || isCurrentPlanSufficient;
 
   const footer = (
     <>
-      {subscriptionPlan && <Button onClick={cancelSubscription} link>Cancel subscription</Button>}
-      <div style={{ flexGrow: 1 }}/>
-      {subscriptionPlan && <Button onClick={updateSubscription} secondary>Update payment method</Button>}
-      {isCurrentPlanSufficient && <Button primary onClick={close}>Close</Button>}
+      {subscriptionPlan && (
+        <Button onClick={cancelSubscription} link>
+          Cancel subscription
+        </Button>
+      )}
+      <div style={{ flexGrow: 1 }} />
+      {subscriptionPlan && (
+        <Button onClick={updateSubscription} secondary>
+          Update payment method
+        </Button>
+      )}
+      {isCurrentPlanSufficient && (
+        <Button primary onClick={close}>
+          Close
+        </Button>
+      )}
     </>
   );
 
   const trialInfo = `Your free trial ends in ${daysOfTrialLeft} days. Connected devices will stop working soon after that. If you are happy with the product you can end the trial now and start subscription below.`;
-  const endOfTrialInfo = "Your free trial is over. Connected devices will stop working. Choose one of the subscription plans below.";
-  const paidInfo = `You are currently on the ${subscriptionPlan && subscriptionPlan.name} plan which allows you to connect up to ${subscriptionPlan && subscriptionPlan.maxDevices} devices. You can change the plan below.`;
+  const endOfTrialInfo =
+    "Your free trial is over. Connected devices will stop working. Choose one of the subscription plans below.";
+  const paidInfo = `You are currently on the ${subscriptionPlan &&
+    subscriptionPlan.name} plan which allows you to connect up to ${subscriptionPlan &&
+    subscriptionPlan.maxDevices} devices. You can change the plan below.`;
   const needsUpgradeInfo = `You connected more devices than allowed in your current plan. Change the subscription plan below.`;
 
   return (
@@ -129,39 +162,45 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
         <PricingCard>
           <PlanName current={isStarterCurrent}>Starter</PlanName>
           <Price>5</Price>
-          <VAT/>
-          <Feature>Up to 5 devices</Feature>
+          <VAT />
+          <Feature>Up to {premiumPlans.STARTER.maxDevices} devices</Feature>
           <Feature>48h support SLA</Feature>
-          <ChoosePlan disabled={isStarterCurrent || connectedDevices > 5}
-                      success={isStarterHighlighted}
-                      secondary={!isStarterHighlighted}
-                      onClick={() => selectPlan(premiumPlans.STARTER.subscriptionPlanId)}>
+          <ChoosePlan
+            disabled={isStarterCurrent || connectedDevices > premiumPlans.STARTER.maxDevices}
+            success={isStarterHighlighted}
+            secondary={!isStarterHighlighted}
+            onClick={() => selectPlan(premiumPlans.STARTER.subscriptionPlanId)}
+          >
             Choose plan
           </ChoosePlan>
         </PricingCard>
         <PricingCard>
           <PlanName current={isGrowingCurrent}>Growing</PlanName>
           <Price>20</Price>
-          <VAT/>
-          <Feature>Up to 10 devices</Feature>
+          <VAT />
+          <Feature>Up to {premiumPlans.GROWING.maxDevices} devices</Feature>
           <Feature>24h support SLA</Feature>
-          <ChoosePlan disabled={isGrowingCurrent || connectedDevices > 10}
-                      success={isGrowingHighlighted}
-                      secondary={!isGrowingHighlighted}
-                      onClick={() => selectPlan(premiumPlans.GROWING.subscriptionPlanId)}>
+          <ChoosePlan
+            disabled={isGrowingCurrent || connectedDevices > premiumPlans.GROWING.maxDevices}
+            success={isGrowingHighlighted}
+            secondary={!isGrowingHighlighted}
+            onClick={() => selectPlan(premiumPlans.GROWING.subscriptionPlanId)}
+          >
             Choose plan
           </ChoosePlan>
         </PricingCard>
         <PricingCard>
           <PlanName current={isBusinessCurrent}>Business</PlanName>
           <Price>50</Price>
-          <VAT/>
-          <Feature>20 devices included</Feature>
+          <VAT />
+          <Feature>{userCreatedAt > 1572031551573 ? 10 : 20} devices included</Feature>
           <Feature>$5 / device above the limit</Feature>
-          <ChoosePlan disabled={isBusinessCurrent}
-                      success={isBusinessHighlighted}
-                      secondary={!isBusinessHighlighted}
-                      onClick={() => selectPlan(premiumPlans.BUSINESS.subscriptionPlanId)}>
+          <ChoosePlan
+            disabled={isBusinessCurrent}
+            success={isBusinessHighlighted}
+            secondary={!isBusinessHighlighted}
+            onClick={() => selectPlan(premiumPlans.BUSINESS.subscriptionPlanId)}
+          >
             Choose plan
           </ChoosePlan>
         </PricingCard>
@@ -173,13 +212,14 @@ const ChoosePlanDialog = ({ isOpen, connectedDevices, daysOfTrialLeft, subscript
 const mapStateToProps = state => ({
   isOpen: isChoosePlanDialogOpenSelector(state),
   daysOfTrialLeft: daysOfTrialLeftSelector(state),
+  userCreatedAt: userCreatedAtSelector(state),
   subscriptionPlan: currentSubscriptionPlanSelector(state),
   connectedDevices: connectedDevicesSelector(state).length
 });
 
 const mapDispatchToProps = dispatch => ({
   close: () => dispatch(monetizationActions.closePlanDialog()),
-  selectPlan: (planId) => dispatch(monetizationActions.selectSubscriptionPlan(planId)),
+  selectPlan: planId => dispatch(monetizationActions.selectSubscriptionPlan(planId)),
   updateSubscription: () => dispatch(monetizationActions.openUpdateSubscriptionOverlay()),
   cancelSubscription: () => dispatch(monetizationActions.openCancelSubscriptionDialog())
 });

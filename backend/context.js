@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 const Moment = require("moment");
 const Storage = require("./storage");
 const config = require("./config");
-const premiumPlans = require("./services/premium-plans");
+const getPricingPlans = require("./services/premium-plans");
 
 const GoogleCalendar = require("./services/google-calendar");
 const Office365Calendar = require("./services/office365-calendar");
@@ -22,11 +22,12 @@ async function getSubscriptionStatus(oauth) {
   const isSubscriptionCancelled = oauth.isSubscriptionCancelled;
 
   const now = Moment();
+  const createdAt = new Date(oauth.createdAt).getTime();
   const endOfTrial = Moment(oauth.createdAt).add(30, "days");
   const isTrialExpired = !oauth.subscriptionPlanId && now.isAfter(endOfTrial);
   const isTrialLongExpired = isTrialExpired && now.isAfter(endOfTrial.add(3, "days"));
 
-  const currentPlan = premiumPlans[oauth.subscriptionPlanId];
+  const currentPlan = getPricingPlans(createdAt)[oauth.subscriptionPlanId];
   const connectedDevicesCount = storage.devices.countDevicesForUser(oauth.userId);
   const isUpgradeRequired = currentPlan && currentPlan.maxDevices < connectedDevicesCount;
 
