@@ -1,13 +1,8 @@
 ## Roombelt
 
-[Roombelt](https://roombelt.com) is a meeting room manager
-focused on simplicity. Works both in Cloud and On-Premises.
+[Roombelt](https://roombelt.com) is a meeting room manager focused on simplicity. The productis available at [roombelt.com](https://roombelt.com).
 
 ![Tablet with roombelt installed](https://roombelt.com/assets/img/tablet.png)
-
-## Custom themes
-I provide professional services to customize Roombelt look & feel in order to meet your company visual identity.
-Reach me at [mateusz@roombelt.com](mailto:mateusz@roombelt.com) for details.
 
 ## Feedback
 
