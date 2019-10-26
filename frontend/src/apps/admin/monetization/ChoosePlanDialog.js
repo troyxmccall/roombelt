@@ -193,7 +193,7 @@ const ChoosePlanDialog = ({
           <PlanName current={isBusinessCurrent}>Business</PlanName>
           <Price>50</Price>
           <VAT />
-          <Feature>{userCreatedAt > 1572031551573 ? 10 : 20} devices included</Feature>
+          <Feature>20 devices included</Feature>
           <Feature>$5 / device above the limit</Feature>
           <ChoosePlan
             disabled={isBusinessCurrent}
