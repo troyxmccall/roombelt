@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 export const ensureElement = Component => {
-  if (Component instanceof React.Component || typeof Component === "function") {
+  if (Component.$$typeof || typeof Component === "function") {
     return <Component/>;
   }
 

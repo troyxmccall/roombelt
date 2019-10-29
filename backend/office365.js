@@ -25,7 +25,7 @@ router.get("/oauth_callback", context.adminContext, async (req, res) => {
 
 router.get("/oauth_callback_admin", context.adminContext, async (req, res) => {
   if (req.query && req.query["admin_consent"] === "True" && !req.query["error"]) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 30; i++) {
       if (await req.context.calendarProviders.office365.isAccessTokenValid()) {
         return res.redirect("/admin");
       }

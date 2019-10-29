@@ -5,11 +5,12 @@ const context = require("../context");
 const logger = require("../logger");
 const paddle = require("../services/paddle");
 
-const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) => ({
+const deviceRepresentation = ({ deviceId, createdAt, lastActivityAt, deviceType, calendarId, displayName, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) => ({
   id: deviceId,
   createdAt: new Date(createdAt).getTime(),
   deviceType,
   calendarId,
+  displayName,
   location,
   minutesForCheckIn,
   minutesForStartEarly,
@@ -126,10 +127,13 @@ router.put("/admin/device/:deviceId", checkSubscription, async function(req, res
 
   if (req.body.calendarId) {
     const calendarsFromProvider = await req.context.calendarProvider.getCalendars();
-    const calendar = calendarsFromProvider.find(calendar => calendar.id === req.body.calendarId);
 
-    if (!calendar) {
-      return res.status(404).send(`No calendar with id ${req.body.calendarId}`);
+    for (let calendarId of req.body.calendarId.split(";")) {
+      if (calendarId === "all-connected-devices") continue;
+
+      if (!calendarsFromProvider.find(calendar => calendar.id === calendarId)) {
+        return res.status(404).send(`No calendar with id ${calendarId}`);
+      }
     }
   }
 
@@ -171,7 +175,7 @@ router.delete("/admin/subscription", async function(req, res) {
 });
 
 router.get("/admin/audit", async function(req, res) {
-  const audit = await req.context.storage.audit.findEvents(req.context.session.adminUserId);
+  const audit = await req.context.storage.audit.findEvents(req.context.session.adminUserId, req.query.getAll === "true");
 
   res.json(audit.map(({ calendarId, meetingSummary, eventType, createdAt }) => ({
     createdAt,

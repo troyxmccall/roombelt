@@ -43,9 +43,14 @@ module.exports = class {
     await model.save();
   }
 
-  async findEvents(userId) {
-    const where = { userId, createdAt: { [Sequelize.Op.gt]: new Date(Date.now() - ms("7 days")) } };
-    return await this.Model.findAll({ where, order: [["createdAt", "DESC"]], limit: 5000 });
+  async findEvents(userId, getAllEvents = false) {
+    const where = { userId };
+
+    if (!getAllEvents) {
+      where.createdAt = { [Sequelize.Op.gt]: new Date(Date.now() - ms("7 days")) };
+    }
+
+    return await this.Model.findAll({ where, order: [["createdAt", "DESC"]], limit: getAllEvents ? undefined : 2000 });
   }
 
   async findLastRecurringMeetingEvents(deviceId, recurringMasterId, count) {

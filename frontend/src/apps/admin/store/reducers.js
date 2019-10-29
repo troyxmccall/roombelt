@@ -66,11 +66,19 @@ const editedDevice = (state = { data: null, isSaving: false }, action) => {
     case editDeviceDialogActions.$startSubmitting:
       return { data: state.data, isSaving: true };
     case editDeviceDialogActions.setDeviceType:
-      return { data: { ...state.data, deviceType: action.deviceType } };
+      return {
+        data: {
+          ...state.data,
+          deviceType: action.deviceType,
+          calendarId: action.deviceType === "calendar" ? "" : "all-connected-devices"
+        }
+      };
     case editDeviceDialogActions.setCalendarId:
       return { data: { ...state.data, calendarId: action.calendarId } };
     case editDeviceDialogActions.setLocation:
       return { data: { ...state.data, location: action.location } };
+    case editDeviceDialogActions.setDisplayName:
+      return { data: { ...state.data, displayName: action.displayName } };
     case editDeviceDialogActions.setLanguage:
       return { data: { ...state.data, language: action.language } };
     case editDeviceDialogActions.setClockType:
@@ -111,7 +119,6 @@ const defaultConnectDeviceWizardState = {
   calendarId: null,
   language: "en-US",
   clockType: 12,
-  showAvailableRooms: true,
   errorMessage: null,
   submitButton: null
 };
@@ -133,7 +140,11 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
     case connectDeviceWizardActions.firstStep.$submitError:
       return { ...state, errorMessage: action.errorMessage, submitButton: null };
     case connectDeviceWizardActions.secondStep.setDeviceType:
-      return { ...state, deviceType: action.deviceType };
+      return {
+        ...state,
+        deviceType: action.deviceType,
+        calendarId: action.deviceType === "calendar" ? "" : "all-connected-devices"
+      };
     case connectDeviceWizardActions.secondStep.nextStep:
       return { ...state, currentStep: "configuration" };
     case connectDeviceWizardActions.thirdStep.previousStep:
@@ -144,8 +155,6 @@ const connectDeviceWizard = (state = defaultConnectDeviceWizardState, action) =>
       return { ...state, language: action.language };
     case connectDeviceWizardActions.thirdStep.setClockType:
       return { ...state, clockType: action.clockType };
-    case connectDeviceWizardActions.thirdStep.setShowAvailableRooms:
-      return { ...state, showAvailableRooms: action.showAvailableRooms };
     default:
       return state;
   }

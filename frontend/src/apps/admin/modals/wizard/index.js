@@ -24,7 +24,7 @@ const getStepStyle = (currentStepIndex, index) => {
 
 
 const NewDeviceWizard = ({ currentStep }) => (
-  <Modal footer={null} header={null} visible={currentStep !== null} compact wide>
+  <Modal footer={null} header={null} visible={currentStep !== null} compact fullWidth>
     <Wizard
       steps={[step1, step2, step3]}
       header={WizardHeader}

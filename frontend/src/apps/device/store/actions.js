@@ -17,7 +17,7 @@ import {
   isInitializedSelector,
   isInOfflineModeSelector,
   isSubscriptionCancelledSelector,
-  lastActivityOnShowCalendarsViewSelector,
+  lastActivityOnDeviceViewSelector,
   minutesLeftForCheckInSelector,
   showAllCalendarsViewSelector
 } from "apps/device/store/selectors";
@@ -25,7 +25,6 @@ import { changeLanguage } from "i18n";
 
 import i18next from "i18next";
 import { wait, waitUntilTrue } from "utils/time";
-
 
 export const deviceActions = {
   $markInitialized: action(),
@@ -131,6 +130,8 @@ export const deviceActions = {
 
   changeFontSize: action(fontSizeDelta => ({ fontSizeDelta })),
 
+  toggleTwoColumnLayout: action(),
+
   $updateOfflineStatus: action(isOffline => ({ isOffline })),
   $initializeOfflineObserver: () => (dispatch, getState) => {
     const successCallback = result => {
@@ -181,22 +182,32 @@ export const deviceActions = {
 
   setLanguage: language => () => changeLanguage(language),
 
-  $updateShowAllCalendarsView: action(showAllCalendarsView => ({ showAllCalendarsView })),
-  $allCalendarsViewActivity: action(() => ({ timestamp: Date.now() })),
+  $setCurrentDeviceView: action(currentDeviceView => ({ currentDeviceView })),
+  markDeviceViewActivity: action(() => ({ timestamp: Date.now() })),
 
   showAllCalendarsView: () => async (dispatch, getState) => {
-    dispatch(deviceActions.$updateShowAllCalendarsView(true));
-    dispatch(deviceActions.$allCalendarsViewActivity());
+    dispatch(deviceActions.$setCurrentDeviceView("all-calendars"));
+    dispatch(deviceActions.markDeviceViewActivity());
     dispatch(deviceActions.$fetchDeviceData());
 
-    await waitUntilTrue(() => lastActivityOnShowCalendarsViewSelector(getState()) < Date.now() - 30 * 1000);
+    await waitUntilTrue(() => lastActivityOnDeviceViewSelector(getState()) < Date.now() - 30 * 1000);
 
-    dispatch(deviceActions.closeAllCalendarsView());
+    dispatch(deviceActions.setMainDeviceView());
   },
 
-  closeAllCalendarsView: () => dispatch => {
+  showTodayScheduleView: () => async (dispatch, getState) => {
+    dispatch(deviceActions.$setCurrentDeviceView("today-schedule"));
+    dispatch(deviceActions.markDeviceViewActivity());
+    dispatch(deviceActions.$fetchDeviceData());
+
+    await waitUntilTrue(() => lastActivityOnDeviceViewSelector(getState()) < Date.now() - 30 * 1000);
+
+    dispatch(deviceActions.setMainDeviceView());
+  },
+
+  setMainDeviceView: () => async (dispatch) => {
     dispatch(meetingActions.endAction());
-    dispatch(deviceActions.$updateShowAllCalendarsView(false));
+    dispatch(deviceActions.$setCurrentDeviceView(null));
   }
 };
 

@@ -8,7 +8,6 @@ import IoAndroidMoreVertical from "react-icons/lib/io/android-more-vertical";
 import { translations } from "i18n";
 
 import {
-  Alert,
   Badge,
   Card,
   DropdownMenu,
@@ -33,61 +32,59 @@ const CalendarRowWrapper = styled(TableRow)`
   }
 `;
 
-const SingleDeviceRow = props => (
-  <CalendarRowWrapper>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        {props.device.deviceType === "dashboard" && props.device.location}
-        {props.device.deviceType === "dashboard" && !props.device.location && <em>Dashboard</em>}
+const SingleDeviceRow = props => {
+  const hasDisplayName = !!props.device.displayName;
+  const isDashboard = props.device.deviceType === "dashboard";
+  const hasCalendar = !!props.calendar;
 
-        {props.device.deviceType === "calendar" && !props.calendar && <em>No calendar connected</em>}
-        {props.device.deviceType === "calendar" && props.calendar && <>
-          {props.calendar.summary}
-          {" "}
-          {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
-            <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+  return (
+    <CalendarRowWrapper>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          {hasDisplayName && props.device.displayName}
+          {!hasDisplayName && isDashboard && <em>Dashboard</em>}
+          {!hasDisplayName && !isDashboard && !hasCalendar && <em>No calendar connected</em>}
+          {!hasDisplayName && !isDashboard && hasCalendar && (
+            <>
+              {props.calendar.summary}
+              {" "}
+              {(props.device.isReadOnlyDevice || !props.calendar.canModifyEvents) && (
+                <Badge warning style={{ fontSize: 12 }}>Read only</Badge>
+              )}
+            </>
           )}
-        </>}
-      </Text>
-      <Text muted small>
-        Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        {translations[props.device.language].language}
-      </Text>
-      <Text muted small>
-        {props.device.clockType}h clock
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
-      <Text block>
-        <StatusIcon success={props.device.isOnline} danger={!props.device.isOnline}/>
-        {props.device.isOnline ? "Online" : "Offline"}
-      </Text>
-      <Text muted small>
-        {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
-      </Text>
-    </TableRowColumn>
-    <TableRowColumn style={{ textAlign: "right" }}>
-      <DropdownMenu trigger={<IoAndroidMoreVertical style={{ cursor: "pointer", color: "#555" }}/>}>
-        <DropdownMenuItem onClick={props.onConfigureClicked}>Configure</DropdownMenuItem>
-        <DropdownMenuItem onClick={props.onDeleteClicked}>Disconnect</DropdownMenuItem>
-      </DropdownMenu>
-    </TableRowColumn>
-  </CalendarRowWrapper>
-);
-
-const EmptyDashboardWarning = () => (
-  <Alert warning>
-    <strong>Warning: </strong>
-    Dashboard shows a summary of all connected devices.
-    You didn't connect any other devices so the dashboard will be empty.
-    <br/><br/>
-    Please connect another device with calendar selected.
-  </Alert>
-);
+          {props.device.location && <span> ({props.device.location})</span>}
+        </Text>
+        <Text muted small>
+          Added: {moment(props.device.createdTimestamp).format("MMM DD, YYYY ")}
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          {translations[props.device.language].language}
+        </Text>
+        <Text muted small>
+          {props.device.clockType}h clock
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn onClick={props.onRowClicked} style={{ cursor: "pointer" }}>
+        <Text block>
+          <StatusIcon success={props.device.isOnline} danger={!props.device.isOnline}/>
+          {props.device.isOnline ? "Online" : "Offline"}
+        </Text>
+        <Text muted small>
+          {(props.device.msSinceLastActivity < ms("1 year")) && `Seen ${moment(Date.now() - props.device.msSinceLastActivity).fromNow()}`}
+        </Text>
+      </TableRowColumn>
+      <TableRowColumn style={{ textAlign: "right" }}>
+        <DropdownMenu trigger={<IoAndroidMoreVertical style={{ cursor: "pointer", color: "#555" }}/>}>
+          <DropdownMenuItem onClick={props.onConfigureClicked}>Configure</DropdownMenuItem>
+          <DropdownMenuItem onClick={props.onDeleteClicked}>Disconnect</DropdownMenuItem>
+        </DropdownMenu>
+      </TableRowColumn>
+    </CalendarRowWrapper>
+  );
+};
 
 const Devices = props => {
   if (!props.isLoaded) {
@@ -115,25 +112,20 @@ const Devices = props => {
     />
   ));
 
-  const hasDashboardDevices = props.devices.some(device => device.deviceType === "dashboard");
-  const hasSingleCalendarDevices = props.devices.some(device => device.deviceType === "calendar" && props.calendars[device.calendarId]);
-
-  return (<>
-      {hasDashboardDevices && !hasSingleCalendarDevices && <EmptyDashboardWarning/>}
-      <Card block compact>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Device</TableHeaderColumn>
-              <TableHeaderColumn>Locale</TableHeaderColumn>
-              <TableHeaderColumn>Status</TableHeaderColumn>
-              <TableHeaderColumn style={{ width: 50 }}/>
-            </TableRow>
-          </TableHeader>
-          <TableBody children={rows}/>
-        </Table>
-      </Card>
-    </>
+  return (
+    <Card block compact>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderColumn>Device</TableHeaderColumn>
+            <TableHeaderColumn>Locale</TableHeaderColumn>
+            <TableHeaderColumn>Status</TableHeaderColumn>
+            <TableHeaderColumn style={{ width: 50 }}/>
+          </TableRow>
+        </TableHeader>
+        <TableBody children={rows}/>
+      </Table>
+    </Card>
   );
 };
 

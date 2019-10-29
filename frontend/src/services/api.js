@@ -3,6 +3,10 @@ import axios from "axios";
 axios.interceptors.request.use(config => ({ ...config, url: config.url + "?_ts=" + Date.now() }));
 axios.interceptors.response.use(response => response.data);
 
+export function setHeader(name, value) {
+  axios.interceptors.request.use(config => ({ ...config, headers: { ...config.headers, [name]: value } }));
+}
+
 export async function isOnline() {
   try {
     await getApiVersion();
@@ -52,10 +56,11 @@ export function getCalendars() {
   return axios.get("/api/admin/calendar");
 }
 
-export function setOptionsForDevice(deviceId, deviceType, calendarId, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance) {
+export function setOptionsForDevice(deviceId, deviceType, calendarId, displayName, location, language, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, clockType, recurringMeetingsCheckInTolerance) {
   return axios.put(`/api/admin/device/${encodeURIComponent(deviceId)}`, {
     deviceType,
     calendarId,
+    displayName,
     location,
     language,
     minutesForCheckIn,
@@ -76,8 +81,8 @@ export function cancelSubscription() {
   return axios.delete("/api/admin/subscription");
 }
 
-export function getAuditLog() {
-  return axios.get("/api/admin/audit");
+export function getAuditLog(getAll = false) {
+  return axios.get("/api/admin/audit", { params: { getAll } });
 }
 
 export function getDeviceDetails(getAllCalendars) {

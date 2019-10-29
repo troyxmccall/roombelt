@@ -2,7 +2,7 @@ import { deviceActions, meetingActions } from "apps/device/store/actions";
 
 import { combineReducers } from "redux";
 import Moment from "moment";
-import { getFontSize, setFontSize } from "services/persistent-store";
+import { getFontSize, getIsTwoColumnLayout, setFontSize, setIsTwoColumnLayout } from "services/persistent-store";
 
 const timestamp = (state = 0, action) => (action.type === deviceActions.$updateClock ? action.timestamp : state);
 
@@ -60,7 +60,7 @@ const appState = (state = {
   isRemoved: false,
   isInitialized: false,
   isOffline: false,
-  showAllCalendarsView: false,
+  currentDeviceView: null,
   lastActivityOnShowCalendarsView: null
 }, action) => {
   switch (action.type) {
@@ -72,16 +72,21 @@ const appState = (state = {
       return { ...state, isSubscriptionCancelled: action.isSubscriptionCancelled };
     case deviceActions.$updateOfflineStatus:
       return { ...state, isOffline: action.isOffline };
-    case deviceActions.$updateShowAllCalendarsView:
-      return { ...state, showAllCalendarsView: action.showAllCalendarsView };
-    case deviceActions.$allCalendarsViewActivity:
+    case deviceActions.$setCurrentDeviceView:
+      return { ...state, currentDeviceView: action.currentDeviceView };
+    case deviceActions.markDeviceViewActivity:
       return { ...state, lastActivityOnShowCalendarsView: action.timestamp };
     default:
       return state;
   }
 };
 
-const displayOptions = (state = { isFullScreen: null, isSupported: null, fontSize: getFontSize() }, action) => {
+const displayOptions = (state = {
+  isFullScreen: null,
+  isSupported: null,
+  fontSize: getFontSize(),
+  isTwoColumnLayout: getIsTwoColumnLayout()
+}, action) => {
   switch (action.type) {
     case deviceActions.$updateFullScreenState:
       return { ...state, isFullScreen: action.isFullScreen, isSupported: action.isSupported };
@@ -89,6 +94,9 @@ const displayOptions = (state = { isFullScreen: null, isSupported: null, fontSiz
       const fontSize = Math.max(state.fontSize + action.fontSizeDelta, 0.1);
       setFontSize(fontSize);
       return { ...state, fontSize };
+    case deviceActions.toggleTwoColumnLayout:
+      setIsTwoColumnLayout(!state.isTwoColumnLayout);
+      return { ...state, isTwoColumnLayout: !state.isTwoColumnLayout };
     default:
       return state;
   }

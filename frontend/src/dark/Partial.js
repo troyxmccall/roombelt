@@ -4,16 +4,15 @@ import colors from "./colors";
 export default styled.div`
   position: relative;
   z-index: 0;
-  
+
   :before {
-    content: '';
+    content: "";
     background: ${colors.background.black};
     position: absolute;
-    left: 0; 
+    left: 0;
     right: 0;
     top: 0;
-    bottom: 50%;
+    height: ${props => props.split || "50%"};
     z-index: -1;
-  }  
+  }
 `;
-

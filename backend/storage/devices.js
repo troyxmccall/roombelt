@@ -7,10 +7,11 @@ module.exports = class {
       connectionCode: { type: Sequelize.STRING, defaultValue: () => Math.floor(Math.random() * 100000).toString() },
       userId: Sequelize.STRING,
       location: Sequelize.STRING,
+      displayName: Sequelize.STRING,
       language: { type: Sequelize.STRING, defaultValue: "en-US" },
       clockType: { type: Sequelize.INTEGER, defaultValue: 24 },
       deviceType: { type: Sequelize.STRING, defaultValue: "calendar" },
-      calendarId: Sequelize.STRING,
+      calendarId: Sequelize.TEXT,
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
       lastActivityAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
@@ -57,10 +58,11 @@ module.exports = class {
     await this.Model.update({ lastActivityAt: new Date() }, { where: { deviceId } });
   }
 
-  async setDeviceOptions(deviceId, { deviceType, calendarId, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) {
+  async setDeviceOptions(deviceId, { deviceType, calendarId, displayName, location, language, clockType, minutesForCheckIn, minutesForStartEarly, showAvailableRooms, showTentativeMeetings, isReadOnlyDevice, recurringMeetingsCheckInTolerance }) {
     await this.Model.update({
       deviceType,
       calendarId,
+      displayName,
       location,
       language,
       clockType,

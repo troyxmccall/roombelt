@@ -6,6 +6,7 @@ import ms from "ms";
 import { BlueModal, Button, Text } from "theme";
 import { auditLogEntriesSelector, isAuditLogLoadingSelector, isAuditLogVisibleSelector } from "../store/selectors";
 import { auditLogActions } from "../store/actions";
+import GenerateReportButton, { eventTypes } from "./GenerateReportButton";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
@@ -25,21 +26,10 @@ const Table = styled(ReactTable)`
 const Footer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   padding: 0 15px;
 `;
 
-const eventTypes = {
-  "create": "New meeting",
-  "end": "End meeting",
-  "start-early": "Start early",
-  "check-in": "Check in",
-  "extend": "Extend",
-  "cancel": "Cancel",
-  "auto-cancel": "Auto cancel",
-  "auto-cancel-recurring": "Remove recurring"
-};
 
 const AuditLogModal = ({ onClose, isVisible, devices, calendars, entries }) => {
   const columns = [
@@ -124,7 +114,9 @@ const AuditLogModal = ({ onClose, isVisible, devices, calendars, entries }) => {
       visible={isVisible}
       footer={(
         <Footer>
-          <Text>Audit log shows up to 5000 events from the last 7 days</Text>
+          <Text>Audit log shows events from the last 7 days. Download report to get all events. </Text>
+          <div style={{ flexGrow: 1, minWidth: 20 }}/>
+          <GenerateReportButton calendars={calendars}/>
           <Button primary onClick={onClose}>Close</Button>
         </Footer>
       )}

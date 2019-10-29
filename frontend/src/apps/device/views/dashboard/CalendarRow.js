@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 import { prettyFormatMinutes, timeDifferenceInMinutes } from "services/formatting";
 import * as i18next from "i18next";
 
-const CalendarRow = ({ calendarName, timestamp, currentMeeting, nextMeeting }) => {
+const CalendarRow = ({ calendarName, timestamp, currentMeeting, nextMeeting, fixedHeight }) => {
   if (currentMeeting) {
     return null;
   }
@@ -27,7 +27,8 @@ const CalendarRow = ({ calendarName, timestamp, currentMeeting, nextMeeting }) =
 
   return <RowView meetingRoom={calendarName}
                   meetingStatus={<Status available={true}>{status}</Status>}
-                  meetingSummary={<>&nbsp;–</>}/>;
+                  meetingSummary={<>&nbsp;–</>}
+                  fixedHeight={fixedHeight}/>;
 };
 
 const mapStateToProps = (state, { calendarId }) => ({

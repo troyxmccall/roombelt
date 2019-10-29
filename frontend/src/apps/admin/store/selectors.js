@@ -1,6 +1,5 @@
 import Moment from "moment";
-import ms from "ms";
-import premiumPlans from "services/premium-plans";
+import getPricingPlans from "services/premium-plans";
 
 export const newDeviceDataSelector = state => ({
   connectionCode: state.connectDeviceWizard.connectionCode,
@@ -15,6 +14,7 @@ export const editDeviceDataSelector = state => ({
   deviceId: state.editedDevice.data.id,
   deviceType: state.editedDevice.data.deviceType,
   calendarId: state.editedDevice.data.calendarId,
+  displayName: state.editedDevice.data.displayName && state.editedDevice.data.displayName.trim(),
   location: state.editedDevice.data.location,
   language: state.editedDevice.data.language,
   clockType: state.editedDevice.data.clockType,
@@ -45,7 +45,11 @@ export const isChoosePlanDialogOpenSelector = state => {
     return false;
   }
 
-  if (state.monetization.isCheckoutOverlayOpen || state.monetization.isCancelSubscriptionDialogOpen || state.monetization.isUpdatingSubscription) {
+  if (
+    state.monetization.isCheckoutOverlayOpen ||
+    state.monetization.isCancelSubscriptionDialogOpen ||
+    state.monetization.isUpdatingSubscription
+  ) {
     return false;
   }
 
@@ -65,51 +69,17 @@ export const isChoosePlanDialogOpenSelector = state => {
   return false;
 };
 
-export const isOnPremisesSelector = state => currentSubscriptionPlanSelector(state) === premiumPlans.ON_PREMISES;
-
-export const isOnPremisesPaidPlan = state => {
-  if (!isOnPremisesSelector(state)) {
-    return false;
-  }
-  return state.user && state.user.properties && state.user.properties.lastAcceptanceOfEvaluation > Date.now();
-};
-
-export const isOnPremisesEvaluationExpiredDialogOpenSelector = state => {
-  if (!isOnPremisesSelector(state)) {
-    return false;
-  }
-
-  if (state.monetization.isCheckoutOverlayOpen) {
-    return false;
-  }
-
-  if (state.monetization.isChoosePlanDialogOpenByUser) {
-    return true;
-  }
-
-  if (!state.user || !state.user.properties) {
-    return false;
-  }
-
-  if(!state.user.properties.lastAcceptanceOfEvaluation) {
-    return true;
-  }
-
-  return (state.user.properties.lastAcceptanceOfEvaluation < Date.now() - ms("2 weeks"));
-};
-
-export const daysSinceJoinedSelector = state => {
-  if (!state.user || !state.user.createdAt) {
-    return 0;
-  }
-
-  return Math.floor((Date.now() - state.user.createdAt) / ms("1 day"));
+export const isOnPremisesSelector = state => {
+  const currentPlan = currentSubscriptionPlanSelector(state);
+  return currentPlan && currentPlan.subscriptionPlanId === 1;
 };
 
 export const subscriptionPassthroughSelector = state => state.user.subscriptionPassthrough;
 export const subscriptionUpdateUrlSelector = state => state.user.subscriptionUpdateUrl;
-export const currentSubscriptionPlanSelector = state => premiumPlans[state.user.subscriptionPlanId];
+export const currentSubscriptionPlanSelector = state =>
+  getPricingPlans(userCreatedAtSelector(state))[state.user.subscriptionPlanId];
 
+export const userCreatedAtSelector = state => state.user.createdAt;
 export const daysOfTrialLeftSelector = state => {
   if (currentSubscriptionPlanSelector(state) || !state.user.subscriptionTrialEndTimestamp) {
     return 0;
@@ -128,4 +98,3 @@ export const canConnectAnotherDeviceSelector = state => {
   const currentPlan = currentSubscriptionPlanSelector(state);
   return currentPlan && currentPlan.maxDevices > state.devices.data.length;
 };
-

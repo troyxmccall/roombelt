@@ -52,8 +52,6 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
   const calendarEvents = calendarId && await calendarProvider.getEvents(calendarId, { showTentativeMeetings });
 
   const events = calendarId && calendarEvents
-    .filter(event => event.isAllDayEvent || getTimestamp(event.end) > Date.now())
-    .slice(0, 10)
     .map(event => !event.isPrivate ? event : {
       ...event,
       summary: null,
@@ -73,34 +71,55 @@ async function getCalendarInfo(calendarId, calendarProvider, showTentativeMeetin
   };
 }
 
-async function getUserCalendars(req) {
-  const devices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
-  const calendarIds = devices
-    .map(device => device.deviceType === "calendar" && device.calendarId)
-    .filter(calendarId => calendarId);
+async function getAllCalendars(req) {
+  const device = req.context.device;
 
-  const uniqueCalendarIds = [...new Set(calendarIds)];
-  const calendars = await Promise.all(uniqueCalendarIds.map(
+  if (!device.calendarId) {
+    return [];
+  }
+
+  const includeUserCalendarsForFindRoom = device.deviceType === "calendar" && req.query["all-calendars"] === "true";
+  const includeUserCalendarsForDashboard = device.deviceType === "dashboard" && device.calendarId.split(";").includes("all-connected-devices");
+  const additionalCalendarIdsForDashboard = device.deviceType === "dashboard" && device.calendarId.split(";").filter(x => x !== "all-connected-devices");
+
+  const calendarIds = additionalCalendarIdsForDashboard || [];
+
+  const userDevices = await req.context.storage.devices.getDevicesForUser(req.context.device.userId);
+
+  if (includeUserCalendarsForDashboard || includeUserCalendarsForFindRoom) {
+    const userCalendarIds = userDevices
+      .map(device => device.deviceType === "calendar" && device.calendarId)
+      .filter(calendarId => calendarId);
+
+    calendarIds.push(...userCalendarIds);
+  }
+
+  const calendars = await Promise.all([...new Set(calendarIds)].map(
     calendarId => getCalendarInfo(calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings))
   );
 
-  return calendars.filter(calendar => calendar);
+  const userDevicesWithDisplayName = userDevices.filter(x => x.displayName).sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+  return calendars.filter(calendar => calendar).map(calendar => {
+    const device = userDevicesWithDisplayName.find(x => x.calendarId === calendar.id);
+    return { ...calendar, name: device ? device.displayName : calendar.name };
+  });
 }
 
 router.get("/device", async function(req, res) {
   const device = req.context.device;
 
-  const isDashboard = device.deviceType === "dashboard";
-  const isCalendarSelected = device.calendarId;
-  const getAllCalendars = isDashboard || (isCalendarSelected && req.query["all-calendars"] === "true");
-
-  const calendar = isCalendarSelected ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
-  const allCalendars = getAllCalendars ? await getUserCalendars(req) : null;
+  const calendar = (device.deviceType === "calendar" && device.calendarId) ? await getCalendarInfo(device.calendarId, req.context.calendarProvider, req.context.device.showTentativeMeetings) : null;
   const isReadOnlyDevice = device.isReadOnlyDevice || (calendar && !calendar.canModifyEvents);
+
+  if (calendar && device && device.displayName) {
+    calendar.name = device.displayName;
+  }
 
   res.json({
     deviceType: device.deviceType,
     language: process.env["REFRESH_LANG"] || device.language,
+    displayName: device.displayName,
     clockType: device.clockType,
     connectionCode: device.connectionCode,
     minutesForCheckIn: isReadOnlyDevice ? 0 : device.minutesForCheckIn,
@@ -108,7 +127,7 @@ router.get("/device", async function(req, res) {
     showAvailableRooms: device.showAvailableRooms,
     isReadOnlyDevice,
     calendar,
-    allCalendars
+    allCalendars: await getAllCalendars(req)
   });
 
   await req.context.storage.devices.heartbeatDevice(req.context.session.deviceId);

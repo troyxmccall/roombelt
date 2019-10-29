@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 
@@ -14,8 +14,37 @@ const FormField = styled.div`
 
 const FormFieldLabel = styled.label`
   margin-bottom: 5px;
-  display: block;
   color: #333;
+  display: block;
+`;
+
+const ViewWrapper = styled.div`
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+
+  > :first-child {
+    width: 180px;
+    margin-right: 20px;
+  }
+
+  > :last-child {
+    flex: 1 1 0;
+  }
+`;
+
+const NameAndLocationWrapper = styled.div`
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  
+  > :first-child {
+    margin-right: 20px;
+  }
+  
+  > * {
+      flex: 1 1 0;
+  }
 `;
 
 const LocaleWrapper = styled.div`
@@ -54,12 +83,7 @@ const InlineCheckbox = styled(Checkbox)`
   margin-top: 10px;
 `;
 
-const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType, onChangeShowTentativeMeetings, onChangeReadOnlyDevice, onChangeRecurringMeetingsCheckInTolerance }) => {
-  const select = useRef();
-  useEffect(() => {
-    if (isVisible) select.current.focus();
-  }, [isVisible]);
-
+const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calendars, onCancel, onSubmit, onChangeType, onChangeCalendar, onChangeDisplayName, onChangeLocation, onChangeLanguage, onChangeMinutesForCheckIn, onChangeMinutesForStartEarly, onChangeShowAvailableRooms, onChangeClockType, onChangeShowTentativeMeetings, onChangeReadOnlyDevice, onChangeRecurringMeetingsCheckInTolerance }) => {
   const footer = (
     <>
       <div style={{ flexGrow: 1 }}/>
@@ -70,24 +94,7 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
     </>
   );
 
-  const viewOptions = [
-    { label: "Dashboard", deviceType: "dashboard", calendarId: null, isDisabled: false },
-    {
-      label: "Calendars",
-      options: Object.values(calendars).map(calendar => ({
-        label: calendar.summary,
-        isReadOnly: !calendar.canModifyEvents,
-        deviceType: "calendar",
-        calendarId: calendar.id
-      }))
-    }
-  ];
-
-  const onOptionSelected = option => {
-    onChangeCalendar(option && option.calendarId);
-    onChangeType(option && option.deviceType);
-  };
-
+  const deviceTypes = [{ label: "Single calendar", value: "calendar" }, { label: "Dashboard", value: "dashboard" }];
   const currentCalendar = device && calendars && calendars[device.calendarId];
   const isReadOnly = (device && device.isReadOnlyDevice) || (currentCalendar && !currentCalendar.canModifyEvents);
 
@@ -100,16 +107,26 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
     >
       <FormField>
         <FormFieldLabel>View</FormFieldLabel>
-        <CalendarSelector
-          instanceId="edit-device-choose-calendar"
-          value={device}
-          onChange={onOptionSelected}
-          options={viewOptions}
-          ref={select}
-        />
+        <ViewWrapper>
+          <Select
+            instanceId="edit-device-choose-device-type"
+            value={device && device.deviceType}
+            onChange={option => option && onChangeType(option.value)}
+            options={deviceTypes}
+            autofocus={isVisible}
+            styles={{ container: base => ({ ...base, maxWidth: 180 }) }}
+          />
+          <CalendarSelector
+            instanceId="edit-device-choose-calendar"
+            isMulti={device && device.deviceType === "dashboard"}
+            value={device && device.calendarId}
+            onChange={onChangeCalendar}
+            options={calendars}
+          />
+        </ViewWrapper>
         {isGoogleAccount && (
           <Button link href="https://go.roombelt.com/scMpEB" target="_blank"
-                  style={{ fontSize: 12, margin: "5px 0 0 0", padding: "5px 3px" }}>
+                  style={{ fontSize: 12, margin: "5px 0 0 0", padding: "5px 3px", textAlign: "right" }}>
             Why is my calendar read-only or absent?
           </Button>
         )}
@@ -140,16 +157,22 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
           )}
         </div>
       </FormField>
-      {device && device.deviceType === "dashboard" && <FormField>
-        <FormFieldLabel>
-          Location (optional)
-          <InlineHelp>Name of the device shown in the administration panel.</InlineHelp>
-        </FormFieldLabel>
-        <Input style={{ fontSize: 16, fontFamily: "inherit" }}
-               value={device && device.location}
-               onChange={event => onChangeLocation(event.target.value)}
-               placeholder="e.g. reception"/>
-      </FormField>}
+      <FormField>
+        <NameAndLocationWrapper>
+          <FormFieldLabel>Display name </FormFieldLabel>
+          <FormFieldLabel>Location</FormFieldLabel>
+        </NameAndLocationWrapper>
+        <NameAndLocationWrapper>
+          <Input style={{ fontSize: 16, fontFamily: "inherit" }}
+                 value={(device && device.displayName) || ""}
+                 onChange={event => onChangeDisplayName(event.target.value)}
+                 placeholder={(device && device.deviceType === "dashboard" ? "Conference rooms" : (currentCalendar && currentCalendar.summary)) || "Conference room"}/>
+          <Input style={{ fontSize: 16, fontFamily: "inherit" }}
+                 value={(device && device.location) || ""}
+                 onChange={event => onChangeLocation(event.target.value)}
+                 placeholder="e.g. Main entrance"/>
+        </NameAndLocationWrapper>
+      </FormField>
       <FormField>
         <FormFieldLabel>Locale</FormFieldLabel>
         <LocaleWrapper>
@@ -213,7 +236,7 @@ const EditDeviceModal = ({ isVisible, isSaving, isGoogleAccount, device, calenda
           options={[
             { label: "Don't remove recurring meetings automatically", value: 0 },
             { label: "Remove recurring meetings if nobody checks-in 2 times in a row", value: 2 },
-            { label: "Remove recurring meetings if nobody checks-in 3 times in a row", value: 3 },
+            { label: "Remove recurring meetings if nobody checks-in 3 times in a row", value: 3 }
           ]}
           onChange={option => onChangeRecurringMeetingsCheckInTolerance(option.value)}
         />}
@@ -235,6 +258,7 @@ const mapDispatchToProps = dispatch => ({
   onCancel: () => dispatch(editDeviceDialogActions.hide()),
   onChangeType: deviceType => dispatch(editDeviceDialogActions.setDeviceType(deviceType)),
   onChangeCalendar: calendarId => dispatch(editDeviceDialogActions.setCalendarId(calendarId)),
+  onChangeDisplayName: displayName => dispatch(editDeviceDialogActions.setDisplayName(displayName)),
   onChangeLocation: location => dispatch(editDeviceDialogActions.setLocation(location)),
   onChangeLanguage: language => dispatch(editDeviceDialogActions.setLanguage(language)),
   onChangeClockType: clockType => dispatch(editDeviceDialogActions.setClockType(clockType)),

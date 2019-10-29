@@ -45,9 +45,12 @@ const RowCard = styled.div`
 
 const Content = styled.div`
  font-size: 0.8rem; 
- margin-top: 0.5rem;
  line-height: 1.2rem;
  overflow: hidden;
+ 
+ button {
+  margin-top: 0.5rem;
+ }
 `;
 
 const getAvailability = (isAllDayMeeting, timeToStart, minutesAvailable) => {
@@ -143,12 +146,12 @@ const mapStateToProps = (state, { calendarId }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   createMeeting: (calendarId, minutes, source) => {
-    dispatch(deviceActions.$allCalendarsViewActivity());
+    dispatch(deviceActions.markDeviceViewActivity());
     dispatch(meetingActions.createMeetingInAnotherRoom(calendarId, minutes));
     dispatch(meetingActions.$setActionSource(source));
   },
   acknowledgeMeetingCreated: () => {
-    dispatch(deviceActions.$allCalendarsViewActivity());
+    dispatch(deviceActions.markDeviceViewActivity());
     dispatch(meetingActions.endAction());
   }
 });

@@ -3,8 +3,13 @@ import styled, { keyframes } from "styled-components/macro";
 import { connect } from "react-redux";
 import IoAndroidExpand from "react-icons/lib/io/android-expand";
 import IoAndroidContract from "react-icons/lib/io/android-contract";
+import IoAndroidMdMenu from "react-icons/lib/io/android-menu";
 import { deviceActions } from "apps/device/store/actions";
-import { isCalendarSelectedSelector, isDashboardDeviceSelector } from "apps/device/store/selectors";
+import {
+  isCalendarSelectedSelector,
+  isDashboardDeviceSelector,
+  isTwoColumnLayoutSelector
+} from "apps/device/store/selectors";
 
 const autoHide = keyframes`
   from { visibility: visible }
@@ -24,7 +29,7 @@ const Wrapper = styled.div`
   display: flex;
   user-select: none;
   
-  animation: ${autoHide} 30s forwards;
+  animation: ${autoHide} 60s forwards;
 `;
 
 const Button = styled.button`
@@ -53,11 +58,14 @@ const DisplayOptionsBar = props => {
 
   return (
     <Wrapper>
-      <Button tabindex={0} onClick={props.decreaseFontSize}>-</Button>
-      {props.isFullScreenSupported && <Button tabindex={0} onClick={props.requestFullScreen}>
+      <Button tabIndex={0} onClick={props.decreaseFontSize}>-</Button>
+      {props.isFullScreenSupported && <Button tabIndex={0} onClick={props.requestFullScreen}>
         {props.isFullScreen ? <IoAndroidContract/> : <IoAndroidExpand/>}
       </Button>}
-      <Button tabindex={0} onClick={props.increaseFontSize}>+</Button>
+      {props.isDashboardDevice && <Button tabIndex={0} onClick={props.toggleTwoColumnLayout}>
+        <IoAndroidMdMenu />
+      </Button>}
+      <Button tabIndex={0} onClick={props.increaseFontSize}>+</Button>
     </Wrapper>
   );
 };
@@ -66,13 +74,15 @@ const mapStateToProps = state => ({
   isDashboardDevice: isDashboardDeviceSelector(state),
   isCalendarSelected: isCalendarSelectedSelector(state),
   isFullScreenSupported: state.displayOptions.isSupported,
-  isFullScreen: state.displayOptions.isFullScreen
+  isFullScreen: state.displayOptions.isFullScreen,
+  isTwoColumnsLayout: isTwoColumnLayoutSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({
   requestFullScreen: () => dispatch(deviceActions.toggleFullScreen()),
   increaseFontSize: () => dispatch(deviceActions.changeFontSize(0.05)),
-  decreaseFontSize: () => dispatch(deviceActions.changeFontSize(-0.05))
+  decreaseFontSize: () => dispatch(deviceActions.changeFontSize(-0.05)),
+  toggleTwoColumnLayout: () => dispatch(deviceActions.toggleTwoColumnLayout())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DisplayOptionsBar);

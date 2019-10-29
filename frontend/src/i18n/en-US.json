@@ -35,6 +35,7 @@
     "start-early": "Start early",
     "cancel-meeting": "Cancel meeting",
     "find-room": "Find room",
+    "calendar-view": "Calendar",
     "check-in-warning": "This meeting will be cancelled automatically in {{ count }} min."
   },
   "full-screen": "Full screen",

@@ -1,5 +1,5 @@
 import { createSelector } from "reselect";
-import { timeDifferenceInMinutes } from "../../../services/formatting";
+import { timeDifferenceInMinutes } from "services/formatting";
 
 export const isSubscriptionCancelledSelector = state => state.appState.isSubscriptionCancelled;
 export const isDeviceRemovedSelector = state => state.appState.isRemoved;
@@ -7,8 +7,9 @@ export const isInitializedSelector = state => state.appState.isInitialized;
 export const timestampSelector = state => state.timestamp;
 export const deviceSelector = state => state.device;
 export const isInOfflineModeSelector = state => state.appState.isOffline;
-export const showAllCalendarsViewSelector = state => state.appState.showAllCalendarsView;
-export const lastActivityOnShowCalendarsViewSelector = state => state.appState.lastActivityOnShowCalendarsView;
+export const showAllCalendarsViewSelector = state => state.appState.currentDeviceView === "all-calendars";
+export const showTodayScheduleViewSelector = state => state.appState.currentDeviceView === "today-schedule";
+export const lastActivityOnDeviceViewSelector = state => state.appState.lastActivityOnShowCalendarsView;
 export const connectionCodeSelector = state => state.device && state.device.connectionCode;
 export const currentActionSelector = state => state.currentMeetingActions.currentAction;
 export const currentActionSourceSelector = state => state.currentMeetingActions.source;
@@ -17,6 +18,7 @@ export const actionErrorStatusCodeSelector = state => state.currentMeetingAction
 export const isActionSuccessSelector = state => state.currentMeetingActions.isSuccess;
 export const isRetryingActionSelector = state => state.currentMeetingActions.isRetrying;
 export const fontSizeSelector = state => state.displayOptions.fontSize;
+export const isTwoColumnLayoutSelector = state => state.displayOptions.isTwoColumnLayout;
 
 export const calendarSelector = (state, props) => {
   if (!props || !props.calendarId) {
@@ -33,8 +35,9 @@ export const isAmPmClockSelector = createSelector(deviceSelector, device => devi
 export const showAvailableRoomsSelector = createSelector(deviceSelector, device => device && device.showAvailableRooms);
 export const isReadOnlyDeviceSelector = createSelector(deviceSelector, device => device && device.isReadOnlyDevice);
 
+export const displayNameSelector = createSelector(deviceSelector, device => device && device.displayName);
 export const allCalendarsSelector = createSelector(deviceSelector, device => (device && device.allCalendars) || []);
-export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && !!device.allCalendars);
+export const areAllCalendarsLoadedSelector = createSelector(deviceSelector, device => device && device.allCalendars && device.allCalendars.length);
 
 export const requireCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn > 0);
 export const minutesForCheckInSelector = createSelector(deviceSelector, device => device && device.minutesForCheckIn);

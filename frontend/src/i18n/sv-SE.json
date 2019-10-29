@@ -35,6 +35,7 @@
     "start-early": "Börja tidigare",
     "cancel-meeting": "Avbryta mötet",
     "find-room": "Hitta rum",
+    "calendar-view": "Kalender",
     "check-in-warning": "Det här mötet avbryts automatiskt om {{ count }} min."
   },
   "full-screen": "Fullskärm",
@@ -49,7 +50,7 @@
     "device-disconnected-message": "Den här enheten har kopplats bort i administratörspanelen. Vill du ansluta den igen?"
   },
   "dashboard": {
-    "page-title": "Konferans rum",
+    "page-title": "Konferensrum",
     "no-meetings": "Inga möten idag",
     "calendar": "Rum",
     "meeting": "Möte",
